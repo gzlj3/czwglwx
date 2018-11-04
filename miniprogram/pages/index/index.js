@@ -11,10 +11,10 @@ Page({
   },
 
   onLoad: function() {
-    wx.redirectTo({
-      url: '../fygl/fyglmain',
-    })
-    return;
+    // wx.redirectTo({
+    //   url: '../fygl/fyglmain',
+    // })
+    // return;
 
     if (!wx.cloud) {
       wx.redirectTo({
