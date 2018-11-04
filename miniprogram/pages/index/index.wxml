@@ -39,5 +39,11 @@
       <text>快速新建云函数</text>
     </navigator>
   </view>
+  <!-- 房源管理主界面 -->
+  <view class="uploader">
+    <navigator url="../fygl/fyglmain" open-type="navigate" class="uploader-text">
+      <text>我是房东</text>
+    </navigator>
+  </view>
 
 </view>

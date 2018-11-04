@@ -11,6 +11,11 @@ Page({
   },
 
   onLoad: function() {
+    wx.redirectTo({
+      url: '../fygl/fyglmain',
+    })
+    return;
+
     if (!wx.cloud) {
       wx.redirectTo({
         url: '../chooseLib/chooseLib',

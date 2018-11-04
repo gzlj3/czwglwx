@@ -1,0 +1,3 @@
+<!--miniprogram/pages/fyglmain.wxml-->
+
+<button type="primary" size="mini" bindtap="onAddfy">添加房源</button>

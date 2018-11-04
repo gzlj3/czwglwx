@@ -1,0 +1,10 @@
+<template name="FmFyxx">
+  <view class="section">
+    <view class="section__title">房屋名称</view>
+    <input name="fwmc" placeholder="" />
+  </view>
+  <view class="section">
+    <view class="section__title">租房姓名</view>
+    <input name="zhxm" placeholder="" />
+  </view>
+</template>
