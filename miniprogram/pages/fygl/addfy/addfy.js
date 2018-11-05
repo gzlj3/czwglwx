@@ -1,4 +1,6 @@
 // miniprogram/pages/fygl/addfy/addfy.js
+import * as CONSTS from '../../../utils/constants.js';
+import * as fyglService from '../../../services/fygl.js'; 
 Page({
 
   /**
@@ -10,26 +12,30 @@ Page({
 
   formSubmit: function(e){
     console.log('form发生了submit事件，携带数据为：', e.detail.value)
-    wx.cloud.callFunction({
-      name: 'fygl',
-      data: e.detail.value,
-      success: res => {
-        wx.showToast({
-          title: '调用成功',
-        })
-        console.log(res.result);
-        // this.setData({
-        //   result: JSON.stringify(res.result)
-        // })
-      },
-      fail: err => {
-        wx.showToast({
-          icon: 'none',
-          title: '调用失败',
-        })
-        console.error('[云函数] [fygl] 调用失败：', err)
-      }
-    })
+    fyglService.addFy(e.detail.value);
+    // wx.cloud.callFunction({
+    //   name: 'fygl',
+    //   data: {
+    //     action: CONSTS.BUTTON_ADDFY,
+    //     data:e.detail.value,
+    //   },
+    //   success: res => {
+    //     wx.showToast({
+    //       title: '调用成功',
+    //     })
+    //     console.log(res.result);
+    //     // this.setData({
+    //     //   result: JSON.stringify(res.result)
+    //     // })
+    //   },
+    //   fail: err => {
+    //     wx.showToast({
+    //       icon: 'none',
+    //       title: '调用失败',
+    //     })
+    //     console.error('[云函数] [fygl] 调用失败：', err)
+    //   }
+    // })
 
 
   },
