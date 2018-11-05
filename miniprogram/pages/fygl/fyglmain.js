@@ -3,7 +3,7 @@ import * as fyglService from '../../services/fygl.js';
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
-  fyList: [], // 房源列表数据 
+  fyList: [], // 房源列表数据
   currentObject: {}, // 当前form操作对象
   sourceList: [], // 保存列表
   selectedRowKeys: [], // 列表选中行
@@ -33,6 +33,11 @@ Page({
    */
   onLoad: function (options) {
     const response = fyglService.queryFyglList(); 
+    response.then(res=>{
+      this.setData({ 
+        fyList:res.data,
+      });
+    });
     // yield handleAfterRemote(response, put, select);
  },
 

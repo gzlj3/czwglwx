@@ -3,16 +3,19 @@
 import * as CONSTS from '../utils/constants.js';
 
 export function queryFyglList(params) {
-  wx.cloud.callFunction({
+  const result = wx.cloud.callFunction({
     name: 'fygl',
     data: {
       action: CONSTS.BUTTON_QUERYFY,      
-    }
+    },
   }).then(res=>{
-    console.log(res.result);
-  }).catch(err=>{
-    console.log(err);
-  })
+    return res.result;
+  });
+  // .catch(err=>{
+  //   console.log(err);
+  //   result = null;
+  // })
+  return result;
 }
 export function addFy(params) {
   wx.cloud.callFunction({

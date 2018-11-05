@@ -7,7 +7,7 @@ exports.queryFyList = async (yzhid) => {
   const db = cloud.database();
   try{
     const result = db.collection('house').where({
-      yzhid:'{yzhid}'
+      yzhid
     }).get()
     .then(res => {
       return res.data
