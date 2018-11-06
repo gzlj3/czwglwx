@@ -1,52 +1,84 @@
 // miniprogram/pages/fygl/addfy/addfy.js
 import * as CONSTS from '../../../utils/constants.js';
 import * as fyglService from '../../../services/fygl.js'; 
+const initialState = {
+  status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
+  msg: '', // 远程处理返回信息
+  currentObject: {},
+  buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
+}
+
 Page({
 
   /**
    * 页面的初始数据
    */
-  data: {
+  data: initialState,
+  changeState: function(newState) {
+    this.setData({
+      ...this.data,
+      ...newState,
+    });
+  },
 
+  handleAfterRemote: function(response) {
+    if(!response) return;
+    response.then(res => {
+      const { status = CONSTS.REMOTE_SUCCESS, msg, data } = res.result;
+      const { buttonAction } = this.data;
+      const tsinfo = CONSTS.getButtonActionInfo(buttonAction);
+      this.changeState({status,msg});
+      
+      if (status === CONSTS.REMOTE_SUCCESS) {
+        if (tsinfo.length > 0) {
+          wx.showToast({
+            title: `${tsinfo}成功完成！${msg}`,
+          });
+        };
+      } else {
+        wx.showToast({
+          title: `${tsinfo}处理失败！${msg}`,
+          icon: 'none',
+        });
+      }
+    });
   },
 
   formSubmit: function(e){
     console.log('form发生了submit事件，携带数据为：', e.detail.value)
-    fyglService.addFy(e.detail.value);
-    // wx.cloud.callFunction({
-    //   name: 'fygl',
-    //   data: {
-    //     action: CONSTS.BUTTON_ADDFY,
-    //     data:e.detail.value,
-    //   },
-    //   success: res => {
-    //     wx.showToast({
-    //       title: '调用成功',
-    //     })
-    //     console.log(res.result);
-    //     // this.setData({
-    //     //   result: JSON.stringify(res.result)
-    //     // })
-    //   },
-    //   fail: err => {
-    //     wx.showToast({
-    //       icon: 'none',
-    //       title: '调用失败',
-    //     })
-    //     console.error('[云函数] [fygl] 调用失败：', err)
-    //   }
-    // })
-
-
+    const response = fyglService.addFy(e.detail.value);
+    this.handleAfterRemote(response);
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    console.log(options);
+    const currentObject = options.item?JSON.parse(options.item):{};
+    const buttonAction = options.buttonAction;
+    console.log(currentObject);
+    this.setData({
+      buttonAction,
+      currentObject
+    })
   },
-
+  onInputBlur: function(e) {
+    // console.log(e);
+    // console.log(e.target);
+    this.data.currentObject[e.target.id] = e.detail.value;
+    this.setData({
+      currentObject: this.data.currentObject
+    })
+  },
+  // bindSzrqChange: function(e){
+  //   this.setData({
+  //     currentObject:{
+  //       ...this.data.currentObject,
+  //       szrq: e.detail.value
+  //     }
+  //   })
+  // },
   /**
    * 生命周期函数--监听页面初次渲染完成
    */

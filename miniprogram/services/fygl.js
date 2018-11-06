@@ -18,18 +18,15 @@ export function queryFyglList(params) {
   return result;
 }
 export function addFy(params) {
-  wx.cloud.callFunction({
+  return wx.cloud.callFunction({
     name: 'fygl',
     data: {
       action: CONSTS.BUTTON_ADDFY,
       data: params,
     },
-  }).then(res => {
-    console.log(res.result);
-  }).catch(err => {
-    console.log(err);
-  })
+  });
 }
+
 
 // export async function querySdbList(params) {
 //   return request(`/fygl/sdb_list?${stringify(params)}`);

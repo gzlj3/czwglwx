@@ -1,7 +1,32 @@
-<!--miniprogram/pages/fyglmain.wxml-->
-
-<button type="primary" size="mini" bindtap="onAddfy">添加房源</button>
-
-<view wx:key="_id" wx:for="{{fyList}}">
-  {{index}}: {{item.fwmc}}: {{item.zhxm}}
+<view class="page">
+    <view class="page__hd">
+        <button type="primary" size="mini" bindtap="onAddfy">添加房源</button>
+    </view>
+    <view class="page__bd">
+        <view class="weui-panel weui-panel_access" wx:key="_id" wx:for="{{fyList}}">
+            <view class="weui-panel__bd">
+                <navigator url="" data-item="{{item}}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active" bindtap="onNavigator">
+                    <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                        <image class="weui-media-box__thumb" src="{{item.avatarUrl}}" />
+                    </view>
+                    <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                        <view class="weui-media-box__title">{{item.fwmc}}{{item.zhxm}}</view>
+                        <view class="weui-media-box__desc">收租日期:2018-11-06</view>
+                    </view>
+                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                </navigator>
+            </view>
+            <view class="weui-panel__ft">
+            
+                <view class="weui-cell weui-cell_access weui-cell_link">
+                    <!-- <view class="weui-cell__bd">编辑</view> -->
+                    <view class="weui-cell__bd">帐单详情</view>
+                    <!-- <view class="weui-cell__ft weui-cell__ft_in-access"></view> -->
+                </view>
+            </view>
+        </view>
+    </view>
+    <view class="weui-footer">
+        <view class="weui-footer__text">极简出租，Copyright © 2018 by liujun</view>
+    </view>
 </view>

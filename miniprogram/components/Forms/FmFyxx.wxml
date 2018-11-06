@@ -1,10 +1,59 @@
+<!--
+  当前房屋对象：currentObject
+-->
 <template name="FmFyxx">
-  <view class="section">
-    <view class="section__title">房屋名称</view>
-    <input name="fwmc" placeholder="" />
-  </view>
-  <view class="section">
-    <view class="section__title">租房姓名</view>
-    <input name="zhxm" placeholder="" />
-  </view>
+        <view class="weui-cells weui-cells_after-title">
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">房屋名称</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input id="fwmc" name="fwmc" data-require="{{true}}" value="{{currentObject.fwmc}}" bindblur="onInputBlur" class="weui-input" placeholder="请输入房屋名称"/>
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input weui-cell_vcode">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">租户姓名</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input id="zhxm" name="zhxm" bindblur="onInputBlur" class="weui-input" value="{{currentObject.zhxm}}" placeholder="请输入租户姓名" />
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input weui-cell_vcode">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">身份证号</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input id="sfzh" name="sfzh" bindblur="onInputBlur" type="idcard"  class="weui-input" value="{{currentObject.sfzh}}" placeholder="请输入身份证号" />
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input weui-cell_vcode">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">电话号码</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input id="dhhm" name="dhhm" bindblur="onInputBlur" type="number"  class="weui-input" value="{{currentObject.dhhm}}" placeholder="请输入电话号码" />
+                </view>
+            </view>
+            <view class="weui-cell weui-cell_input weui-cell_vcode">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">出租金额</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input id="czje" name="czje" bindblur="onInputBlur" type="number"  class="weui-input" value="{{currentObject.czje}}" placeholder="请输入出租金额" />
+                </view>
+            </view>
+            
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">收租日期</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <picker mode="date" id="szrq" name="szrq" value="{{currentObject.szrq}}" bindchange="onInputBlur">
+                        <view class="weui-input">{{currentObject.szrq}}</view>
+                    </picker>
+                </view>
+            </view>
+          </view>
+  
 </template>

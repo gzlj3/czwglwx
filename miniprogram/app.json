@@ -2,20 +2,32 @@
   "pages": [
     "pages/index/index",
     "pages/fygl/fyglmain",
+    "pages/fygl/addfy/addfy",
     "pages/userConsole/userConsole",
     "pages/storageConsole/storageConsole",
     "pages/databaseGuide/databaseGuide",
     "pages/addFunction/addFunction",
     "pages/deployFunctions/deployFunctions",
-    "pages/chooseLib/chooseLib",
-    "pages/fyglmain",
-    "pages/fygl/addfy/addfy"
+    "pages/chooseLib/chooseLib"
   ],
-  "window": {
-    "backgroundColor": "#001529",
-    "backgroundTextStyle": "white",
-    "navigationBarBackgroundColor": "#001529",
+  "window_old": {
+    "backgroundColor": "#f6f6f6",
+    "backgroundTextStyle": "black",
+    "navigationBarBackgroundColor": "#f6f6f6",
     "navigationBarTitleText": "极简出租",
-    "navigationBarTextStyle": "white"
-  }
+    "navigationBarTextStyle": "black"
+  },
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "极简出租",
+    "navigationBarBackgroundColor": "#f8f8f8",
+    "backgroundColor": "#f8f8f8"
+  },
+  "networkTimeout": {
+    "request": 10000,
+    "connectSocket": 10000,
+    "uploadFile": 10000,
+    "downloadFile": 10000
+  },
+  "debug": true  
 }

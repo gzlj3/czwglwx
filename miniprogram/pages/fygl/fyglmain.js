@@ -24,20 +24,55 @@ Page({
 
   onAddfy(){
     wx.navigateTo({
-      url: 'addfy/addfy',
+      url: 'addfy/addfy?buttonAction='+CONSTS.BUTTON_ADDFY,
     }) 
   }, 
+
+  onNavigator(e){
+    console.log(e);
+    const {item} = e.currentTarget.dataset;
+    const s = JSON.stringify(item);
+    console.log(s);
+    console.log('addfy/addfy?buttonAction=' + CONSTS.BUTTON_EDITFY + '&item=' + s);
+    wx.navigateTo({
+      url: 'addfy/addfy?buttonAction='+CONSTS.BUTTON_EDITFY+'&item='+s,
+    }) 
+  },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    const response = fyglService.queryFyglList(); 
-    response.then(res=>{
-      this.setData({ 
-        fyList:res.data,
-      });
+    this.setData({
+      fyList: [
+        {
+          _id: '1',
+          fwmc:'101',
+          zhxm:'张三',
+          szrq:'2018-11-01',
+          avatarUrl:'../../images/avatar-empty.png',
+        },
+        {
+          _id: '2',
+          fwmc: '102',
+          zhxm: '李四',
+          avatarUrl: '../../images/avatar-empty.png',
+        },
+        {
+          _id: '3',
+          fwmc: '103',
+          zhxm: '王五',
+          avatarUrl: '../../images/avatar-empty.png',
+        },
+      ]
     });
+
+    // const response = fyglService.queryFyglList(); 
+    // response.then(res=>{
+    //   this.setData({ 
+    //     fyList:res.data,
+    //   });
+    // });
     // yield handleAfterRemote(response, put, select);
  },
 
