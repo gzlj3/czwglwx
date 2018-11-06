@@ -43,36 +43,36 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.setData({
-      fyList: [
-        {
-          _id: '1',
-          fwmc:'101',
-          zhxm:'张三',
-          szrq:'2018-11-01',
-          avatarUrl:'../../images/avatar-empty.png',
-        },
-        {
-          _id: '2',
-          fwmc: '102',
-          zhxm: '李四',
-          avatarUrl: '../../images/avatar-empty.png',
-        },
-        {
-          _id: '3',
-          fwmc: '103',
-          zhxm: '王五',
-          avatarUrl: '../../images/avatar-empty.png',
-        },
-      ]
-    });
-
-    // const response = fyglService.queryFyglList(); 
-    // response.then(res=>{
-    //   this.setData({ 
-    //     fyList:res.data,
-    //   });
+    // this.setData({
+    //   fyList: [
+    //     {
+    //       _id: '1',
+    //       fwmc:'101',
+    //       zhxm:'张三',
+    //       szrq:'2018-11-01',
+    //       avatarUrl:'../../images/avatar-empty.png',
+    //     },
+    //     {
+    //       _id: '2',
+    //       fwmc: '102',
+    //       zhxm: '李四',
+    //       avatarUrl: '../../images/avatar-empty.png',
+    //     },
+    //     {
+    //       _id: '3',
+    //       fwmc: '103',
+    //       zhxm: '王五',
+    //       avatarUrl: '../../images/avatar-empty.png',
+    //     },
+    //   ]
     // });
+  
+    const response = fyglService.queryFyglList(); 
+    response.then(res=>{
+      this.setData({ 
+        fyList:res.result.data,
+      });
+    });
     // yield handleAfterRemote(response, put, select);
  },
 

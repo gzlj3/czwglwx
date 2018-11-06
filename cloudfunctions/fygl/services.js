@@ -34,3 +34,20 @@ exports.addFy = async (house) => {
     throw ex;
   }
 }
+
+exports.updateFy = async (house) => {
+  //添加房源
+  const db = cloud.database();
+  // try {
+    const result = db.collection('house').doc(house._id).update({
+      data: house
+    });
+    // .then(res => {
+    //   return res
+    // })
+    return result;
+  // } catch (ex) {
+  //   console.log(ex);
+  //   throw ex;
+  // }
+}

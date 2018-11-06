@@ -8,20 +8,21 @@ export function queryFyglList(params) {
     data: {
       action: CONSTS.BUTTON_QUERYFY,      
     },
-  }).then(res=>{
-    return res.result;
   });
+  // .then(res=>{
+  //   return res.result;
+  // });
   // .catch(err=>{
   //   console.log(err);
   //   result = null;
   // })
   return result;
 }
-export function addFy(params) {
+export function saveFy(action,params) {
   return wx.cloud.callFunction({
     name: 'fygl',
     data: {
-      action: CONSTS.BUTTON_ADDFY,
+      action,
       data: params,
     },
   });

@@ -1,6 +1,6 @@
 <import src="../../../components/Forms/FmFyxx.wxml"/>
 <form bindsubmit="formSubmit">
-  <view class="weui-toptips weui-toptips_warn" wx:if="{{status!=0}}">{{msg}}</view>
+  <!-- <view class="weui-toptips weui-toptips_warn" wx:if="{{status!=0}}">{{msg}}</view> -->
   <template is="FmFyxx" data="{{currentObject}}"/>
   <button form-type="submit">保存</button>
 </form>

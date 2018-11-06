@@ -23,10 +23,11 @@ Page({
 
   handleAfterRemote: function(response) {
     if(!response) return;
+    const { buttonAction } = this.data;
+    const tsinfo = CONSTS.getButtonActionInfo(buttonAction);
     response.then(res => {
+      console.log(res);
       const { status = CONSTS.REMOTE_SUCCESS, msg, data } = res.result;
-      const { buttonAction } = this.data;
-      const tsinfo = CONSTS.getButtonActionInfo(buttonAction);
       this.changeState({status,msg});
       
       if (status === CONSTS.REMOTE_SUCCESS) {
@@ -39,14 +40,22 @@ Page({
         wx.showToast({
           title: `${tsinfo}处理失败！${msg}`,
           icon: 'none',
+          duration: 5000,
         });
       }
-    });
+    }).catch(err=>{
+      console.log(err);
+      wx.showToast({
+        title: `${tsinfo}处理失败！${err.errMsg}`,
+        icon: 'none',
+        duration: 5000,
+      });
+    })
   },
 
   formSubmit: function(e){
     console.log('form发生了submit事件，携带数据为：', e.detail.value)
-    const response = fyglService.addFy(e.detail.value);
+    const response = fyglService.saveFy(this.data.buttonAction,e.detail.value);
     this.handleAfterRemote(response);
   },
 
@@ -54,10 +63,11 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    console.log(options);
     const currentObject = options.item?JSON.parse(options.item):{};
-    const buttonAction = options.buttonAction;
-    console.log(currentObject);
+    let buttonAction = options.buttonAction;
+    if(buttonAction){
+      buttonAction = Number.parseInt(buttonAction);
+    }
     this.setData({
       buttonAction,
       currentObject

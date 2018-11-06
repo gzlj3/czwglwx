@@ -19,51 +19,32 @@ const userb = {
 exports.main = async (event, context) => {
   const {action,data} = event;
   if(!action) return results.getErrorResults('未确定动作！');
-  // console.log(action);
-  // console.log(CONSTS.BUTTON_QUERYFY);
-  // console.log(action === CONSTS.BUTTON_QUERYFY);
-  switch(action){
-    case CONSTS.BUTTON_QUERYFY:
-      console.log('queryfy');
-      try{
-        const result = await services.queryFyList(userb.yzhid);
-        return results.getSuccessResults(result);
-      }catch(e){
-        console.log(e);
-        return results.getErrorResults(e);
-      }
-      break;
-    case CONSTS.BUTTON_ADDFY:
-      console.log('addfy');
-      try {
-        data.yzhid = userb.yzhid;
-        const result = await services.addFy(data);
-        return results.getSuccessResults(result);
-      } catch (e) {
-        console.log(e);
-        return results.getErrorResults(e);
-      }
-      break;
+  console.log(action);
+  console.log(CONSTS.BUTTON_EDITFY);
+  console.log(action === CONSTS.BUTTON_EDITFY);
+  try {
+    switch(action){
+      case CONSTS.BUTTON_QUERYFY:
+        // console.log('queryfy');
+          const result1 = await services.queryFyList(userb.yzhid);
+          return results.getSuccessResults(result1);
+        break;
+      case CONSTS.BUTTON_ADDFY:
+        // console.log('addfy');
+          data.yzhid = userb.yzhid;
+          const result2 = await services.addFy(data);
+          return results.getSuccessResults(result2);
+        break;
+      case CONSTS.BUTTON_EDITFY:
+        console.log("editfy");
+        console.log(data);
+        const result3 = await services.updateFy(data);
+        return results.getSuccessResults(result3);
+        break;
+      default:
+        return results.getErrorResults('未确定动作！');
+    }
+  } catch (e) {
+    return results.getErrorResults(e.message);
   }
-  // if (!action) return {msg:'未输入动作'};
-
-  // console.log("insert start!");
-  // const db = cloud.database();
-  // console.log("insert start1!");
-  // const house = db.collection('house');
-  // return house.add({
-  //   data: event,
-  // });
-
-  // console.log(house);
-  // const result = await house.add({
-  //   data: event,
-  // })
-  // .then(res =>{
-  //   console.log("insert success."); 
-  //   console.log(res)
-  //   return res;
-  // })
-  // .catch(error=>console.log(error));
-  // return result;
 }
