@@ -19,9 +19,11 @@ const userb = {
 exports.main = async (event, context) => {
   const {action,data} = event;
   if(!action) return results.getErrorResults('未确定动作！');
-  console.log(action);
-  console.log(CONSTS.BUTTON_EDITFY);
-  console.log(action === CONSTS.BUTTON_EDITFY);
+  console.log("action:"+action);
+  // console.log(data);
+  // console.log(context);
+  // console.log(CONSTS.BUTTON_EDITFY);
+  // console.log(action === CONSTS.BUTTON_EDITFY);
   try {
     switch(action){
       case CONSTS.BUTTON_QUERYFY:
@@ -37,9 +39,15 @@ exports.main = async (event, context) => {
         break;
       case CONSTS.BUTTON_EDITFY:
         console.log("editfy");
-        console.log(data);
+        // console.log(data);
         const result3 = await services.updateFy(data);
         return results.getSuccessResults(result3);
+        break;
+      case CONSTS.BUTTON_CB:
+        console.log("cb");
+        // console.log(data);
+        const result = await services.updateSdb(data);
+        return results.getSuccessResults(result);
         break;
       default:
         return results.getErrorResults('未确定动作！');

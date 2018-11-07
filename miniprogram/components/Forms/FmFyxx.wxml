@@ -1,6 +1,4 @@
-<!--
-  当前房屋对象：currentObject
--->
+<!--当前房屋对象：currentObject-->
 <template name="FmFyxx">
         <input id="_id" name="_id"  value="{{currentObject._id}}"/>
         <view class="weui-cells weui-cells_after-title">

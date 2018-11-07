@@ -4,7 +4,8 @@ import * as fyglService from '../../../services/fygl.js';
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
-  currentObject: {},
+  sourceList: {},
+  // targetList: [], //列表编辑保存对象
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
 }
 
@@ -21,45 +22,12 @@ Page({
     });
   },
 
-  // handleAfterRemote: function(response) {
-  //   if(!response) return;
-  //   const { buttonAction } = this.data;
-  //   const tsinfo = CONSTS.getButtonActionInfo(buttonAction);
-  //   response.then(res => {
-  //     console.log(res);
-  //     const { status = CONSTS.REMOTE_SUCCESS, msg, data } = res.result;
-  //     this.changeState({status,msg});
-      
-  //     if (status === CONSTS.REMOTE_SUCCESS) {
-  //       if (tsinfo.length > 0) {
-  //         wx.showToast({
-  //           title: `${tsinfo}成功完成！${msg}`,
-  //         });
-  //       };
-  //       // 传递返回参数
-  //       getApp().setPageParams(buttonAction,data);
-  //       wx.navigateBack();
-  //     } else {
-  //       wx.showToast({
-  //         title: `${tsinfo}处理失败！${msg}`,
-  //         icon: 'none',
-  //         duration: 5000,
-  //       });
-  //     }
-  //   }).catch(err=>{
-  //     console.log(err);
-  //     wx.showToast({
-  //       title: `${tsinfo}处理失败！${err.errMsg}`,
-  //       icon: 'none',
-  //       duration: 5000,
-  //     });
-  //   })
-  // },
-
   formSubmit: function(e){
-    console.log('form发生了submit事件，携带数据为：', e.detail.value)
+    // console.log('form发生了submit事件，携带数据为：', e.detail.value)
+    console.log('form发生了submit事件，携带数据为：')
+    console.log(this.data.sourceList);
     const {buttonAction} = this.data;
-    const response = fyglService.saveFy(buttonAction,e.detail.value);
+    const response = fyglService.saveFy(buttonAction, this.data.sourceList);
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData)=>{
@@ -73,22 +41,37 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    const currentObject = options.item?JSON.parse(options.item):{};
+    // const currentObject = options.item?JSON.parse(options.item):{};
     let buttonAction = options.buttonAction;
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
     }
-    this.setData({
-      buttonAction,
-      currentObject
-    })
+
+    const response = fyglService.queryFyglList(); 
+    fyglService.handleAfterRemote(response, null,
+      (resultData) => { 
+        getApp().setPageParams(CONSTS.BUTTON_NONE, null);
+        // let targetList = new Array(resultData.length); 
+        // resultData.map((value,index)=>{
+        //   targetList[index] = {_id:value._id}
+        // });
+        this.setData({
+          buttonAction,
+          sourceList: resultData,
+          // targetList,
+        }); 
+      }
+    );
   },
   onInputBlur: function(e) {
     // console.log(e);
-    // console.log(e.target);
-    this.data.currentObject[e.target.id] = e.detail.value;
+    console.log(e.currentTarget);
+    const idarr = e.currentTarget.id.split('.');
+    const index =  Number.parseInt(idarr[0]);
+    const name = idarr[1];
+    this.data.sourceList[index][name] = e.detail.value;
     this.setData({
-      currentObject: this.data.currentObject
+      sourceList: this.data.sourceList
     })
   },
   // bindSzrqChange: function(e){

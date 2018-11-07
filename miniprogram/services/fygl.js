@@ -28,6 +28,43 @@ export function saveFy(action,params) {
   });
 }
 
+export function handleAfterRemote(response,tsinfo,successCallback) {
+  if (!response) return;
+  // const { buttonAction } = this.data;
+  // const tsinfo = CONSTS.getButtonActionInfo(buttonAction);
+  // console.log("tsinfo:"+tsinfo);
+  if(!tsinfo) tsinfo = "";
+  response.then(res => {
+    // console.log(res);
+    const { status = CONSTS.REMOTE_SUCCESS, msg, data } = res.result;
+    // this.changeState({ status, msg });
+
+    if (status === CONSTS.REMOTE_SUCCESS) {
+      if (tsinfo.length > 0) {
+        wx.showToast({
+          title: `${tsinfo}成功完成！${msg}`,
+        });
+      };
+      // 传递返回参数
+      // getApp().setPageParams(buttonAction, data);
+      // wx.navigateBack();
+      if (successCallback) successCallback(data);
+    } else {
+      wx.showToast({
+        title: `${tsinfo}处理失败！${msg}`,
+        icon: 'none',
+        duration: 5000,
+      });
+    }
+  }).catch(err => {
+    console.log(err);
+    wx.showToast({
+      title: `${tsinfo}处理失败！${err.errMsg}`,
+      icon: 'none',
+      duration: 5000,
+    });
+  })
+}
 
 // export async function querySdbList(params) {
 //   return request(`/fygl/sdb_list?${stringify(params)}`);

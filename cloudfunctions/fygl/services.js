@@ -39,7 +39,9 @@ exports.updateFy = async (house) => {
   //添加房源
   const db = cloud.database();
   // try {
-    const result = db.collection('house').doc(house._id).update({
+    const {_id} = house;
+    delete house._id;
+    const result = db.collection('house').doc(_id).update({
       data: house
     });
     // .then(res => {
@@ -50,4 +52,20 @@ exports.updateFy = async (house) => {
   //   console.log(ex);
   //   throw ex;
   // }
+}
+
+exports.updateSdb = async (houseList) => {
+  const db = cloud.database();
+  let tasks = [];
+  houseList.map((house)=>{
+    const { _id } = house;
+    const promise = db.collection('house').doc(_id).update({
+      data: {
+        dbcds: house.dbcds && house.dbcds !== '' ? house.dbcds : _.remove,
+        sbcds: house.sbcds && house.sbcds !== '' ? house.sbcds : _.remove,
+      }
+    });
+    tasks.push(promise);
+  });
+  return Promise.all(tasks);
 }

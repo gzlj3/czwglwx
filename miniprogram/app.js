@@ -10,6 +10,20 @@ App({
       })
     }
 
-    this.globalData = {}
+    this.globalData = {
+      buttonAction:0, // 页面之间传递参数的动作
+      currentObject: null, // 页面之间传递参数的对象
+    }
+  },
+
+  setGlobalData: function(newData){
+    this.globalData = {
+      ...this.globalData,
+      ...newData
+    }
+  },
+
+  setPageParams: function(buttonAction,currentObject){
+    this.setGlobalData({ buttonAction, currentObject});
   }
 })

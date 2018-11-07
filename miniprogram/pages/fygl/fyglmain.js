@@ -3,6 +3,7 @@ import * as fyglService from '../../services/fygl.js';
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
+  emptyAvatarUrl: '../../images/avatar-empty.png',
   fyList: [], // 房源列表数据
   currentObject: {}, // 当前form操作对象
   sourceList: [], // 保存列表
@@ -25,6 +26,12 @@ Page({
   onAddfy(){
     wx.navigateTo({
       url: 'addfy/addfy?buttonAction='+CONSTS.BUTTON_ADDFY,
+    }) 
+  }, 
+
+  onCb(){
+    wx.navigateTo({
+      url: 'editlist/editlist?buttonAction=' + CONSTS.BUTTON_CB,
     }) 
   }, 
 
@@ -68,14 +75,16 @@ Page({
     // });
   
     const response = fyglService.queryFyglList(); 
-    response.then(res=>{
-      this.setData({ 
-        fyList:res.result.data,
-      });
-    });
-    // yield handleAfterRemote(response, put, select);
+    fyglService.handleAfterRemote(response, null,
+      (resultData) => { 
+        getApp().setPageParams(CONSTS.BUTTON_NONE, null);
+        this.setData({
+          fyList: resultData,
+        }); 
+      }
+    );
+    
  },
-
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
@@ -87,7 +96,12 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    // 检查返回值，刷新数据
+    const {buttonAction,currentObject} = getApp().globalData;
+    console.log(buttonAction);
+    if ([CONSTS.BUTTON_ADDFY, CONSTS.BUTTON_EDITFY, CONSTS.BUTTON_CB].includes(buttonAction)){
+      this.onLoad();
+    }
   },
 
   /**
@@ -108,7 +122,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
+    this.onLoad();
   },
 
   /**

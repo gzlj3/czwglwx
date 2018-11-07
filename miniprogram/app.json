@@ -3,6 +3,7 @@
     "pages/index/index",
     "pages/fygl/fyglmain",
     "pages/fygl/addfy/addfy",
+    "pages/fygl/editlist/editlist",
     "pages/userConsole/userConsole",
     "pages/storageConsole/storageConsole",
     "pages/databaseGuide/databaseGuide",
@@ -21,7 +22,8 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "极简出租",
     "navigationBarBackgroundColor": "#f8f8f8",
-    "backgroundColor": "#f8f8f8"
+    "backgroundColor": "#f8f8f8",
+    "enablePullDownRefresh":true
   },
   "networkTimeout": {
     "request": 10000,
