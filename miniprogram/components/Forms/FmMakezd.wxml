@@ -1,0 +1,25 @@
+<!--当前房屋对象：sourceList-->
+<template name="FmMakezd">
+  <view class="page">
+    <view class="page__hd">
+        <view class="page__title">创建帐单</view>
+        <view class="page__desc">上月帐单已经结清，且已接近收租日期的房源在此创建下月新帐单</view>
+    </view>
+    <view class="page__bd">
+        <view class="weui-cells__title">待创建新帐单房源列表</view>
+        <view class="weui-cells weui-cells_after-title">
+            <checkbox-group bindchange="checkboxChange">
+                <label class="weui-cell weui-check__label" wx:for="{{sourceList}}" wx:key="_id">
+                    <checkbox class="weui-check" value="{{item._id}}" checked="{{item.checked}}"/>
+
+                    <view class="weui-cell__hd weui-check__hd_in-checkbox">
+                        <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!item.checked}}"></icon>
+                        <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{item.checked}}"></icon>
+                    </view>
+                    <view class="weui-cell__bd">{{item.fwmc}}</view>
+                </label>
+            </checkbox-group>
+        </view>
+    </view>
+  </view>
+</template>

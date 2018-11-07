@@ -29,10 +29,15 @@ Page({
     }) 
   }, 
 
-  onCb(){
+  onMakezd(){
+    wx.navigateTo({
+      url: 'editlist/editlist?buttonAction=' + CONSTS.BUTTON_MAKEZD,
+    }) 
+  }, 
+  onCb() {
     wx.navigateTo({
       url: 'editlist/editlist?buttonAction=' + CONSTS.BUTTON_CB,
-    }) 
+    })
   }, 
 
   onNavigator(e){

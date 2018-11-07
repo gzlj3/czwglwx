@@ -4,8 +4,12 @@ import * as fyglService from '../../../services/fygl.js';
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
-  sourceList: {},
-  // targetList: [], //列表编辑保存对象
+  sourceList: [],
+  CONSTS,
+  // checkboxItems: [
+  //   { name: 'standard is dealt for u.', value: '0', checked: true },
+  //   { name: 'standard is dealicient for u.', value: '1' }
+  // ],  
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
 }
 
@@ -47,7 +51,7 @@ Page({
       buttonAction = Number.parseInt(buttonAction);
     }
 
-    const response = fyglService.queryFyglList(); 
+    const response = fyglService.queryList(buttonAction);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
         getApp().setPageParams(CONSTS.BUTTON_NONE, null);
@@ -58,23 +62,44 @@ Page({
         this.setData({
           buttonAction,
           sourceList: resultData,
-          // targetList,
         }); 
       }
     );
   },
-  onInputBlur: function(e) {
-    // console.log(e);
-    console.log(e.currentTarget);
-    const idarr = e.currentTarget.id.split('.');
-    const index =  Number.parseInt(idarr[0]);
-    const name = idarr[1];
-    this.data.sourceList[index][name] = e.detail.value;
+
+  checkboxChange: function (e) {
+    console.log('checkbox发生change事件，携带value值为：', e.detail.value);
+
+    var sourceList = this.data.sourceList, values = e.detail.value;
+    for (var i = 0, lenI = sourceList.length; i < lenI; ++i) {
+      sourceList[i].checked = false;
+
+      for (var j = 0, lenJ = values.length; j < lenJ; ++j) {
+        if (sourceList[i]._id == values[j]) {
+          sourceList[i].checked = true;
+          break;
+        }
+      }
+    }
+
     this.setData({
-      sourceList: this.data.sourceList
-    })
+      sourceList
+    });
   },
-  // bindSzrqChange: function(e){
+  
+  // onInputBlur: function(e) {
+  //   // console.log(e);
+  //   console.log(e.currentTarget);
+  //   const idarr = e.currentTarget.id.split('.');
+  //   const index =  Number.parseInt(idarr[0]);
+  //   const name = idarr[1];
+  //   this.data.sourceList[index][name] = e.detail.value;
+  //   this.setData({
+  //     sourceList: this.data.sourceList
+  //   })
+  // },
+
+  // // bindSzrqChange: function(e){
   //   this.setData({
   //     currentObject:{
   //       ...this.data.currentObject,

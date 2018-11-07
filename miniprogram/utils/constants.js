@@ -18,6 +18,7 @@ export const BUTTON_DELETEFY = 4; // 删除房源
 export const BUTTON_CB = 5; // 抄表
 export const BUTTON_MAKEZD = 6; // 创建帐单
 export const BUTTON_LASTZD = 7; // 查看/处理最近帐单
+export const BUTTON_QUERYSDB = 8; // 查询水电表
 export const getButtonActionInfo = buttonAction => {
   try {
     return ['', '查询房源','添加房源', '编辑房源', '删除房源', '抄表', '创建帐单', '查看/处理帐单', '', ''][

@@ -2,6 +2,16 @@
 // import request from '@/utils/request';
 import * as CONSTS from '../utils/constants.js';
 
+export function queryList(buttonAction) {
+  const result = wx.cloud.callFunction({
+    name: 'fygl',
+    data: {
+      action: buttonAction,
+    },
+  });
+  return result;
+}
+
 export function queryFyglList(params) {
   const result = wx.cloud.callFunction({
     name: 'fygl',

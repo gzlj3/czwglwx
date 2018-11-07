@@ -2,6 +2,7 @@
     <view class="page__hd">
         <button  size="mini" bindtap="onAddfy">添加房源</button>
         <button  size="mini" bindtap="onCb">集中抄表</button>
+        <button  size="mini" bindtap="onMakezd">创建帐单</button>
     </view>
     <view class="page__bd">
         <view class="weui-panel weui-panel_access" wx:key="_id" wx:for="{{fyList}}">

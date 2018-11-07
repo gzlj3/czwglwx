@@ -39,15 +39,18 @@ exports.main = async (event, context) => {
         break;
       case CONSTS.BUTTON_EDITFY:
         console.log("editfy");
-        // console.log(data);
         const result3 = await services.updateFy(data);
         return results.getSuccessResults(result3);
         break;
       case CONSTS.BUTTON_CB:
         console.log("cb");
-        // console.log(data);
-        const result = await services.updateSdb(data);
-        return results.getSuccessResults(result);
+        const result5 = await services.updateSdb(data);
+        return results.getSuccessResults(result5);
+        break;
+      case CONSTS.BUTTON_QUERYSDB:
+        console.log("querysdb");
+        const result6 = await services.querySdb(userb.yzhid);
+        return results.getSuccessResults(result6);
         break;
       default:
         return results.getErrorResults('未确定动作！');
