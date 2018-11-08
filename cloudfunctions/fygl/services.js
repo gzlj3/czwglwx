@@ -88,18 +88,31 @@ exports.updateSdb = async (houseList) => {
 
 exports.updateZdList = async (zdList) => {
   const db = cloud.database();
+  const _ = db.command;
   const houseTable = db.collection('house');
   const housefyTable = db.collection('housefy');
+  let selectedRowkeys = [];
+  zdList.map((zd) => {
+    const { _id, checked } = zd;
+    if(checked) selectedRowkeys.push(_id);
+  });
+
+  // console.log(selectedRowkeys);
+  const list = await houseTable.where({
+    _id: _.in(selectedRowkeys),
+  }).get();
+
+  const houseList = list.data;
+
   let tasks = [];
-  zdList.map((zd)=>{
-    const {_id,checked} = zd;
-    if(!checked) return;
-    const house = await houseTable.doc(_id).get();
-    // const housefyid = house.housefyid;
+  houseList.map((house)=>{ 
     // 生成新帐单
+    const {_id} = house;
     const newHousefy = makeHousefy(house, null,
       CONSTS.ZDLX_YJZD);
-    const housefyPromise = housefyTable.add({ data: housefy });
+    console.log(newHousefy);
+    const housefyPromise = housefyTable.add({ data: newHousefy });
+    delete house._id;
     const housePromise = houseTable.doc(_id).set({data:house});
     tasks.push(housefyPromise);
     tasks.push(housePromise);
@@ -152,111 +165,100 @@ function jsqtfhj(house) {
   return qtfy;
 }
 
-	/**
-	 * 生成新帐单,同时更新房屋主数据
-	 * 
-	 * @param house
-	 * @param housefy
-	 *            如果传入有housefy，则表示刷新当前帐单
-	 * @param zdlx
-	 *            帐单类型（0：合同帐单，1：月结帐单，2：退房帐单）
-	 * @return 新生成的帐单
-	 * @throws Exception
-	 */
-	function makeHousefy(house, housefy, zdlx){
-    // 计算收租范围
-    const szrq = moment(house.szrq);
-    if (!szrq.isValid()) throw "收租日期不合法！";
+function makeHousefy(house, housefy, zdlx){
+  // 计算收租范围
+  const szrq = moment(house.szrq);
+  if (!szrq.isValid()) throw "收租日期不合法！";
 
-    if (!housefy) {
-      housefy = {};
-    } else {
-      zdlx = housefy.zdlx;
-    }
+  if (!housefy) {
+    housefy = {};
+  } else {
+    zdlx = housefy.zdlx;
+  }
 
-    let xcszrq, rq1, rq2;
-    if (CONSTS.ZDLX_HTZD === zdlx) {
-      // 合同帐单的下次收租日期为当前录入的时间
-      xcszrq = szrq;
-      rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
-      if(!rq1.isValid()) 
-        throw "合同起始日期不合法！";
-      rq2 = szrq.subtract(1,'days');
-      const days = rq2.diff(rq1,'days') + 1;
-      if (days < 0)
-        throw "下次收租日期不能小于合同起始日期！";
-      let yzj;
-      if (days == 30 || days == 31)
-        yzj = house.Czje();
-      else
-        yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同签约时月租金
-      housefy.czje = yzj; // 月租金
-      housefy.yj = house.yj; // 押金
-      housefy.qtf=house.qtf;
-      housefy.dbcds=house.dscds;
-      housefy.Sbcds=house.Sscds;
-      // 房屋合计费
-      housefy.fyhj = utils.getInteger(housefy.czje)
-        + Utils.getInteger(housefy.yj)
-        + Utils.getFloat(housefy.qtf);
-    } else {
-      xcszrq = szrq.add(1,'months');
-      rq1 = szrq.subtract(1, 'months'); 
-      rq2 = szrq.subtract(1, 'days');
+  let xcszrq, rq1, rq2;
+  if (CONSTS.ZDLX_HTZD === zdlx) {
+    // 合同帐单的下次收租日期为当前录入的时间
+    xcszrq = szrq;
+    rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
+    if(!rq1.isValid()) 
+      throw "合同起始日期不合法！";
+    rq2 = szrq.subtract(1,'days');
+    const days = rq2.diff(rq1,'days') + 1;
+    if (days < 0)
+      throw "下次收租日期不能小于合同起始日期！";
+    let yzj;
+    if (days == 30 || days == 31)
+      yzj = house.Czje();
+    else
+      yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同签约时月租金
+    housefy.czje = yzj; // 月租金
+    housefy.yj = house.yj; // 押金
+    housefy.qtf=house.qtf;
+    housefy.dbcds=house.dscds;
+    housefy.Sbcds=house.Sscds;
+    // 房屋合计费
+    housefy.fyhj = utils.getInteger(housefy.czje)
+      + Utils.getInteger(housefy.yj)
+      + Utils.getFloat(housefy.qtf);
+  } else {
+    xcszrq = szrq.add(1,'months');
+    rq1 = szrq.subtract(1, 'months'); 
+    rq2 = szrq.subtract(1, 'days');
 
-      housefy.czje=house.czje;
-      // 电费数据
-      housefy.dbcds=house.dbcds;
-      housefy.dscds=house.dscds;
-      housefy.dsyds = utils.getInteger(housefy.dbcds) - utils.getInteger(housefy.dscds);
-      housefy.dgtds=house.dgtds;
-      housefy.ddj=house.ddj;
-      housefy.dfhj = jsdf(house);
+    housefy.czje=house.czje;
+    // 电费数据
+    housefy.dbcds=house.dbcds;
+    housefy.dscds=house.dscds;
+    housefy.dsyds = utils.getInteger(housefy.dbcds) - utils.getInteger(housefy.dscds);
+    housefy.dgtds=house.dgtds;
+    housefy.ddj=house.ddj;
+    housefy.dfhj = jsdf(house);
 
-      // 水费数据
-      housefy.sbcds=house.sbcds;
-      housefy.sscds=house.sscds;
-      housefy.ssyds = utils.getInteger(housefy.sbcds) - utils.getInteger(housefy.sscds);
-      housefy.sgtds=house.sgtds;
-      housefy.sdj=house.sdj;
-      housefy.sfhj(jssf(house));
-      // 房屋其它费用
-      housefy.glf=house.glf;
-      housefy.wlf=house.wlf;
-      housefy.ljf=house.ljf;
-      housefy.syjzf=house.syjzf;
-      housefy.qtf=house.qtf;
+    // 水费数据
+    housefy.sbcds=house.sbcds;
+    housefy.sscds=house.sscds;
+    housefy.ssyds = utils.getInteger(housefy.sbcds) - utils.getInteger(housefy.sscds);
+    housefy.sgtds=house.sgtds;
+    housefy.sdj=house.sdj;
+    housefy.sfhj = jssf(house);
+    // 房屋其它费用
+    housefy.glf=house.glf;
+    housefy.wlf=house.wlf;
+    housefy.ljf=house.ljf;
+    housefy.syjzf=house.syjzf;
+    housefy.qtf=house.qtf;
 
-      // 房屋合计费
-      housefy.fyhj = utils.getFloat(housefy.dfhj)
-        + utils.getFloat(housefy.sfhj) + jsqtfhj(house);
-    }
+    // 房屋合计费
+    housefy.fyhj = utils.getFloat(housefy.dfhj)
+      + utils.getFloat(housefy.sfhj) + jsqtfhj(house);
+  }
 
-    // 日期范围
-    housefy.szrq = xcszrq.format('YYYY-MM-DD');
-    housefy.rq1 = rq1.format('YYYY-MM-DD');
-    housefy.rq2 = rq2.format('YYYY-MM-DD');
+  // 日期范围
+  housefy.szrq = xcszrq.format('YYYY-MM-DD');
+  housefy.rq1 = rq1.format('YYYY-MM-DD');
+  housefy.rq2 = rq2.format('YYYY-MM-DD');
 
-    // 房屋信息
-    housefy.houseid=house.houseid;
-    housefy.fwmc=house.fwmc;
-    housefy.zhxm=house.zhxm;
+  // 房屋信息
+  housefy.houseid=house.houseid;
+  housefy.fwmc=house.fwmc;
+  housefy.zhxm=house.zhxm;
 
-    // 是否收租
-    housefy.sfsz = "0";
-    housefy.zdlx = zdlx;
+  // 是否收租
+  housefy.sfsz = "0";
+  housefy.zdlx = zdlx;
 
-    // 生成更新人和时间
-    housefy.yzhid=house.yzhid;
-    housefy.zhxgr=house.zhxgr;
-    housefy.zhxgsj=house.zhxgsj;
+  // 生成更新人和时间
+  housefy.yzhid=house.yzhid;
+  housefy.zhxgr=house.zhxgr;
+  housefy.zhxgsj=house.zhxgsj;
 
-    // 更新房屋数据
-    house.sfsz = "0"; // 设置房屋为未收租
-    house.zdlx = zdlx;
-    house.rq1 = housefy.rq1;
-    house.rq2= housefy.rq2;
-    house.fyhj=housefy.fyhj;
-    house.housefyid = housefy.housefyid;
-    return housefy;
+  // 更新房屋数据
+  house.sfsz = "0"; // 设置房屋为未收租
+  house.zdlx = zdlx;
+  house.rq1 = housefy.rq1;
+  house.rq2= housefy.rq2;
+  house.fyhj=housefy.fyhj;
+  house.housefyid = housefy.housefyid;
+  return housefy;
 }

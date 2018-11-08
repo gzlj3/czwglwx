@@ -12,7 +12,10 @@
                         <image class="weui-media-box__thumb" src="{{item.avatarUrl?item.avatarUrl:emptyAvatarUrl}}" />
                     </view>
                     <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
-                        <view class="weui-media-box__title">{{item.fwmc}} {{item.zhxm}}</view>
+                        <view class="weui-media-box__title">
+                          <view class="weui-cell__bd">{{item.fwmc}} {{item.zhxm}}</view>
+                          <view class="weui-cell__bd">未结清</view>
+                        </view>
                         <view class="weui-media-box__desc">收租日期:{{item.szrq}}</view>
                     </view>
                     <view class="weui-cell__ft weui-cell__ft_in-access"></view>
@@ -29,6 +32,6 @@
         </view>
     </view>
     <view class="weui-footer">
-        <view class="weui-footer__text">极简出租，Copyright © 2018 by liujun</view>
+        <view class="weui-footer__text">极简出租，Copyright©2018-2019 by liujun</view>
     </view>
 </view>

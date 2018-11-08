@@ -88,15 +88,15 @@ Page({
     // console.log(utils.getInteger('fff')); 
     // console.log(moment('2018-11-aa','YYYY-MM-DD')); 
 
-    // const response = fyglService.queryFyglList(); 
-    // fyglService.handleAfterRemote(response, null,
-    //   (resultData) => { 
-    //     getApp().setPageParams(CONSTS.BUTTON_NONE, null);
-    //     this.setData({
-    //       fyList: resultData,
-    //     }); 
-    //   }
-    // );
+    const response = fyglService.queryFyglList(); 
+    fyglService.handleAfterRemote(response, null,
+      (resultData) => { 
+        getApp().setPageParams(CONSTS.BUTTON_NONE, null);
+        this.setData({
+          fyList: resultData,
+        }); 
+      }
+    );
     
  },
   /**
