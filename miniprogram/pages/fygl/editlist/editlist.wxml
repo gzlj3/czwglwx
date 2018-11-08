@@ -4,5 +4,5 @@
   <!-- <view class="weui-toptips weui-toptips_warn" wx:if="{{status!=0}}">{{msg}}</view> -->
   <template is="FmCb" data="{{sourceList}}" wx:if="{{buttonAction===CONSTS.BUTTON_CB}}"/>
   <template is="FmMakezd" data="{{sourceList}}" wx:if="{{buttonAction===CONSTS.BUTTON_MAKEZD}}"/>
-  <button form-type="submit">保存</button>
+  <button form-type="submit" wx:if="{{sourceList && sourceList.length>0}}">保存</button>
 </form>

@@ -12,12 +12,8 @@ exports.BUTTON_CB = 5; // 抄表
 exports.BUTTON_MAKEZD = 6; // 创建帐单
 exports.BUTTON_LASTZD = 7; // 查看/处理最近帐单
 exports.BUTTON_QUERYSDB = 8; // 查询水电表
-// exports.getButtonActionInfo = buttonAction => {
-//   try {
-//     return ['', '查询房源','添加房源', '编辑房源', '删除房源', '抄表', '创建帐单', '查看/处理帐单', '', ''][
-//       buttonAction
-//     ];
-//   } catch (e) {
-//     return '';
-//   }
-// };
+exports.BUTTON_QUERYMAKEZD = 9; // 查询创建帐单列表
+
+exports.ZDLX_HTZD = "0";  //合同帐单
+exports.ZDLX_YJZD = "1";  //月结帐单
+exports.ZDLX_TFZD = "2";  //退房帐单

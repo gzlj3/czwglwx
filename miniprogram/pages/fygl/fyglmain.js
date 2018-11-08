@@ -1,5 +1,9 @@
 import * as CONSTS from '../../utils/constants.js';
+// import moment from '../../utils/moment-with-locales.min.js';
+import moment from '../../utils/moment.min.js';
 import * as fyglService from '../../services/fygl.js'; 
+const utils = require('../../utils/utils.js');
+
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
@@ -78,16 +82,21 @@ Page({
     //     },
     //   ]
     // });
-  
-    const response = fyglService.queryFyglList(); 
-    fyglService.handleAfterRemote(response, null,
-      (resultData) => { 
-        getApp().setPageParams(CONSTS.BUTTON_NONE, null);
-        this.setData({
-          fyList: resultData,
-        }); 
-      }
-    );
+
+    // console.log(moment('2018-01-31','YYYY-MM-DD').add(1,'months').format('YYYY-MM-DD'));
+    // console.log(moment().startOf('day').add(4, 'days').format('YYYY-MM-DD'));
+    // console.log(utils.getInteger('fff')); 
+    // console.log(moment('2018-11-aa','YYYY-MM-DD')); 
+
+    // const response = fyglService.queryFyglList(); 
+    // fyglService.handleAfterRemote(response, null,
+    //   (resultData) => { 
+    //     getApp().setPageParams(CONSTS.BUTTON_NONE, null);
+    //     this.setData({
+    //       fyList: resultData,
+    //     }); 
+    //   }
+    // );
     
  },
   /**

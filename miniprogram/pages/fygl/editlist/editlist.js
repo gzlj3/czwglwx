@@ -50,15 +50,18 @@ Page({
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
     }
+    let queryListAction;
+    if (buttonAction === CONSTS.BUTTON_CB) {
+      queryListAction = CONSTS.BUTTON_QUERYSDB;
+    } else {
+      queryListAction = CONSTS.BUTTON_QUERYMAKEZD;
+      // queryListAction = CONSTS.BUTTON_QUERYSDB;
+    }
 
-    const response = fyglService.queryList(buttonAction);
+    const response = fyglService.queryList(queryListAction);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
         getApp().setPageParams(CONSTS.BUTTON_NONE, null);
-        // let targetList = new Array(resultData.length); 
-        // resultData.map((value,index)=>{
-        //   targetList[index] = {_id:value._id}
-        // });
         this.setData({
           buttonAction,
           sourceList: resultData,

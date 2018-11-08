@@ -25,37 +25,49 @@ exports.main = async (event, context) => {
   // console.log(CONSTS.BUTTON_EDITFY);
   // console.log(action === CONSTS.BUTTON_EDITFY);
   try {
+    let result;
     switch(action){
       case CONSTS.BUTTON_QUERYFY:
         // console.log('queryfy');
-          const result1 = await services.queryFyList(userb.yzhid);
-          return results.getSuccessResults(result1);
+          result = await services.queryFyList(userb.yzhid);
+          return results.getSuccessResults(result.data);
         break;
       case CONSTS.BUTTON_ADDFY:
         // console.log('addfy');
           data.yzhid = userb.yzhid;
-          const result2 = await services.addFy(data);
-          return results.getSuccessResults(result2);
+          result = await services.addFy(data);
+          return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_EDITFY:
         console.log("editfy");
-        const result3 = await services.updateFy(data);
-        return results.getSuccessResults(result3);
+        result = await services.updateFy(data);
+        return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_CB:
         console.log("cb");
-        const result5 = await services.updateSdb(data);
-        return results.getSuccessResults(result5);
+        result = await services.updateSdb(data);
+        return results.getSuccessResults(result);
+        break;
+      case CONSTS.BUTTON_MAKEZD:
+        console.log("makezd");
+        result = await services.updateZdList(data);
+        return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_QUERYSDB:
         console.log("querysdb");
-        const result6 = await services.querySdb(userb.yzhid);
-        return results.getSuccessResults(result6);
+        result = await services.querySdbList(userb.yzhid);
+        return results.getSuccessResults(result.data);
+        break;
+      case CONSTS.BUTTON_QUERYMAKEZD:
+        console.log("querymakezd");
+        result = await services.queryZdList(userb.yzhid);
+        return results.getSuccessResults(result);
         break;
       default:
         return results.getErrorResults('未确定动作！');
     }
   } catch (e) {
+    console.log(e);
     return results.getErrorResults(e.message);
   }
 }

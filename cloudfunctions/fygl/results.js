@@ -9,10 +9,13 @@ let results = {
 exports.getErrorResults = (msg) => {
   results.status = CONSTS.REMOTE_ERROR;
   results.msg = msg;
+  results.data = null;
   return results;
 }
 
 exports.getSuccessResults = (data=null) => {
+  results.status = CONSTS.REMOTE_SUCCESS;
+  results.msg = '';
   results.data = data;
   return results;
 }
