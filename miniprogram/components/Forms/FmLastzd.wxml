@@ -1,0 +1,97 @@
+<!--当前房屋对象：sourceList-->
+<wxs module="m">
+  module.exports.getSzzt = function(item){
+    if(!item.zhxm) return '';
+    var sfsz = item.sfsz;
+    if(!sfsz) sfsz = '0';
+    if(sfsz=='0') return '未结清';
+    else if(sfsz=='1') return '已结清';
+    else if(sfsz=='2') return '已结转';
+    return '异常'+sfsz;
+  }
+  module.exports.getZdfy = function(item){
+    var rq1 = item.rq1;
+    if(!rq1 || rq1.length<10) return '';
+    var ym = rq1.substring(0,4)+'年'+rq1.substring(5,7)+'月';
+    var zdfy = ym+'帐单:'+item.fyhj+'元';  
+    return zdfy;
+  }
+</wxs>
+<template name="FmLastzd">
+  <view class="page">
+    <view class="page__hd" wx:if="{{sourceList.length>0}}">
+        <view class="page__title">{{sourceList[0].fwmc}} {{sourceList[0].zhxm}}</view>
+        <view class="page__desc">最近6个月帐单列表</view>
+    </view>
+    <view class="page__bd">
+        <view class="weui-form-preview" wx:for="{{sourceList}}" wx:key="_id">
+            <view class="weui-form-preview__hd">
+                <view class="weui-form-preview__item">
+                    <view class="weui-form-preview__label">{{m.getZdfy(item)}}</view>
+                    <view class="weui-form-preview__value_in-hd">{{m.getSzzt(item)}}</view>
+                </view>
+            </view>
+            <view class="weui-form-preview__bd">
+                <view class="weui-form-preview__item" >
+                    <view class="weui-form-preview__label">电费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        合计:{{item.dfhj}}元(上次:{{item.dscds}},本次:{{item.dbcds}},实用:{{item.dsyds}},公摊:{{item.dgtds?item.dgtds:0}},单价:{{item.ddj}}元)
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" >
+                    <view class="weui-form-preview__label">水费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        合计:{{item.sfhj}}元(上次:{{item.sscds}},本次:{{item.sbcds}},实用:{{item.ssyds}},公摊:{{item.sgtds?item.sgtds:0}},单价:{{item.sdj}}元)
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.czje}}">
+                    <view class="weui-form-preview__label">月租费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.czje}}元
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.yj}}">
+                    <view class="weui-form-preview__label">押金</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.yj}}元
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.wlf}}">
+                    <view class="weui-form-preview__label">网络费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.wlf}}元
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.ljf}}">
+                    <view class="weui-form-preview__label">卫生费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.ljf}}元
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.glf}}">
+                    <view class="weui-form-preview__label">管理费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.glf}}元
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.syjzf}}">
+                    <view class="weui-form-preview__label">上月结转费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.syjzf}}元
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.qtf}}">
+                    <view class="weui-form-preview__label">其它费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.qtf}}元
+                    </view>
+                </view>
+            </view>
+            <view class="weui-form-preview__ft">
+                <navigator class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active">结转下月</navigator>
+                <navigator class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active">确认收费</navigator>
+            </view>
+        </view>
+    </view>
+  </view>
+</template>

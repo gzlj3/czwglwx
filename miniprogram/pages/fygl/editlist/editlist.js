@@ -31,7 +31,7 @@ Page({
     console.log('form发生了submit事件，携带数据为：')
     console.log(this.data.sourceList);
     const {buttonAction} = this.data;
-    const response = fyglService.saveFy(buttonAction, this.data.sourceList);
+    const response = fyglService.postData(buttonAction, this.data.sourceList);
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData)=>{
@@ -45,20 +45,22 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    // const currentObject = options.item?JSON.parse(options.item):{};
+    const params = options.item?JSON.parse(options.item):{};
     let buttonAction = options.buttonAction;
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
     }
-    let queryListAction;
-    if (buttonAction === CONSTS.BUTTON_CB) {
-      queryListAction = CONSTS.BUTTON_QUERYSDB;
-    } else {
-      queryListAction = CONSTS.BUTTON_QUERYMAKEZD;
-      // queryListAction = CONSTS.BUTTON_QUERYSDB;
-    }
-
-    const response = fyglService.queryList(queryListAction);
+    // let queryListAction;
+    // if (buttonAction === CONSTS.BUTTON_CB) {
+    //   queryListAction = CONSTS.BUTTON_QUERYSDB;
+    // } else if (buttonAction === CONSTS.BUTTON_LASTZD) {
+    //   queryListAction = CONSTS.BUTTON_QUERYLASTZD;
+    // } else if (buttonAction === CONSTS.BUTTON_MAKEZD) {
+    //   queryListAction = CONSTS.BUTTON_QUERYMAKEZD;
+    // }
+console.log('editlist:'+buttonAction);
+console.log(params);
+    const response = fyglService.queryData(buttonAction, params);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
         getApp().setPageParams(CONSTS.BUTTON_NONE, null);

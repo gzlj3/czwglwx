@@ -14,6 +14,16 @@ exports.queryFyList = async (yzhid) => {
   return result;
 }
 
+exports.queryLastzdList = async (params) => {
+  const {houseid} = params;
+  const db = cloud.database();
+  const _ = db.command;
+  const result = db.collection('housefy').where({
+    houseid,
+  }).get();
+  return result;
+}
+
 async function querySdbList (yzhid) {
   const db = cloud.database();  
   const _ = db.command;
@@ -240,7 +250,7 @@ function makeHousefy(house, housefy, zdlx){
   housefy.rq2 = rq2.format('YYYY-MM-DD');
 
   // 房屋信息
-  housefy.houseid=house.houseid;
+  housefy.houseid=house._id;
   housefy.fwmc=house.fwmc;
   housefy.zhxm=house.zhxm;
 
@@ -259,6 +269,6 @@ function makeHousefy(house, housefy, zdlx){
   house.rq1 = housefy.rq1;
   house.rq2= housefy.rq2;
   house.fyhj=housefy.fyhj;
-  house.housefyid = housefy.housefyid;
+  house.housefyid = housefy._id;
   return housefy;
 }

@@ -1,12 +1,25 @@
-// import { stringify } from 'qs';
-// import request from '@/utils/request';
 import * as CONSTS from '../utils/constants.js';
+import moment from '../utils/moment.min.js';
 
-export function queryList(buttonAction) {
+export function queryData(action,params) {
   const result = wx.cloud.callFunction({
     name: 'fygl',
     data: {
-      action: buttonAction,
+      action,
+      method: 'GET',
+      data:params,
+    },
+  });
+  return result;
+}
+
+export function postData(action, params) {
+  const result = wx.cloud.callFunction({
+    name: 'fygl',
+    data: {
+      action,
+      method: 'POST',
+      data: params,
     },
   });
   return result;
@@ -19,13 +32,6 @@ export function queryFyglList(params) {
       action: CONSTS.BUTTON_QUERYFY,      
     },
   });
-  // .then(res=>{
-  //   return res.result;
-  // });
-  // .catch(err=>{
-  //   console.log(err);
-  //   result = null;
-  // })
   return result;
 }
 export function saveFy(action,params) {
@@ -55,9 +61,6 @@ export function handleAfterRemote(response,tsinfo,successCallback) {
           title: `${tsinfo}成功完成！${msg}`,
         });
       };
-      // 传递返回参数
-      // getApp().setPageParams(buttonAction, data);
-      // wx.navigateBack();
       if (successCallback) successCallback(data);
     } else {
       wx.showToast({
@@ -76,65 +79,47 @@ export function handleAfterRemote(response,tsinfo,successCallback) {
   })
 }
 
-// export async function querySdbList(params) {
-//   return request(`/fygl/sdb_list?${stringify(params)}`);
-// }
+export function refreshProgessState(fyList) {
+  fyList.map(item =>{
+    item.progressState = getProgessState(item);
+  }) 
+}
 
-// export async function queryLastZd(params) {
-//   return request(`/fygl/lastzd?${stringify(params)}`);
-// }
-// export async function qrsz(params) {
-//   return request(`/fygl/handlezd?${stringify(params)}`);
-// }
-
-// export async function queryZdList(params) {
-//   return request(`/fygl/zd_list?${stringify(params)}`);
-// }
-
-// export async function removeFyglList(params) {
-//   const { count = 5, ...restParams } = params;
-//   return request(`/fygl/fygl_list/${CONSTS.BUTTON_DELETEFY}?count=${count}`, {
-//     method: 'POST',
-//     body: {
-//       ...restParams,
-//     },
-//   });
-// }
-
-// export async function addFyglList(params) {
-//   const { count = 5, ...restParams } = params;
-//   return request(`/fygl/fygl_list/${CONSTS.BUTTON_ADDFY}?count=${count}`, {
-//     method: 'POST',
-//     body: {
-//       ...restParams,
-//     },
-//   });
-// }
-
-// export async function updateFyglList(params) {
-//   const { count = 5, ...restParams } = params;
-//   return request(`/fygl/fygl_list/${CONSTS.BUTTON_EDITFY}?count=${count}`, {
-//     method: 'POST',
-//     body: {
-//       ...restParams,
-//     },
-//   });
-// }
-
-// export async function updateSdbList(params) {
-//   return request(`/fygl/sdb_list`, {
-//     method: 'POST',
-//     body: {
-//       ...params,
-//     },
-//   });
-// }
-
-// export async function updateZdList(params) {
-//   return request(`/fygl/zd_list`, {
-//     method: 'POST',
-//     body: {
-//       ...params,
-//     },
-//   });
-// }
+const getProgessState = item => {
+  const ysz = (item.sfsz && item.sfsz !== '0');
+  const currq = moment().startOf('day');
+  const szrq = moment(item.szrq, 'YYYY-MM-DD');
+  let progressState = {
+    backgroundColor:'default',
+    activeColor:'default',
+    percent: 0,
+  };
+// console.log(item.fwmc+'  '+ysz);
+  let { percent, activeColor, backgroundColor } = progressState;
+  if (ysz) {
+    const days1 = currq.diff(szrq, 'days');
+    if(days1<=0){
+      percent = Math.round((days1+31) / 31 * 100);
+      if (percent >= 90) activeColor='yellow';
+    }else{
+      percent = Math.round(days1 / 5 * 100);
+      if(percent<100){
+        backgroundColor = 'yellow';
+      }else{
+        activeColor = 'red';
+      }
+    }
+  } else if (!ysz) {
+    const days1 = currq.diff(szrq, 'days');
+    percent = Math.round((days1 / 5) * 100);
+    if(percent<100){ 
+      backgroundColor = 'yellow';
+    }else{
+      backgroundColor = 'yellow';
+      activeColor = 'red';
+    }
+  }
+  progressState = { percent, activeColor, backgroundColor };
+  // console.log(progressState);
+  return progressState;
+};

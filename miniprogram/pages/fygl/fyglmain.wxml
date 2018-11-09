@@ -1,3 +1,22 @@
+<wxs module="m">
+  module.exports.getSzzt = function(item){
+    if(!item.zhxm) return '';
+    var sfsz = item.sfsz;
+    if(!sfsz) sfsz = '0';
+    if(sfsz=='0') return '(未结清)';
+    else if(sfsz=='1') return '(已结清)';
+    else if(sfsz=='2') return '(已结转)';
+    return '异常'+sfsz;
+  }
+  module.exports.getZdfy = function(item){
+    var rq1 = item.rq1;
+    if(!rq1 || rq1.length<10) return '';
+    var ym = rq1.substring(0,4)+'年'+rq1.substring(5,7)+'月';
+    var zdfy = ym+'帐单:'+item.fyhj+'元';  
+    return zdfy;
+  }
+</wxs>
+
 <view class="page">
     <view class="page__hd">
         <button  size="mini" bindtap="onAddfy">添加房源</button>
@@ -7,25 +26,30 @@
     <view class="page__bd">
         <view class="weui-panel weui-panel_access" wx:key="_id" wx:for="{{fyList}}">
             <view class="weui-panel__bd">
-                <navigator url="" data-item="{{item}}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active" bindtap="onNavigator">
+                <view data-item="{{item}}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active" bindtap="onEditfy">
                     <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
                         <image class="weui-media-box__thumb" src="{{item.avatarUrl?item.avatarUrl:emptyAvatarUrl}}" />
                     </view>
                     <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
                         <view class="weui-media-box__title">
-                          <view class="weui-cell__bd">{{item.fwmc}} {{item.zhxm}}</view>
-                          <view class="weui-cell__bd">未结清</view>
+                          <view class="weui-cell__bd">{{item.fwmc}} {{item.zhxm?item.zhxm:'(未出租)'}} {{m.getSzzt(item)}}</view>
                         </view>
-                        <view class="weui-media-box__desc">收租日期:{{item.szrq}}</view>
+                        <view class="weui-media-box__desc">{{m.getZdfy(item)}}</view>
+                        <view wx:if="{{item.zhxm}}">
+                          <view class="weui-media-box__desc">收租日期:{{item.szrq}}</view>
+                          <view class="weui-media-box__desc">
+                            <progress percent="{{item.progressState.percent}}" activeColor="{{item.progressState.activeColor}}" backgroundColor="{{item.progressState.backgroundColor}}" active='{{false}}' active-mode="forwards"></progress> 
+                          </view>
+                        </view>
                     </view>
                     <view class="weui-cell__ft weui-cell__ft_in-access"></view>
-                </navigator>
+                </view>
             </view>
             <view class="weui-panel__ft">
             
                 <view class="weui-cell weui-cell_access weui-cell_link">
                     <!-- <view class="weui-cell__bd">编辑</view> -->
-                    <view class="weui-cell__bd">帐单详情</view>
+                    <view data-item="{{item._id}}" bindtap="onLastzd" class="weui-cell__bd">帐单详情</view>
                     <!-- <view class="weui-cell__ft weui-cell__ft_in-access"></view> -->
                 </view>
             </view>

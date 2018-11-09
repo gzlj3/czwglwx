@@ -17,9 +17,9 @@ const userb = {
 }
 */
 exports.main = async (event, context) => {
-  const {action,data} = event;
+  const {action,method,data} = event;
   if(!action) return results.getErrorResults('未确定动作！');
-  console.log("action:"+action);
+  console.log("action:"+action+"   method:"+method);
   // console.log(data);
   // console.log(context);
   // console.log(CONSTS.BUTTON_EDITFY);
@@ -44,25 +44,45 @@ exports.main = async (event, context) => {
         return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_CB:
-        console.log("cb");
-        result = await services.updateSdb(data);
+        if(method==='POST'){
+          console.log("cb");
+          result = await services.updateSdb(data);
+        }else{
+          console.log("querysdb");
+          result = await services.querySdbList(userb.yzhid);
+          result = result.data;
+        }
         return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_MAKEZD:
-        console.log("makezd");
-        result = await services.updateZdList(data);
+        if (method === 'POST') {
+          console.log("makezd");
+          result = await services.updateZdList(data);
+        }else{
+          console.log("querymakezd");
+          result = await services.queryZdList(userb.yzhid);
+        }
         return results.getSuccessResults(result);
-        break;
-      case CONSTS.BUTTON_QUERYSDB:
-        console.log("querysdb");
-        result = await services.querySdbList(userb.yzhid);
-        return results.getSuccessResults(result.data);
-        break;
-      case CONSTS.BUTTON_QUERYMAKEZD:
-        console.log("querymakezd");
-        result = await services.queryZdList(userb.yzhid);
+      case CONSTS.BUTTON_LASTZD:
+        if (method === 'POST') {
+          // console.log("lastzd");
+          // result = await services.updateZdList(data);
+        } else {
+          console.log("querylastzd");
+          result = await services.queryLastzdList(data);
+          result = result.data;
+        }
         return results.getSuccessResults(result);
-        break;
+      // case CONSTS.BUTTON_QUERYSDB:
+      //   console.log("querysdb");
+      //   result = await services.querySdbList(userb.yzhid);
+      //   return results.getSuccessResults(result.data);
+      //   break;
+      // case CONSTS.BUTTON_QUERYMAKEZD:
+      //   console.log("querymakezd");
+      //   result = await services.queryZdList(userb.yzhid);
+      //   return results.getSuccessResults(result);
+      //   break;
       default:
         return results.getErrorResults('未确定动作！');
     }

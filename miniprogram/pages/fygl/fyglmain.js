@@ -44,14 +44,24 @@ Page({
     })
   }, 
 
-  onNavigator(e){
-    console.log(e);
+  onEditfy(e){
+    // console.log(e);
     const {item} = e.currentTarget.dataset;
     const s = JSON.stringify(item);
-    console.log(s);
-    console.log('addfy/addfy?buttonAction=' + CONSTS.BUTTON_EDITFY + '&item=' + s);
+    // console.log(s);
+    // console.log('addfy/addfy?buttonAction=' + CONSTS.BUTTON_EDITFY + '&item=' + s);
     wx.navigateTo({
       url: 'addfy/addfy?buttonAction='+CONSTS.BUTTON_EDITFY+'&item='+s,
+    }) 
+  },
+
+  onLastzd(e){
+    const { item } = e.currentTarget.dataset;
+    const s = JSON.stringify({houseid:item});
+    // console.log(s);
+    console.log('editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s);
+    wx.navigateTo({
+      url: 'editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s,
     }) 
   },
 
@@ -91,6 +101,9 @@ Page({
     const response = fyglService.queryFyglList(); 
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
+        //计算房源进度条显示数据
+        fyglService.refreshProgessState(resultData);
+
         getApp().setPageParams(CONSTS.BUTTON_NONE, null);
         this.setData({
           fyList: resultData,
@@ -113,7 +126,8 @@ Page({
     // 检查返回值，刷新数据
     const {buttonAction,currentObject} = getApp().globalData;
     console.log(buttonAction);
-    if ([CONSTS.BUTTON_ADDFY, CONSTS.BUTTON_EDITFY, CONSTS.BUTTON_CB].includes(buttonAction)){
+    // if ([CONSTS.BUTTON_ADDFY, CONSTS.BUTTON_EDITFY, CONSTS.BUTTON_CB].includes(buttonAction)){
+    if (![CONSTS.BUTTON_NONE].includes(buttonAction)) {
       this.onLoad();
     }
   },
