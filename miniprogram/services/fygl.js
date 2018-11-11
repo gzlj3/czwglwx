@@ -51,7 +51,7 @@ export function handleAfterRemote(response,tsinfo,successCallback) {
   // console.log("tsinfo:"+tsinfo);
   if(!tsinfo) tsinfo = "";
   response.then(res => {
-    // console.log(res);
+    console.log(res);
     const { status = CONSTS.REMOTE_SUCCESS, msg, data } = res.result;
     // this.changeState({ status, msg });
 

@@ -17,3 +17,7 @@ exports.getFloat = (value) => {
     return 0;
   }
 }
+
+exports.isEmpty = (value) => {
+  return !(value && value.length>0);
+}

@@ -41,6 +41,20 @@ Page({
     );
   },
 
+  onQrsz: function (e) {
+    console.log(e);
+    const { item:housefyid } = e.currentTarget.dataset;
+    const {id:flag} = e.currentTarget;
+    const { buttonAction } = this.data;
+    const response = fyglService.postData(buttonAction,{housefyid,flag});
+    fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
+      (resultData) => {
+        getApp().setPageParams(buttonAction, resultData);
+        wx.navigateBack();
+      }
+    );
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
@@ -92,17 +106,17 @@ console.log(params);
     });
   },
   
-  // onInputBlur: function(e) {
-  //   // console.log(e);
-  //   console.log(e.currentTarget);
-  //   const idarr = e.currentTarget.id.split('.');
-  //   const index =  Number.parseInt(idarr[0]);
-  //   const name = idarr[1];
-  //   this.data.sourceList[index][name] = e.detail.value;
-  //   this.setData({
-  //     sourceList: this.data.sourceList
-  //   })
-  // },
+  onInputBlur: function(e) {
+    // console.log(e);
+    console.log(e.currentTarget);
+    const idarr = e.currentTarget.id.split('.');
+    const index =  Number.parseInt(idarr[0]);
+    const name = idarr[1];
+    this.data.sourceList[index][name] = e.detail.value;
+    this.setData({
+      sourceList: this.data.sourceList
+    })
+  },
 
   // // bindSzrqChange: function(e){
   //   this.setData({

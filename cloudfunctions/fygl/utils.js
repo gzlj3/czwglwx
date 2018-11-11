@@ -1,3 +1,5 @@
+const moment = require('moment.min.js');
+
 exports.getInteger = (value) => {
   try{
     const result = Number.parseInt(value);
@@ -16,4 +18,12 @@ exports.getFloat = (value) => {
   } catch (e) {
     return 0;
   }
+}
+
+exports.isEmpty = (value) => {
+  return !(value && value.length > 0);
+}
+
+exports.getCurrentTimestamp = ()=>{
+  return moment().format('YYYY-MM-DD HH:mm:ss');
 }

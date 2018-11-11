@@ -18,7 +18,7 @@ exports.queryLastzdList = async (params) => {
   const {houseid} = params;
   const db = cloud.database();
   const _ = db.command;
-  const result = db.collection('housefy').where({
+  const result = db.collection('housefy').orderBy('szrq','desc').where({
     houseid,
   }).get();
   return result;
@@ -59,8 +59,33 @@ exports.queryZdList = async (yzhid) => {
   return zdList;
 }
 
+exports.saveFy = async (house) => {
+  let result;
+  if (utils.isEmpty(house.housefyid) && !utils.isEmpty(house.zhxm)) {
+    // 如果为新签约，则自动生成合同帐单
+    const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_HTZD);
+    // 结转房屋数据
+    const housefyResult = await addDoc('housefy',newHousefy);
+    house.housefyid = housefyResult._id;
+    // result = updateDoc('house', house);
+  }
+  if (utils.isEmpty(house._id)) {
+    //如果是添加房源，则先保存房屋数据，以便拿到ID
+    result = await addDoc('house', house);
+    house._id = result._id;
+    //更新housefy中的houseid
+    updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
+  } else {
+    //更新房源
+    result = updateDoc('house', house);
+  } 
+  return result;
+}
+
+
 exports.addFy = async (house) => {
   //添加房源
+  // return saveDoc('house',house);
   const db = cloud.database();
   const result = db.collection('house').add({
     data:house
@@ -115,20 +140,75 @@ exports.updateZdList = async (zdList) => {
   const houseList = list.data;
 
   let tasks = [];
-  houseList.map((house)=>{ 
+  houseList.map(async (house)=>{  
     // 生成新帐单
     const {_id} = house;
-    const newHousefy = makeHousefy(house, null,
-      CONSTS.ZDLX_YJZD);
-    console.log(newHousefy);
-    const housefyPromise = housefyTable.add({ data: newHousefy });
+    const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_YJZD);
+    // console.log(newHousefy);
+    const addResult = await housefyTable.add({ data: newHousefy });
+    house.housefyid = addResult._id;
     delete house._id;
-    const housePromise = houseTable.doc(_id).set({data:house});
-    tasks.push(housefyPromise);
+    const housePromise = houseTable.doc(_id).set({ data: house });
     tasks.push(housePromise);
   });
   return Promise.all(tasks);
 }
+
+exports.processQrsz = async (params,userb) => {
+  const { housefyid, flag } = params;
+  const db = cloud.database();
+  const _ = db.command;
+
+  let result = await db.collection('housefy').doc(housefyid).get();
+  const housefy = result.data;
+  if (!housefy) throw "未查到房源帐单记录：" + housefyid;
+
+  result = await db.collection('house').doc(housefy.houseid).get();
+  const house = result.data;
+  if (!house) throw "未查到房源记录：" + houseid;
+
+  if ("sxzd" === flag && housefyid !== house.housefyid)
+    throw "帐单数据与主房屋不匹配，刷新帐单失败！";
+
+  if ("sxzd" === flag) {
+    // 刷新帐单
+    makeHousefy(house, housefy, null);
+  } else {
+    jzHouse(house, housefy, flag);
+  }
+
+  house.zhxgr=userb.userid;
+  house.zhxgsj = utils.getCurrentTimestamp();
+  housefy.zhxgr=userb.userid;
+  housefy.zhxgsj = house.zhxgsj;
+  const promise1 = updateDoc('housefy',housefy);
+  const promise2 = updateDoc('house',house);
+  return Promise.all([promise1,promise2]);
+}
+
+function jzHouse(house, housefy, flag) {
+  // 更新房源上次收租日期
+  house.szrq = housefy.szrq;
+  // 更新房源结转数据
+  house.dscds=housefy.dbcds;
+  house.sscds=housefy.sbcds;
+  house.dbcds=null;
+  house.sbcds=null;
+  if ("jzzd"===flag) {
+    // 结转帐单
+    house.syjzf=housefy.fyhj;
+    house.sfsz="2";
+    housefy.sfsz="2";
+  } else if ("qrsz"===flag) {
+    // 确认收租
+    house.syjzf=null;
+    house.sfsz="1";
+    housefy.sfsz="1";
+  } else {
+    throw "未知的帐单处理动作，帐单处理失败！";
+  }
+}
+
 
 function jsFwfy(house){
   if (!house.sbcds || !house.dbcds)
@@ -199,7 +279,7 @@ function makeHousefy(house, housefy, zdlx){
       throw "下次收租日期不能小于合同起始日期！";
     let yzj;
     if (days == 30 || days == 31)
-      yzj = house.Czje();
+      yzj = house.czje;
     else
       yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同签约时月租金
     housefy.czje = yzj; // 月租金
@@ -209,8 +289,8 @@ function makeHousefy(house, housefy, zdlx){
     housefy.Sbcds=house.Sscds;
     // 房屋合计费
     housefy.fyhj = utils.getInteger(housefy.czje)
-      + Utils.getInteger(housefy.yj)
-      + Utils.getFloat(housefy.qtf);
+      + utils.getInteger(housefy.yj)
+      + utils.getFloat(housefy.qtf);
   } else {
     xcszrq = szrq.add(1,'months');
     rq1 = szrq.subtract(1, 'months'); 
@@ -271,4 +351,22 @@ function makeHousefy(house, housefy, zdlx){
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
   return housefy;
+}
+
+const updateDoc = async (tableName,docObj) => {
+  const db = cloud.database();
+  const { _id } = docObj;
+  delete docObj._id;
+  const result = db.collection(tableName).doc(_id).update({
+    data: docObj
+  });
+  return result;
+}
+
+const addDoc = async (tableName, docObj) => {
+  const db = cloud.database();
+  const result = db.collection(tableName).add({
+    data: docObj
+  });
+  return result;
 }

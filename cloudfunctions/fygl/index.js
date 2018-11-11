@@ -2,8 +2,9 @@
 const results = require('results.js');
 const CONSTS = require('constants.js');
 const services = require('services.js');
+const utils = require('utils.js');
 
-const userb = {
+const curUser = {
   userid:'admin',
   username:'管理员',
   dhhm:'13332875650',
@@ -29,18 +30,24 @@ exports.main = async (event, context) => {
     switch(action){
       case CONSTS.BUTTON_QUERYFY:
         // console.log('queryfy');
-          result = await services.queryFyList(userb.yzhid);
+          result = await services.queryFyList(curUser.yzhid);
           return results.getSuccessResults(result.data);
         break;
       case CONSTS.BUTTON_ADDFY:
         // console.log('addfy');
-          data.yzhid = userb.yzhid;
-          result = await services.addFy(data);
+          data.yzhid = curUser.yzhid;
+          data.lrr=curUser.userid;
+          data.lrsj=utils.getCurrentTimestamp();
+          data.zhxgr=curUser.userid;
+          data.zhxgsj=data.lrsj;
+          result = await services.saveFy(data);
           return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_EDITFY:
         console.log("editfy");
-        result = await services.updateFy(data);
+        data.zhxgr=curUser.userid;
+        data.zhxgsj=utils.getCurrentTimestamp();
+        result = await services.saveFy(data);
         return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_CB:
@@ -49,7 +56,7 @@ exports.main = async (event, context) => {
           result = await services.updateSdb(data);
         }else{
           console.log("querysdb");
-          result = await services.querySdbList(userb.yzhid);
+          result = await services.querySdbList(curUser.yzhid);
           result = result.data;
         }
         return results.getSuccessResults(result);
@@ -60,13 +67,13 @@ exports.main = async (event, context) => {
           result = await services.updateZdList(data);
         }else{
           console.log("querymakezd");
-          result = await services.queryZdList(userb.yzhid);
+          result = await services.queryZdList(curUser.yzhid);
         }
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_LASTZD:
         if (method === 'POST') {
-          // console.log("lastzd");
-          // result = await services.updateZdList(data);
+          console.log("post lastzd");
+          result = await services.processQrsz(data,curUser);
         } else {
           console.log("querylastzd");
           result = await services.queryLastzdList(data);
@@ -75,12 +82,12 @@ exports.main = async (event, context) => {
         return results.getSuccessResults(result);
       // case CONSTS.BUTTON_QUERYSDB:
       //   console.log("querysdb");
-      //   result = await services.querySdbList(userb.yzhid);
+      //   result = await services.querySdbList(curUser.yzhid);
       //   return results.getSuccessResults(result.data);
       //   break;
-      // case CONSTS.BUTTON_QUERYMAKEZD:
+      // case CONSTS.BUTTON_QUERYMAKEZD: 
       //   console.log("querymakezd");
-      //   result = await services.queryZdList(userb.yzhid);
+      //   result = await services.queryZdList(curUser.yzhid);
       //   return results.getSuccessResults(result);
       //   break;
       default:
@@ -88,6 +95,6 @@ exports.main = async (event, context) => {
     }
   } catch (e) {
     console.log(e);
-    return results.getErrorResults(e.message);
+    return results.getErrorResults((e.message ? e.message : e));
   }
 }

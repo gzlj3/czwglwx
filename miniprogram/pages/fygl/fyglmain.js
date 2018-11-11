@@ -3,7 +3,7 @@ import * as CONSTS from '../../utils/constants.js';
 import moment from '../../utils/moment.min.js';
 import * as fyglService from '../../services/fygl.js'; 
 const utils = require('../../utils/utils.js');
-
+ 
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息

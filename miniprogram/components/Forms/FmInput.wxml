@@ -1,0 +1,14 @@
+<!--传入对象：{label:'房屋名称',name:'fwmc',require:true,currentObject} -->
+<template name="FmInput">
+            <view class="weui-cell weui-cell_input">
+                <view class="weui-cell__hd">
+                    <view class="weui-label {{require?((isEmpty===undefine || isEmpty)?'redColor':''):''}}">{{label}}</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <picker mode="{{type}}" id="{{name}}" name="{{name}}" value="{{currentObject[name]}}" bindchange="onInputBlur" wx:if="{{type==='date'}}">
+                        <view class="weui-input">{{currentObject[name]}}</view>
+                    </picker>
+                    <input id="{{name}}" name="{{name}}" type="{{type}}" value="{{currentObject[name]}}" bindblur="onInputBlur" class="weui-input" placeholder="请输入{{label}}" wx:else/>
+                </view>
+            </view>
+</template>
