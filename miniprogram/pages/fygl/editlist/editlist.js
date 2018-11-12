@@ -50,7 +50,7 @@ Page({
       content = "确认收到租金了吗？"
     }else if("jzzd"===flag){
       title = "结转下月";
-      content = "未收到本月租金，确认将本月帐单结转到下月吗？"
+      content = "本月租金未缴费，确认将本月帐单结转到下月吗？"
     } else if ("sxzd" === flag) {
       title = "刷新帐单";
       content = "确定刷新当前帐单吗？"

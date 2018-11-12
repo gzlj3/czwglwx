@@ -7,6 +7,10 @@
   color:blue;
 }
 
+.greenColor {
+  color:green;
+}
+
 .displaynone {
   display:none;
 }

@@ -1,7 +1,9 @@
 import * as CONSTS from '../utils/constants.js';
+import * as utils from '../utils/utils.js';
 import moment from '../utils/moment.min.js';
 
 export function queryData(action,params) {
+  utils.showLoading();
   const result = wx.cloud.callFunction({
     name: 'fygl',
     data: {
@@ -14,6 +16,7 @@ export function queryData(action,params) {
 }
 
 export function postData(action, params) {
+  utils.showLoading();
   const result = wx.cloud.callFunction({
     name: 'fygl',
     data: {
@@ -26,6 +29,7 @@ export function postData(action, params) {
 }
 
 export function queryFyglList(params) {
+  utils.showLoading();
   const result = wx.cloud.callFunction({
     name: 'fygl',
     data: {
@@ -35,6 +39,7 @@ export function queryFyglList(params) {
   return result;
 }
 export function saveFy(action,params) {
+  utils.showLoading();
   return wx.cloud.callFunction({
     name: 'fygl',
     data: {
@@ -51,6 +56,7 @@ export function handleAfterRemote(response,tsinfo,successCallback) {
   // console.log("tsinfo:"+tsinfo);
   if(!tsinfo) tsinfo = "";
   response.then(res => {
+    wx.hideLoading();
     console.log(res);
     const { status = CONSTS.REMOTE_SUCCESS, msg, data } = res.result;
     // this.changeState({ status, msg });
@@ -70,6 +76,7 @@ export function handleAfterRemote(response,tsinfo,successCallback) {
       });
     }
   }).catch(err => {
+    wx.hideLoading();
     console.log(err);
     wx.showToast({
       title: `${tsinfo}处理失败！${err.errMsg}`,
@@ -96,8 +103,9 @@ const getProgessState = item => {
   };
 // console.log(item.fwmc+'  '+ysz);
   let { percent, activeColor, backgroundColor } = progressState;
-  if (ysz) {
+  if (ysz) { 
     const days1 = currq.diff(szrq, 'days');
+// console.log(days1);
     if(days1<=0){
       percent = Math.round((days1+31) / 31 * 100);
       if (percent >= 90) activeColor='yellow';

@@ -97,7 +97,11 @@ Page({
     // console.log(moment().startOf('day').add(4, 'days').format('YYYY-MM-DD'));
     // console.log(utils.getInteger('fff')); 
     // console.log(moment('2018-11-aa','YYYY-MM-DD')); 
-
+    // let sszrq = '2018-11-15';
+    // const szrq = moment(sszrq);
+    // const xcszrq = szrq.clone();
+    // szrq.subtract(1, 'days');
+    // console.log(xcszrq.format('YYYY-MM-DD'));
     const response = fyglService.queryFyglList(); 
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 

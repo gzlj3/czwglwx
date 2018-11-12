@@ -21,3 +21,10 @@ exports.getFloat = (value) => {
 exports.isEmpty = (value) => {
   return !(value && value.length>0);
 }
+
+exports.showLoading = (info) => {
+  wx.showLoading({
+    title:info?info:'加载中',
+    mask: true,
+  });
+}

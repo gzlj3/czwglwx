@@ -13,7 +13,10 @@
     var rq1 = item.rq1;
     if(!rq1 || rq1.length<10) return '';
     var ym = rq1.substring(0,4)+'年'+rq1.substring(5,7)+'月';
-    var zdfy = ym+'帐单:'+item.fyhj+'元';  
+    if(item.zdlx=='0') tsinfo = '签约帐单';
+    else if(item.zdlx=='2') tsinfo = '退房帐单';
+    else tsinfo = ym+'帐单';
+    var zdfy = tsinfo+':'+item.fyhj+'元';  
     return zdfy;
   }
 </wxs>
@@ -24,12 +27,12 @@
         <view class="page__desc">最近6个月帐单列表</view>
     </view>
     <view class="page__bd">
-        <view class="weui-form-preview" wx:for="{{sourceList}}" wx:key="_id">
+        <view class="weui-form-preview margin-bottom" wx:for="{{sourceList}}" wx:key="_id">
             <view class="weui-form-preview__hd">
                 <view class="weui-form-preview__item">
                     <view class="weui-form-preview__label">{{m.getZdfy(item)}}</view>
-                    <view class="weui-form-preview__value_in-hd" wx:if="{{item.sfsz==='0'}}">{{m.getSzzt(item)}}</view>
-                    <view class="weui-form-preview__value" wx:if="{{item.sfsz!=='0'}}">{{m.getSzzt(item)}}</view>
+                    <!-- <view class="weui-form-preview__value_in-hd redColor" wx:if="{{item.sfsz==='0'}}">{{m.getSzzt(item)}}</view> -->
+                    <view class="weui-form-preview__value {{item.sfsz!=='0'?'greenColor':'redColor'}}">{{m.getSzzt(item)}}</view>
                 </view>
             </view>
             <view class="weui-form-preview__bd" >

@@ -47,7 +47,7 @@ exports.queryZdList = async (yzhid) => {
     zdList[index]._id = house._id;
 		try {
       const fwfy = jsFwfy(house);
-      zdList[index].tsinfo = house.fwmc+',帐单费用:'+fwfy+'元';
+      zdList[index].tsinfo = house.fwmc+','+house.zhxm+',帐单:'+fwfy+'元';
       zdList[index].checked = true;
       zdList[index].disabled = false;
     } catch (e) {
@@ -78,11 +78,13 @@ exports.saveFy = async (house) => {
     house._id = result._id;
     if (utils.isEmpty(house._id))
       throw utils.newException("添加房源失败！");
-    //更新housefy中的houseid
-    result  = await updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
-    const updatedNum = result.stats.updated;
-    if(updatedNum!==1){
-      throw utils.newException("关联签约帐单表失败！");
+    if(!utils.isEmpty(house.housefyid)){
+      //更新housefy中的houseid
+      result  = await updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
+      const updatedNum = result.stats.updated;
+      if(updatedNum!==1){
+        throw utils.newException("关联签约帐单表失败！");
+      }
     }
   } else {
     //更新房源
@@ -295,7 +297,7 @@ function makeHousefy(house, housefy, zdlx){
     rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
     if(!rq1.isValid()) 
       throw utils.newException("合同起始日期不合法！");
-    rq2 = szrq.subtract(1,'days');
+    rq2 = szrq.clone().subtract(1,'days');
     const days = rq2.diff(rq1,'days') + 1;
     if (days < 0)
       throw utils.newException("下次收租日期不能小于合同起始日期！");
@@ -314,9 +316,13 @@ function makeHousefy(house, housefy, zdlx){
       + utils.getInteger(housefy.yj)
       + utils.getFloat(housefy.qtf);
   } else {
-    xcszrq = szrq.add(1,'months');
-    rq1 = szrq.subtract(1, 'months'); 
-    rq2 = szrq.subtract(1, 'days');
+    xcszrq = szrq.clone().add(1,'months');
+    rq1 = szrq.clone().subtract(1, 'months'); 
+    if(rq1.format('YYYY-MM-DD')<house.htrqq){
+      rq1 = moment(house.htrqq);
+    }
+
+    rq2 = szrq.clone().subtract(1, 'days');
 
     housefy.czje=house.czje;
     // 电费数据

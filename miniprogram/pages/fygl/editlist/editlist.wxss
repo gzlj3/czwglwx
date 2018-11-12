@@ -12,3 +12,7 @@
     width:90px;
     word-wrap: break-word;
 }
+
+.margin-bottom{
+  margin-bottom: 10px;
+}

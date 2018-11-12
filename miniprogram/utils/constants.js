@@ -29,3 +29,7 @@ export const getButtonActionInfo = buttonAction => {
     return '';
   }
 };
+
+export const ZDLX_HTZD = '0';  //合同帐单
+export const ZDLX_YJZD = '1';  //月结帐单
+export const ZDLX_TFZD = '2';  //退房帐单
