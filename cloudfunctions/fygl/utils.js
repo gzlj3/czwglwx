@@ -27,3 +27,7 @@ exports.isEmpty = (value) => {
 exports.getCurrentTimestamp = ()=>{
   return moment().format('YYYY-MM-DD HH:mm:ss');
 }
+
+exports.newException = (message,code)=>{
+  return {message,code};
+}

@@ -14,8 +14,8 @@ const fyxxMetas = {
   htrqq: { label: '合同日期起', name: 'htrqq', type: 'date' },
   htrqz: { label: '合同日期止', name: 'htrqz', type: 'date' },
   szrq: { label: '收租日期', name: 'szrq',type:'date' },
-  dqsds: { label: '电起始读数', name: 'dqsds', type: "number" },
-  sqsds: { label: '水起始读数', name: 'sqsds', type: "number" },
+  dscds: { label: '电起始读数', name: 'dscds', type: "number" },
+  sscds: { label: '水起始读数', name: 'sscds', type: "number" },
   ddj: { label: '电费单价', name: 'ddj', type: "digit" },
   sdj: { label: '水费单价', name: 'sdj', type: "digit" },
   dgtds: { label: '电公摊度数', name: 'dgtds' },
@@ -148,7 +148,7 @@ Page({
     if(name === 'zhxm'){
       const isRequire = !utils.isEmpty(e.detail.value);
       // const {fmMetas} = this.data;
-      ['dhhm','czje','htrqq','htrqz','szrq','dqsds','sqsds','ddj','sdj'].map(value=>{
+      ['dhhm','czje','htrqq','htrqz','szrq','dscds','sscds','ddj','sdj'].map(value=>{
         if (fmMetas[value]){
           fmMetas[value].require = isRequire;
           if(isRequire){

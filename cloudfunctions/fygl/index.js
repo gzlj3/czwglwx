@@ -95,6 +95,6 @@ exports.main = async (event, context) => {
     }
   } catch (e) {
     console.log(e);
-    return results.getErrorResults((e.message ? e.message : e));
+    return results.getErrorResults(e.message);
   }
 }

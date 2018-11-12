@@ -41,11 +41,45 @@ Page({
     );
   },
 
+
   onQrsz: function (e) {
+    const { id: flag } = e.currentTarget;
+    let title,content;
+    if("qrsz"===flag){
+      title = "确认收租";
+      content = "确认收到租金了吗？"
+    }else if("jzzd"===flag){
+      title = "结转下月";
+      content = "未收到本月租金，确认将本月帐单结转到下月吗？"
+    } else if ("sxzd" === flag) {
+      title = "刷新帐单";
+      content = "确定刷新当前帐单吗？"
+    }else{
+      return;
+    }
+    let self = this;
+    wx.showModal({
+      title,
+      content,
+      // confirmText: "确认操作",
+      // cancelText: "取消",
+      success: function (res) {
+        console.log(res);
+        if (res.confirm) {
+          self.onQrszCz(e);
+        } else {
+          // console.log('用户点击辅助操作')
+        }
+      }
+    });
+  },
+
+  onQrszCz: function (e) {
     console.log(e);
     const { item:housefyid } = e.currentTarget.dataset;
     const {id:flag} = e.currentTarget;
     const { buttonAction } = this.data;
+    
     const response = fyglService.postData(buttonAction,{housefyid,flag});
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData) => {

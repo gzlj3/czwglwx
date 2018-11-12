@@ -15,7 +15,7 @@
         </view> 
         <view class="weui-cells__title">签约信息</view>
         <view class="weui-cells weui-cells_after-title">
-            <template is="FmInput" wx:key="{{item}}" wx:for="{{['zhxm','sfzh','dhhm','czje','yj','htrqq','htrqz','szrq','dqsds','sqsds','ddj','sdj','dgtds','sgtds','dbcds','sbcds']}}" data="{{...fmMetas[item],currentObject}}"/>
+            <template is="FmInput" wx:key="{{item}}" wx:for="{{['zhxm','sfzh','dhhm','czje','yj','htrqq','htrqz','szrq','dscds','sscds','ddj','sdj','dgtds','sgtds','dbcds','sbcds']}}" data="{{...fmMetas[item],currentObject}}"/>
         </view>
         <view class="weui-cells__title">其它费用</view>
         <view class="weui-cells weui-cells_after-title">

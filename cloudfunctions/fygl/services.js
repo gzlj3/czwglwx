@@ -52,7 +52,7 @@ exports.queryZdList = async (yzhid) => {
       zdList[index].disabled = false;
     } catch (e) {
       // console.log(e);
-      zdList[index].tsinfo = house.fwmc +","+(e.message?e.message:e);
+      zdList[index].tsinfo = house.fwmc +","+e.message;
       zdList[index].disabled = true;
     }
   });
@@ -61,25 +61,39 @@ exports.queryZdList = async (yzhid) => {
 
 exports.saveFy = async (house) => {
   let result;
+  // 检查房屋名称是否重复
+
   if (utils.isEmpty(house.housefyid) && !utils.isEmpty(house.zhxm)) {
     // 如果为新签约，则自动生成合同帐单
     const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_HTZD);
     // 结转房屋数据
     const housefyResult = await addDoc('housefy',newHousefy);
     house.housefyid = housefyResult._id;
-    // result = updateDoc('house', house);
+    if(utils.isEmpty(house.housefyid))
+      throw utils.newException("生成签约帐单失败！");
   }
   if (utils.isEmpty(house._id)) {
     //如果是添加房源，则先保存房屋数据，以便拿到ID
     result = await addDoc('house', house);
     house._id = result._id;
+    if (utils.isEmpty(house._id))
+      throw utils.newException("添加房源失败！");
     //更新housefy中的houseid
-    updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
+    result  = await updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
+    const updatedNum = result.stats.updated;
+    if(updatedNum!==1){
+      throw utils.newException("关联签约帐单表失败！");
+    }
   } else {
     //更新房源
-    result = updateDoc('house', house);
+    result =await updateDoc('house', house);
+    console.log(result);
+    const updatedNum = result.stats.updated;
+    if (updatedNum !== 1) {
+      throw utils.newException("更新房屋表失败！");
+    }
   } 
-  return result;
+  return null;
 }
 
 
@@ -132,26 +146,34 @@ exports.updateZdList = async (zdList) => {
     if(checked) selectedRowkeys.push(_id);
   });
 
-  // console.log(selectedRowkeys);
+  console.log(selectedRowkeys);
   const list = await houseTable.where({
     _id: _.in(selectedRowkeys),
   }).get();
 
   const houseList = list.data;
+  // console.log(houseList);
 
-  let tasks = [];
-  houseList.map(async (house)=>{  
-    // 生成新帐单
-    const {_id} = house;
-    const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_YJZD);
-    // console.log(newHousefy);
-    const addResult = await housefyTable.add({ data: newHousefy });
-    house.housefyid = addResult._id;
-    delete house._id;
-    const housePromise = houseTable.doc(_id).set({ data: house });
-    tasks.push(housePromise);
-  });
-  return Promise.all(tasks);
+  let errMsg = '';
+  for(i=0;i<houseList.length;i++){
+  // houseList.map(async (house)=>{
+    let house = houseList[i];
+    try{
+      // 生成新帐单
+      const {_id} = house;
+      const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_YJZD);
+      // console.log(newHousefy);
+      const housefyResult = await addDoc('housefy',newHousefy); 
+      console.log("======="+housefyResult._id); 
+      house.housefyid = housefyResult._id;
+      const houseResult = await updateDoc('house',house);
+      console.log(houseResult);
+    }catch(e){
+      errMsg += e.message;
+    }
+  };
+  if(!utils.isEmpty(errMsg)) throw utils.newException(errMsg);
+  return null;
 }
 
 exports.processQrsz = async (params,userb) => {
@@ -161,14 +183,14 @@ exports.processQrsz = async (params,userb) => {
 
   let result = await db.collection('housefy').doc(housefyid).get();
   const housefy = result.data;
-  if (!housefy) throw "未查到房源帐单记录：" + housefyid;
+  if (!housefy) throw utils.newException("未查到房源帐单记录：" + housefyid);
 
   result = await db.collection('house').doc(housefy.houseid).get();
   const house = result.data;
-  if (!house) throw "未查到房源记录：" + houseid;
+  if (!house) throw utils.newException("未查到房源记录：" + houseid);
 
   if ("sxzd" === flag && housefyid !== house.housefyid)
-    throw "帐单数据与主房屋不匹配，刷新帐单失败！";
+    throw utils.newException("帐单数据与主房屋不匹配，刷新帐单失败！");
 
   if ("sxzd" === flag) {
     // 刷新帐单
@@ -205,27 +227,27 @@ function jzHouse(house, housefy, flag) {
     house.sfsz="1";
     housefy.sfsz="1";
   } else {
-    throw "未知的帐单处理动作，帐单处理失败！";
+    throw utils.newException("未知的帐单处理动作，帐单处理失败！");
   }
 }
 
 
 function jsFwfy(house){
   if (!house.sbcds || !house.dbcds)
-    throw "未抄水电表";
+    throw utils.newException("未抄水电表");
 
   // 计算电费
   const df = jsdf(house);
   if (df < 0)
-    throw "电费计算小于0";
+    throw utils.newException("电费计算小于0");
   // 计算水费
   const sf = jssf(house);
   if (sf < 0)
-    throw "水费计算小于0";
+    throw utils.newException("水费计算小于0");
   // 计算合计费
   const fwfy = df + sf + jsqtfhj(house);
   if (fwfy <= 0)
-    throw "无帐单费用";
+    throw utils.newException("无帐单费用");
   return fwfy;
 }
 
@@ -258,7 +280,7 @@ function jsqtfhj(house) {
 function makeHousefy(house, housefy, zdlx){
   // 计算收租范围
   const szrq = moment(house.szrq);
-  if (!szrq.isValid()) throw "收租日期不合法！";
+  if (!szrq.isValid()) throw utils.newException("收租日期不合法！");
 
   if (!housefy) {
     housefy = {};
@@ -272,11 +294,11 @@ function makeHousefy(house, housefy, zdlx){
     xcszrq = szrq;
     rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
     if(!rq1.isValid()) 
-      throw "合同起始日期不合法！";
+      throw utils.newException("合同起始日期不合法！");
     rq2 = szrq.subtract(1,'days');
     const days = rq2.diff(rq1,'days') + 1;
     if (days < 0)
-      throw "下次收租日期不能小于合同起始日期！";
+      throw utils.newException("下次收租日期不能小于合同起始日期！");
     let yzj;
     if (days == 30 || days == 31)
       yzj = house.czje;
