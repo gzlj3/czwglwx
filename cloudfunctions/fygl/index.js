@@ -74,6 +74,7 @@ exports.main = async (event, context) => {
         if (method === 'POST') {
           console.log("post lastzd");
           result = await services.processQrsz(data,curUser);
+          result = result.data;
         } else {
           console.log("querylastzd");
           result = await services.queryLastzdList(data);

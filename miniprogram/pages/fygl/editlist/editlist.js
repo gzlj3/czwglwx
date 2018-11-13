@@ -37,6 +37,14 @@ Page({
       (resultData)=>{
         getApp().setPageParams(buttonAction, resultData);
         wx.navigateBack();
+        // console.log("===buttonAction:" + buttonAction);
+        // if (buttonAction === CONSTS.BUTTON_LASTZD) {
+        //   this.setData({
+        //     sourceList: resultData,
+        //   });
+        // } else {
+        //   wx.navigateBack();
+        // }
       }
     );
   },
@@ -84,7 +92,9 @@ Page({
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData) => {
         getApp().setPageParams(buttonAction, resultData);
-        wx.navigateBack();
+        this.setData({
+          sourceList: resultData,
+        }); 
       }
     );
   },

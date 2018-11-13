@@ -14,15 +14,16 @@ exports.queryFyList = async (yzhid) => {
   return result;
 }
 
-exports.queryLastzdList = async (params) => {
+async function queryLastzdList (params) {
   const {houseid} = params;
   const db = cloud.database();
   const _ = db.command;
-  const result = db.collection('housefy').orderBy('szrq','desc').where({
+  const result = db.collection('housefy').orderBy('szrq','desc').limit(6).where({
     houseid,
   }).get();
   return result;
 }
+exports.queryLastzdList = queryLastzdList;
 
 async function querySdbList (yzhid) {
   const db = cloud.database();  
@@ -38,7 +39,7 @@ async function querySdbList (yzhid) {
 }
 exports.querySdbList = querySdbList;
 
-exports.queryZdList = async (yzhid) => {
+async function queryZdList(yzhid) {
   const fyList = await querySdbList(yzhid);
   const resultList = fyList.data;
   let zdList = new Array(resultList.length);
@@ -58,6 +59,8 @@ exports.queryZdList = async (yzhid) => {
   });
   return zdList;
 }
+exports.queryZdList = queryZdList;
+
 
 exports.saveFy = async (house) => {
   let result;
@@ -80,18 +83,17 @@ exports.saveFy = async (house) => {
       throw utils.newException("添加房源失败！");
     if(!utils.isEmpty(house.housefyid)){
       //更新housefy中的houseid
-      result  = await updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
-      const updatedNum = result.stats.updated;
-      if(updatedNum!==1){
+      const updatedNum  = updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
+      if(updatedNum===0){
         throw utils.newException("关联签约帐单表失败！");
       }
     }
   } else {
     //更新房源
-    result =await updateDoc('house', house);
-    console.log(result);
-    const updatedNum = result.stats.updated;
-    if (updatedNum !== 1) {
+    const updatedNum = updateDoc('house', house);
+    // console.log(result);
+    // const updatedNum = result.stats.updated;
+    if (updatedNum === 0) {
       throw utils.newException("更新房屋表失败！");
     }
   } 
@@ -168,8 +170,9 @@ exports.updateZdList = async (zdList) => {
       const housefyResult = await addDoc('housefy',newHousefy); 
       console.log("======="+housefyResult._id); 
       house.housefyid = housefyResult._id;
-      const houseResult = await updateDoc('house',house);
-      console.log(houseResult);
+      const houseNum = updateDoc('house',house);
+      if(houseNum===0)
+        throw utils.newException("更新房源信息失败！");      
     }catch(e){
       errMsg += e.message;
     }
@@ -186,8 +189,8 @@ exports.processQrsz = async (params,userb) => {
   let result = await db.collection('housefy').doc(housefyid).get();
   const housefy = result.data;
   if (!housefy) throw utils.newException("未查到房源帐单记录：" + housefyid);
-
-  result = await db.collection('house').doc(housefy.houseid).get();
+  const {houseid} = housefy;
+  result = await db.collection('house').doc(houseid).get();
   const house = result.data;
   if (!house) throw utils.newException("未查到房源记录：" + houseid);
 
@@ -205,9 +208,14 @@ exports.processQrsz = async (params,userb) => {
   house.zhxgsj = utils.getCurrentTimestamp();
   housefy.zhxgr=userb.userid;
   housefy.zhxgsj = house.zhxgsj;
-  const promise1 = updateDoc('housefy',housefy);
-  const promise2 = updateDoc('house',house);
-  return Promise.all([promise1,promise2]);
+  const housefyNum = updateDoc('housefy',housefy);
+  if(housefyNum===0)
+    throw utils.newException("帐单数据更新失败！");
+  const houseNum = updateDoc('house',house);
+  if (houseNum === 0)
+    throw utils.newException("房源数据更新失败！");
+  console.log("=====:" + houseid);
+  return queryLastzdList({houseid});
 }
 
 function jzHouse(house, housefy, flag) {
@@ -216,8 +224,8 @@ function jzHouse(house, housefy, flag) {
   // 更新房源结转数据
   house.dscds=housefy.dbcds;
   house.sscds=housefy.sbcds;
-  house.dbcds=null;
-  house.sbcds=null;
+  house.dbcds="";
+  house.sbcds="";
   if ("jzzd"===flag) {
     // 结转帐单
     house.syjzf=housefy.fyhj;
@@ -225,7 +233,7 @@ function jzHouse(house, housefy, flag) {
     housefy.sfsz="2";
   } else if ("qrsz"===flag) {
     // 确认收租
-    house.syjzf=null;
+    house.syjzf="";
     house.sfsz="1";
     housefy.sfsz="1";
   } else {
@@ -381,14 +389,19 @@ function makeHousefy(house, housefy, zdlx){
   return housefy;
 }
 
+/**
+ * 更新表的记录，返回更新成功的记录数
+ */
 const updateDoc = async (tableName,docObj) => {
   const db = cloud.database();
   const { _id } = docObj;
   delete docObj._id;
-  const result = db.collection(tableName).doc(_id).update({
+  const result = await db.collection(tableName).doc(_id).update({
     data: docObj
   });
-  return result;
+  const updatedNum = result.stats.updated;
+
+  return updatedNum;
 }
 
 const addDoc = async (tableName, docObj) => {

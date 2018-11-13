@@ -16,3 +16,9 @@
 .margin-bottom{
   margin-bottom: 10px;
 }
+
+.zdfy{
+  display:inline-block;
+  font-size:18px;
+  color:blue;
+}

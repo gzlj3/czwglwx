@@ -64,7 +64,7 @@ export function handleAfterRemote(response,tsinfo,successCallback) {
     if (status === CONSTS.REMOTE_SUCCESS) {
       if (tsinfo.length > 0) {
         wx.showToast({
-          title: `${tsinfo}成功完成！${msg}`,
+          title: `处理成功完成！`,
         });
       };
       if (successCallback) successCallback(data);

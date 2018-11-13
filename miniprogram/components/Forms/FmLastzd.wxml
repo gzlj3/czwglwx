@@ -16,7 +16,7 @@
     if(item.zdlx=='0') tsinfo = '签约帐单';
     else if(item.zdlx=='2') tsinfo = '退房帐单';
     else tsinfo = ym+'帐单';
-    var zdfy = tsinfo+':'+item.fyhj+'元';  
+    var zdfy = tsinfo;  
     return zdfy;
   }
 </wxs>
@@ -30,7 +30,8 @@
         <view class="weui-form-preview margin-bottom" wx:for="{{sourceList}}" wx:key="_id">
             <view class="weui-form-preview__hd">
                 <view class="weui-form-preview__item">
-                    <view class="weui-form-preview__label">{{m.getZdfy(item)}}</view>
+                    <view class="weui-form-preview__label">{{m.getZdfy(item)}}:<view class="zdfy">{{item.fyhj+'元'}}</view>
+                    </view>
                     <!-- <view class="weui-form-preview__value_in-hd redColor" wx:if="{{item.sfsz==='0'}}">{{m.getSzzt(item)}}</view> -->
                     <view class="weui-form-preview__value {{item.sfsz!=='0'?'greenColor':'redColor'}}">{{m.getSzzt(item)}}</view>
                 </view>
