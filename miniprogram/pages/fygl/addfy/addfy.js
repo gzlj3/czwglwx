@@ -1,7 +1,7 @@
 // miniprogram/pages/fygl/addfy/addfy.js
 import * as CONSTS from '../../../utils/constants.js';
 import * as utils from '../../../utils/utils.js';
-import * as fyglService from '../../../services/fygl.js'; 
+import * as fyglService from '../../../services/fyglServices.js'; 
 import moment from '../../../utils/moment.min.js';
 
 const fyxxMetas = {

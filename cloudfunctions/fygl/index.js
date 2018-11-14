@@ -32,6 +32,9 @@ exports.main = async (event, context) => {
       case CONSTS.BUTTON_QUERYUSER:
         result = await userServices.queryUser(event.userInfo);
         return results.getSuccessResults(result);
+      case CONSTS.BUTTON_REGISTERUSER:
+        result = await userServices.registerUser(data,event.userInfo);
+        return results.getSuccessResults(result);
       case CONSTS.BUTTON_QUERYFY:
         // console.log('queryfy');
           result = await services.queryFyList(curUser.yzhid);
@@ -85,7 +88,7 @@ exports.main = async (event, context) => {
         }
         return results.getSuccessResults(result);
       default:
-        return results.getErrorResults('未确定动作！');
+        return results.getErrorResults('未确定动作！'+action);
     }
   } catch (e) {
     console.log(e);

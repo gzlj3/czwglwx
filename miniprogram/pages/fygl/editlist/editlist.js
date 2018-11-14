@@ -1,6 +1,6 @@
 // miniprogram/pages/fygl/addfy/addfy.js
 import * as CONSTS from '../../../utils/constants.js';
-import * as fyglService from '../../../services/fygl.js'; 
+import * as fyglService from '../../../services/fyglServices.js'; 
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息

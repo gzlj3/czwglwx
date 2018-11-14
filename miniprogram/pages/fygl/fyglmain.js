@@ -1,7 +1,7 @@
 import * as CONSTS from '../../utils/constants.js';
 // import moment from '../../utils/moment-with-locales.min.js';
 import moment from '../../utils/moment.min.js';
-import * as fyglService from '../../services/fygl.js'; 
+import * as fyglService from '../../services/fyglServices.js'; 
 const utils = require('../../utils/utils.js');
  
 const initialState = {

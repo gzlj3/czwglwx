@@ -1,11 +1,12 @@
 //index.js
 const CONSTS = require('../../utils/constants.js');
-const userService = require('../../services/userServices.js');
+// const userService = require('../../services/userServices.js');
+const fyglService = require('../../services/fyglServices.js');
 const app = getApp()
 
 const menuList = [
   {
-    id: 'form', 
+    id: 'form',  
     name: '我的房源列表',
     open: false,
     // pages: ['button', 'list', 'input', 'slider', 'uploader']
@@ -55,8 +56,6 @@ Page({
     // wx.redirectTo({
     //  url: '../fygl/fyglmain',
     // })
-    // return; 
-// console.log(this.data.list);
     if (!wx.cloud) {
       wx.redirectTo({
         url: '../chooseLib/chooseLib',
@@ -155,14 +154,40 @@ Page({
     })
   },
 
+  onRegister: function(e) {
+    e.detail.value.userType = '1';
+    console.log(e.detail.value);
+
+    const response = fyglService.postData(CONSTS.BUTTON_REGISTERUSER,
+      {frontUserInfo:this.data.userInfo,
+       sjData:e.detail.value});
+
+    fyglService.handleAfterRemote(response, '用户注册',
+      (resultData) => {
+        console.log('======register user result:');
+        console.log(resultData);
+        // let userType;
+        // if (resultData && resultData.length > 0) {
+        //   userType = resultData[0].userType;
+        // } else { 
+        //   userType = CONSTS.USERTYPE_NONE;
+        // }
+        // this.setData({ userType });
+        // getApp().setPageParams(CONSTS.BUTTON_NONE, null);
+        // this.setData({
+        //   fyList: resultData,
+        // });
+      }
+    );
+
+  },
+
   queryUser: function(){
     if(!this.data.granted) return;
-    const response = userService.queryUser();
+    const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
     // const response = fyglService.queryFyglList();
-    userService.handleAfterRemote(response, null,
+    fyglService.handleAfterRemote(response, null,
       (resultData) => {
-        //计算房源进度条显示数据
-        // fyglService.refreshProgessState(resultData);
         console.log('======query user result:');
         console.log(resultData);
         let userType;
