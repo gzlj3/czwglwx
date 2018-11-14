@@ -1,6 +1,10 @@
-import * as CONSTS from '../utils/constants.js';
+// import * as CONSTS from '../utils/constants.js';
 import * as utils from '../utils/utils.js';
 import moment from '../utils/moment.min.js';
+// import commServices from 'commServices.js';
+const CONSTS = require('../utils/constants.js');
+
+export { handleAfterRemote } from 'commServices.js';
 
 export function queryData(action,params) {
   utils.showLoading();
@@ -49,42 +53,42 @@ export function saveFy(action,params) {
   });
 }
 
-export function handleAfterRemote(response,tsinfo,successCallback) {
-  if (!response) return;
-  // const { buttonAction } = this.data;
-  // const tsinfo = CONSTS.getButtonActionInfo(buttonAction);
-  // console.log("tsinfo:"+tsinfo);
-  if(!tsinfo) tsinfo = "";
-  response.then(res => {
-    wx.hideLoading();
-    console.log(res);
-    const { status = CONSTS.REMOTE_SUCCESS, msg, data } = res.result;
-    // this.changeState({ status, msg });
+// export function handleAfterRemote(response,tsinfo,successCallback) {
+//   if (!response) return;
+//   // const { buttonAction } = this.data;
+//   // const tsinfo = CONSTS.getButtonActionInfo(buttonAction);
+//   // console.log("tsinfo:"+tsinfo);
+//   if(!tsinfo) tsinfo = "";
+//   response.then(res => {
+//     wx.hideLoading();
+//     console.log(res);
+//     const { status = CONSTS.REMOTE_SUCCESS, msg, data } = res.result;
+//     // this.changeState({ status, msg });
 
-    if (status === CONSTS.REMOTE_SUCCESS) {
-      if (tsinfo.length > 0) {
-        wx.showToast({
-          title: `处理成功完成！`,
-        });
-      };
-      if (successCallback) successCallback(data);
-    } else {
-      wx.showToast({
-        title: `${tsinfo}处理失败！${msg}`,
-        icon: 'none',
-        duration: 5000,
-      });
-    }
-  }).catch(err => {
-    wx.hideLoading();
-    console.log(err);
-    wx.showToast({
-      title: `${tsinfo}处理失败！${err.errMsg}`,
-      icon: 'none',
-      duration: 5000,
-    });
-  })
-}
+//     if (status === CONSTS.REMOTE_SUCCESS) {
+//       if (tsinfo.length > 0) {
+//         wx.showToast({
+//           title: `处理成功完成！`,
+//         });
+//       };
+//       if (successCallback) successCallback(data);
+//     } else {
+//       wx.showToast({
+//         title: `${tsinfo}处理失败！${msg}`,
+//         icon: 'none',
+//         duration: 5000,
+//       });
+//     }
+//   }).catch(err => {
+//     wx.hideLoading();
+//     console.log(err);
+//     wx.showToast({
+//       title: `${tsinfo}处理失败！${err.errMsg}`,
+//       icon: 'none',
+//       duration: 5000,
+//     });
+//   })
+// }
 
 export function refreshProgessState(fyList) {
   fyList.map(item =>{

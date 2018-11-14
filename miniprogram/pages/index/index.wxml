@@ -1,7 +1,72 @@
-<!--index.wxml-->
-<view class="container">
+<view class="page">
+    <view class="nickname" wx:if="{{granted}}">
+      {{userInfo.nickName}},欢迎您的到来！
+    </view>
+    <view class="page__hd">
+        <view class="page__title">极简出租</view>
+        <view class="page__desc">为房东提供简洁高效的房屋出租管理，为租客提供方便快捷的帐单管理。</view> 
+    </view>
+    <view class="page__bd page__bd_spacing">
+        <view class="grant-container" wx:if="{{!granted}}">
+          <view class='grant-item'>我们需要获得你的授权</view>
+          <view class='grant-item'>
+            <button size='mini' type='primary' open-type="getUserInfo" 
+        bindgetuserinfo="onGetUserInfo">微信授权</button>
+          </view>
+        </view>
+        <view class="grant-container" wx:if="{{granted && userType===CONSTS.USERTYPE_NONE}}">
+          <view class='grant-item'>需要注册后才能使用</view>
+          <view class='grant-item'>
+            手机号:<input placeholder="请输入手机号" />获取验证码
+            <!-- <view class="weui-cell weui-cell_input weui-cell_vcode">
+                <view class="weui-cell__hd">
+                    <view class="weui-label">手机号</view>
+                </view>
+                <view class="weui-cell__bd">
+                    <input class="weui-input" placeholder="请输入手机号" />
+                </view>
+                <view class="weui-cell__ft">
+                    <view class="weui-vcode-btn">获取验证码</view>
+                </view>
+            </view> -->
+          
+          </view>
+          <view class='grant-item'>
+            <button size='mini' type='primary' open-type="getUserInfo" 
+        bindgetuserinfo="onGetUserInfo">立即注册</button>
+          </view>
+        </view>
+        
+            <!-- <button size='mini' type='primary' 
+        bindtap="onGetOpenid">获取openid</button> -->
+        <view class="kind-list" wx:if="{{userType===CONSTS.USERTYPE_FD}}">
+            <block wx:for="{{list}}" wx:key="id">
+                <view class="kind-list__item">
+                    <view id="{{item.page}}" class="weui-flex kind-list__item-hd {{item.open ? 'kind-list__item-hd_show' : ''}}" bindtap="kindToggle">
+                        <view class="weui-flex__item">{{item.name}}</view>
+                        <image class="kind-list__img" src="../../images/icon_nav_{{item.id}}.png"></image>
+                    </view>
+                    <view class="kind-list__item-bd {{item.open ? 'kind-list__item-bd_show' : ''}}">
+                        <view class="weui-cells {{item.open ? 'weui-cells_show' : ''}}">
+                            <block wx:for="{{item.pages}}" wx:for-item="page" wx:key="*this">
+                                <navigator url="{{page}}/{{page}}" class="weui-cell weui-cell_access">
+                                    <view class="weui-cell__bd">{{page}}</view>
+                                    <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+                                </navigator>
+                            </block>
+                        </view>
+                    </view>
+                </view>
+            </block>
+        </view>
+    </view>
+    <view class="page__ft weui-footer_fixed-bottom">
+        <view class="weui-footer__text">极简出租，Copyright©2018-2019 by liujun</view>
+    </view>
+</view>
 
-  <!-- 用户 openid -->
+<!-- 
+<view class="container">
   <view class="userinfo">
     <button 
       open-type="getUserInfo" 
@@ -9,41 +74,21 @@
       class="userinfo-avatar"
       style="background-image: url({{avatarUrl}})"
     ></button>
-    <view>
-      <button class="userinfo-nickname" bindtap="onGetOpenid">点击获取 openid</button>
+    <view class="userinfo-nickname" wx:if="{{granted}}">
+      <open-data type="userNickName"></open-data>
+      {{userInfo.nickName}},欢迎您！
+    </view>
+    <view class="userinfo-nickname" wx:else>
+      未授权 
     </view>
   </view>
 
-
-  <!-- 上传图片 -->
-  <view class="uploader">
-    <view class="uploader-text" bindtap="doUpload">
-      <text>上传图片</text>
+  <block wx:if="{{granted}}">
+    <view class="uploader">
+      <navigator url="../fygl/fyglmain" open-type="navigate" class="uploader-text">
+        <text>我是房东</text>
+      </navigator>
     </view>
-    <view class="uploader-container" wx:if="{{imgUrl}}">
-      <image class="uploader-image" src="{{imgUrl}}" mode="aspectFit" bindtap="previewImg"></image>
-    </view>
-  </view>
+  </block>
 
-
-  <!-- 操作数据库 -->
-  <view class="uploader">
-    <navigator url="../databaseGuide/databaseGuide" open-type="navigate" class="uploader-text">
-      <text>前端操作数据库</text>
-    </navigator>
-  </view>
-
-  <!-- 新建云函数 -->
-  <view class="uploader">
-    <navigator url="../addFunction/addFunction" open-type="navigate" class="uploader-text">
-      <text>快速新建云函数</text>
-    </navigator>
-  </view>
-  <!-- 房源管理主界面 -->
-  <view class="uploader">
-    <navigator url="../fygl/fyglmain" open-type="navigate" class="uploader-text">
-      <text>我是房东</text>
-    </navigator>
-  </view>
-
-</view>
+</view> -->

@@ -18,10 +18,10 @@ const fyxxMetas = {
   sscds: { label: '水起始读数', name: 'sscds', type: "number" },
   ddj: { label: '电费单价', name: 'ddj', type: "digit" },
   sdj: { label: '水费单价', name: 'sdj', type: "digit" },
-  dgtds: { label: '电公摊度数', name: 'dgtds' },
-  sgtds: { label: '水公摊度数', name: 'sgtds' },
-  dbcds: { label: '电本次读数', name: 'dbcds' },
-  sbcds: { label: '水本次读数', name: 'sbcds' },
+  dgtds: { label: '电公摊度数', name: 'dgtds', type: "number" },
+  sgtds: { label: '水公摊度数', name: 'sgtds', type: "number" },
+  dbcds: { label: '电本次读数', name: 'dbcds', type: "number" },
+  sbcds: { label: '水本次读数', name: 'sbcds', type: "number" },
   wlf: { label: '网络费', name: 'wlf', type: "digit" },
   ljf: { label: '卫生费', name: 'ljf', type: "digit" },
   glf: { label: '管理费', name: 'glf', type: "digit" },
@@ -63,6 +63,7 @@ Page({
 
   formSubmit: function(e){
     console.log('form发生了submit事件，携带数据为：', e.detail.value)
+    console.log('formid：', e.detail.formId);
     const {buttonAction} = this.data;
     // 校验必录项
     let { fmMetas } = this.data;

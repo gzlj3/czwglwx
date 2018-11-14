@@ -2,6 +2,7 @@
 const results = require('results.js');
 const CONSTS = require('constants.js');
 const services = require('services.js');
+const userServices = require('UserServices.js');
 const utils = require('utils.js');
 
 const curUser = {
@@ -28,11 +29,13 @@ exports.main = async (event, context) => {
   try {
     let result;
     switch(action){
+      case CONSTS.BUTTON_QUERYUSER:
+        result = await userServices.queryUser(event.userInfo);
+        return results.getSuccessResults(result);
       case CONSTS.BUTTON_QUERYFY:
         // console.log('queryfy');
           result = await services.queryFyList(curUser.yzhid);
           return results.getSuccessResults(result.data);
-        break;
       case CONSTS.BUTTON_ADDFY:
         // console.log('addfy');
           data.yzhid = curUser.yzhid;
@@ -81,16 +84,6 @@ exports.main = async (event, context) => {
           result = result.data;
         }
         return results.getSuccessResults(result);
-      // case CONSTS.BUTTON_QUERYSDB:
-      //   console.log("querysdb");
-      //   result = await services.querySdbList(curUser.yzhid);
-      //   return results.getSuccessResults(result.data);
-      //   break;
-      // case CONSTS.BUTTON_QUERYMAKEZD: 
-      //   console.log("querymakezd");
-      //   result = await services.queryZdList(curUser.yzhid);
-      //   return results.getSuccessResults(result);
-      //   break;
       default:
         return results.getErrorResults('未确定动作！');
     }

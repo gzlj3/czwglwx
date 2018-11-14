@@ -1,4 +1,5 @@
 <import src="../../../components/Forms/FmFyxx.wxml"/>
+<!-- <form bindsubmit="formSubmit" report-submit="true"> -->
 <form bindsubmit="formSubmit">
   <!-- <view class="weui-toptips weui-toptips_warn" wx:if="{{status!=0}}">{{msg}}</view> -->
   <template is="FmFyxx" data="{{currentObject,fmMetas,pageTitle,pageDesc}}"/>

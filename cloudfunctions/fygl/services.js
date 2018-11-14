@@ -3,7 +3,10 @@ const utils = require('utils.js');
 const cloud = require('wx-server-sdk')
 const CONSTS = require('constants.js');
 
-cloud.init()
+cloud.init({
+  env: 'jjczwgl-bc6ef9'
+  // env: 'jjczwgl-test-2e296e'
+})
 
 exports.queryFyList = async (yzhid) => {
   //查询房源列表
@@ -81,16 +84,18 @@ exports.saveFy = async (house) => {
     house._id = result._id;
     if (utils.isEmpty(house._id))
       throw utils.newException("添加房源失败！");
+    console.log("===house.housefyid:"+house.housefyid+",house._id:"+house._id);
     if(!utils.isEmpty(house.housefyid)){
       //更新housefy中的houseid
-      const updatedNum  = updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
+      const updatedNum  = await updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
+      console.log(updatedNum);
       if(updatedNum===0){
         throw utils.newException("关联签约帐单表失败！");
       }
     }
   } else {
     //更新房源
-    const updatedNum = updateDoc('house', house);
+    const updatedNum = await updateDoc('house', house);
     // console.log(result);
     // const updatedNum = result.stats.updated;
     if (updatedNum === 0) {
@@ -170,7 +175,7 @@ exports.updateZdList = async (zdList) => {
       const housefyResult = await addDoc('housefy',newHousefy); 
       console.log("======="+housefyResult._id); 
       house.housefyid = housefyResult._id;
-      const houseNum = updateDoc('house',house);
+      const houseNum = await updateDoc('house',house);
       if(houseNum===0)
         throw utils.newException("更新房源信息失败！");      
     }catch(e){
@@ -208,10 +213,10 @@ exports.processQrsz = async (params,userb) => {
   house.zhxgsj = utils.getCurrentTimestamp();
   housefy.zhxgr=userb.userid;
   housefy.zhxgsj = house.zhxgsj;
-  const housefyNum = updateDoc('housefy',housefy);
+  const housefyNum = await updateDoc('housefy',housefy);
   if(housefyNum===0)
     throw utils.newException("帐单数据更新失败！");
-  const houseNum = updateDoc('house',house);
+  const houseNum = await updateDoc('house',house);
   if (houseNum === 0)
     throw utils.newException("房源数据更新失败！");
   console.log("=====:" + houseid);

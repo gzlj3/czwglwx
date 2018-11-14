@@ -10,7 +10,7 @@
 	},
 	"appid": "wx074eecae1210da4a",
 	"projectname": "czwglwx",
-	"libVersion": "2.3.2",
+	"libVersion": "2.4.0",
 	"condition": {
 		"search": {
 			"current": -1,
