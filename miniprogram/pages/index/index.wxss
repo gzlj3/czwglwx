@@ -36,14 +36,14 @@ page {
 .grant-item {
   flex: 1;
   margin:5px 0px;
-}
+} 
 
-.weui-input{
+/* .weui-input{
   border: 1px solid rgba(0, 0, 0, 0.1);
     height: 20px;
-    /* min-height: 24px; */
+    min-height: 24px;
     line-height: 20px;
-}
+} */
 
 .userinfo, .uploader, .tunnel {
   margin-top: 40rpx;

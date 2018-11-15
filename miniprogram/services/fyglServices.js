@@ -1,7 +1,5 @@
-// import * as CONSTS from '../utils/constants.js';
 import * as utils from '../utils/utils.js';
 import moment from '../utils/moment.min.js';
-// import commServices from 'commServices.js';
 const CONSTS = require('../utils/constants.js');
 
 export { handleAfterRemote } from 'commServices.js';

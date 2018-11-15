@@ -1,6 +1,7 @@
 const cloud = require('wx-server-sdk')
+const config = require('config.js')
 cloud.init({
-  env: 'jjczwgl-bc6ef9'
+  env: config.conf.env,   //'jjczwgl-bc6ef9'
   // env: 'jjczwgl-test-2e296e'
 })
 /**
@@ -20,7 +21,7 @@ exports.updateDoc = async (tableName, docObj) => {
 
 exports.addDoc = async (tableName, docObj) => {
   const db = cloud.database();
-  const result = db.collection(tableName).add({
+  const result = await db.collection(tableName).add({
     data: docObj
   });
   return result;

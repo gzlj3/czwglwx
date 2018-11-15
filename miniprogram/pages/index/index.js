@@ -1,5 +1,6 @@
 //index.js
 const CONSTS = require('../../utils/constants.js');
+const utils = require('../../utils/utils.js');
 // const userService = require('../../services/userServices.js');
 const fyglService = require('../../services/fyglServices.js');
 const app = getApp()
@@ -49,19 +50,20 @@ Page({
     takeSession: false,
     requestResult: '',
     list:menuList,
+    sjhm:'',
     CONSTS
   },
-
+  
   onLoad: function() {
     // wx.redirectTo({
     //  url: '../fygl/fyglmain',
     // })
-    if (!wx.cloud) {
-      wx.redirectTo({
-        url: '../chooseLib/chooseLib',
-      })
-      return
-    }
+    // if (!wx.cloud) {
+    //   wx.redirectTo({
+    //     url: '../chooseLib/chooseLib',
+    //   })
+    //   return
+    // }
     // console.log('========='); 
     // wx.makePhoneCall({
     //   phoneNumber: '13332875650',
@@ -97,6 +99,8 @@ Page({
     //     }
     //   }
     // })
+
+    // console.log(utils.getRandom(6));
 
     // 获取用户信息
     wx.getSetting({
@@ -152,6 +156,46 @@ Page({
         })
       }
     })
+  }, 
+
+  onInputSjhm: function(e){
+    this.setData({sjhm:e.detail.value});
+  },
+
+  onSendSjyzm: function(e){
+
+    // wx.request({
+    //   url: 'http://sms_developer.zhenzikj.com/sms/send.do',
+    //   data: {
+    //     appId: '100127',
+    //     appSecret: '4d8234e0-9771-4d1c-a673-83c88f943b92',
+    //     message: '',
+    //     number: '13332875650'
+    //   },
+    //   header: {
+    //     'content-type': 'application/x-www-form-urlencoded'
+    //   },
+    //   success(res) {
+    //     console.log(res)
+    //   }
+    // });
+    
+    const {sjhm} = this.data;
+    if(!utils.checkSjhm(sjhm)){
+      wx.showToast({
+        title: '请先输入正确的手机号',
+        icon: 'none',
+      });
+      return;
+    };
+    const response = fyglService.postData(CONSTS.BUTTON_SENDSJYZM,{sjhm});
+    fyglService.handleAfterRemote(response, '发送验证码',
+      (resultData) => {
+        console.log('======send sjyzm result:');
+        console.log(resultData);
+      }
+    );
+    
   },
 
   onRegister: function(e) {
@@ -181,7 +225,7 @@ Page({
     );
 
   },
-
+ 
   queryUser: function(){
     if(!this.data.granted) return;
     const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);

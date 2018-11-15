@@ -2,11 +2,16 @@ const moment = require('moment.min.js');
 const utils = require('utils.js');
 const cloud = require('wx-server-sdk')
 const CONSTS = require('constants.js');
-
+const config = require('config.js')
 cloud.init({
-  env: 'jjczwgl-bc6ef9'
+  env: config.conf.env,   //'jjczwgl-bc6ef9'
   // env: 'jjczwgl-test-2e296e'
 })
+
+// cloud.init({
+//   env: 'jjczwgl-bc6ef9'
+//   // env: 'jjczwgl-test-2e296e'
+// })
 
 exports.queryFyList = async (yzhid) => {
   //查询房源列表

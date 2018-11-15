@@ -19,7 +19,7 @@ const curUser = {
 }
 */
 exports.main = async (event, context) => {
-  const {action,method,data} = event;
+  const {action,method,data,userInfo} = event;
   if(!action) return results.getErrorResults('未确定动作！');
   console.log("action:"+action+"   method:"+method);
   // console.log(data);
@@ -30,10 +30,13 @@ exports.main = async (event, context) => {
     let result;
     switch(action){
       case CONSTS.BUTTON_QUERYUSER:
-        result = await userServices.queryUser(event.userInfo);
+        result = await userServices.queryUser(userInfo);
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_REGISTERUSER:
-        result = await userServices.registerUser(data,event.userInfo);
+        result = await userServices.registerUser(data,userInfo);
+        return results.getSuccessResults(result);
+      case CONSTS.BUTTON_SENDSJYZM:
+        result = await userServices.sendSjyzm(data,userInfo);
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_QUERYFY:
         // console.log('queryfy');
