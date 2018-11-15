@@ -1,3 +1,4 @@
+const fyglService = require('./services/fyglServices.js');
 const config = require('config.js')
 App({
   onLaunch: function () {
@@ -17,7 +18,7 @@ App({
       currentObject: null, // 页面之间传递参数的对象
     } 
   },
- 
+
   setGlobalData: function(newData){
     this.globalData = {
       ...this.globalData,

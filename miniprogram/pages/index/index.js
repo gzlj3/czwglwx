@@ -125,6 +125,27 @@ Page({
     })
   },
 
+  // login: function () {
+  //   const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
+  //   // const response = fyglService.queryFyglList();
+  //   fyglService.handleAfterRemote(response, null,
+  //     (resultData) => {
+  //       console.log('====== login =====:');
+  //       console.log(resultData);
+  //       // let registered,userType, nickName, avatarUrl;
+  //       if (resultData && resultData.length > 0) {
+  //         const { userType, nickName, avatarUrl } = resultData[0];
+  //         this.setGlobalData({ userType, nickName, avatarUrl });
+  //       } else {
+  //         userType = CONSTS.USERTYPE_NONE;
+  //       }
+  //       this.setGlobalData({ userType, nickName, avatarUrl });
+  //     }
+  //   );
+  // },
+
+
+
   onGetUserInfo: function(e) {
     // console.log(e);
     if (!this.data.granted && e.detail.userInfo) {
@@ -162,7 +183,7 @@ Page({
     this.setData({sjhm:e.detail.value});
   },
 
-  onSendSjyzm: function(e){
+  onSendSjyzm: function(e){ 
 
     // wx.request({
     //   url: 'http://sms_developer.zhenzikj.com/sms/send.do',
@@ -227,24 +248,22 @@ Page({
   },
  
   queryUser: function(){
-    if(!this.data.granted) return;
+    // if(!this.data.granted) return;
     const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
     // const response = fyglService.queryFyglList();
     fyglService.handleAfterRemote(response, null,
       (resultData) => {
         console.log('======query user result:');
         console.log(resultData);
-        let userType;
+        let userType, nickName, avatarUrl;
         if(resultData && resultData.length>0){
-          userType = resultData[0].userType;
+          let { userType, nickName, avatarUrl } = resultData[0];
         }else{
           userType = CONSTS.USERTYPE_NONE;
+          nickName = '';
+          avatarUrl = '';
         }
-        this.setData({ userType });
-        // getApp().setPageParams(CONSTS.BUTTON_NONE, null);
-        // this.setData({
-        //   fyList: resultData,
-        // });
+        app.setGlobalData({ userType, nickName, avatarUrl });
       }
     );
   },

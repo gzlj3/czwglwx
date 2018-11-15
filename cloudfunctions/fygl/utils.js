@@ -55,9 +55,12 @@ exports.sendPhoneMessage = async (sjhm,message)=>{
       'content-type': 'application/x-www-form-urlencoded',
     }
   };
-  const result = await rp(options);
+  console.log(options);
+  let result = await rp(options);
+  result = JSON.parse(result);
+  console.log(result); 
   if(result.code!==0)
-    throw newException("短信发送失败:"+result.data);
+    throw newException("短信发送失败:【"+result.code+"】"+result.data);
   return result;
 }
 
