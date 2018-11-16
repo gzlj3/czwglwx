@@ -125,7 +125,7 @@ Page({
       if(utils.isEmpty(currentObject.zhxm)){
         pageDesc = '输入租户姓名及必要信息，即表示房屋出租了，存盘完成会自动生成一张签约帐单。';
       }else{
-        pageDesc = '数据修改后，帐单未结前如需刷新帐单，需要在帐单处理页面进行操作。';
+        pageDesc = '数据修改后，帐单未结前如需刷新帐单，请在帐单处理页面进行操作。';
       }
       this.setData({
         pageTitle: '查看/修改房源',

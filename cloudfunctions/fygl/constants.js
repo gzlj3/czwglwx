@@ -13,6 +13,24 @@ exports.BUTTON_MAKEZD = 6; // 创建帐单
 exports.BUTTON_LASTZD = 7; // 查看/处理最近帐单
 exports.BUTTON_QUERYSDB = 8; // 查询水电表
 exports.BUTTON_QUERYMAKEZD = 9; // 查询创建帐单列表
+
+//用户管理 
+exports.BUTTON_QUERYUSER = 100; // 查询当前用户数据
+exports.BUTTON_REGISTERUSER = 101; // 注册用户
+exports.BUTTON_SENDSJYZM = 102; // 发送手机验证码
+exports.USERTYPE_NONE = '0'; // 用户类型：未注册
+exports.USERTYPE_FD = '1'; // 用户类型：房东
+exports.USERTYPE_ZK = '2'; // 用户类型：租客
+exports.USERTYPE_FDZK = '3'; // 用户类型：房东租客双重身份
+
+//租客操作
+exports.BUTTON_ZK_SEELASTZD = 200;  //租客查看帐单
+
+//帐单类型
+exports.ZDLX_HTZD = '0';  //合同帐单
+exports.ZDLX_YJZD = '1';  //月结帐单
+exports.ZDLX_TFZD = '2';  //退房帐单
+
 exports.getButtonActionInfo = buttonAction => {
   try {
     return ['', '查询房源', '添加房源', '编辑房源', '删除房源', '抄表', '创建帐单', '查看/处理帐单', '', ''][
@@ -22,17 +40,3 @@ exports.getButtonActionInfo = buttonAction => {
     return '';
   }
 };
-
-//用户管理 
-exports.BUTTON_QUERYUSER = 100; // 查询用户数据
-exports.BUTTON_REGISTERUSER = 101; // 注册用户
-exports.BUTTON_SENDSJYZM = 102; // 发送手机验证码
-exports.USERTYPE_NONE = '0'; // 用户类型：未注册
-exports.USERTYPE_FD = '1'; // 用户类型：房东
-exports.USERTYPE_ZK = '2'; // 用户类型：租客
-
-
-//帐单类型
-exports.ZDLX_HTZD = '0';  //合同帐单
-exports.ZDLX_YJZD = '1';  //月结帐单
-exports.ZDLX_TFZD = '2';  //退房帐单

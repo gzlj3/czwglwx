@@ -1,46 +1,44 @@
 //index.js
+import moment from '../../utils/moment.min.js';
 const CONSTS = require('../../utils/constants.js');
 const utils = require('../../utils/utils.js');
 // const userService = require('../../services/userServices.js');
 const fyglService = require('../../services/fyglServices.js');
+const config = require('../../config.js');
 const app = getApp()
 
 const menuList = [
-  {
+  { 
     id: 'form',  
     name: '我的房源列表',
     open: false,
-    // pages: ['button', 'list', 'input', 'slider', 'uploader']
     page: '../fygl/fyglmain'
   },
-  // {
-  //   id: 'widget',
-  //   name: '基础组件',
-  //   open: false,
-  //   pages: ['article', 'badge', 'flex', 'footer', 'gallery', 'grid', 'icons', 'loadmore', 'panel', 'preview', 'progress']
-  // },
-  // {
-  //   id: 'feedback',
-  //   name: '操作反馈',
-  //   open: false,
-  //   pages: ['actionsheet', 'dialog', 'msg', 'picker', 'toast']
-  // },
-  // {
-  //   id: 'nav',
-  //   name: '导航相关',
-  //   open: false,
-  //   pages: ['navbar', 'tabbar']
-  // },
-  // {
-  //   id: 'search',
-  //   name: '搜索相关',
-  //   open: false,
-  //   pages: ['searchbar']
-  // }
+  {
+    id: 'widget',
+    name: '集中抄表',
+    open: false,
+    page: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_CB
+  },
+  {
+    id: 'special',
+    name: '生成帐单',
+    open: false,
+    page: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_MAKEZD
+  },
 ];
+const zkMenuList = [
+  {
+    id: 'widget',
+    name: '查看我的帐单',
+    open: false,
+    page: 'seeLastzd'
+  },
+]
 
 Page({
   data: {
+    user: app.globalData.user,
     avatarUrl: './user-unlogin.png',
     userInfo: {},
     granted: false,  //是否获得用户公共信息的授权    
@@ -50,112 +48,73 @@ Page({
     takeSession: false,
     requestResult: '',
     list:menuList,
+    zkMenuList,
     sjhm:'',
-    CONSTS
+    sendingYzm:false,
+    second:config.conf.yzmYxq,
+    CONSTS,
+    radioItems: [
+      { name: '我是房东，想管理我的房源', value: '1', checked: true  },
+      { name: '我是租客，想查询我的帐单', value: '2'}
+    ], 
   },
   
   onLoad: function() {
-    // wx.redirectTo({
-    //  url: '../fygl/fyglmain',
-    // })
-    // if (!wx.cloud) {
-    //   wx.redirectTo({
-    //     url: '../chooseLib/chooseLib',
-    //   })
-    //   return
-    // }
-    // console.log('========='); 
-    // wx.makePhoneCall({
-    //   phoneNumber: '13332875650',
-    //   fail:res=>{
-    //     console.log(res);
-    //   },
-    //   complete:(para1)=>{
-    //     console.log(para1);
-    //     // console.log(para2);
-    //   }
-    // })
-    // const result = wx.getAccountInfoSync();
-    // console.log(result);
-
-    // wx.chooseAddress({ 
-    //   success(res) {
-    //     console.log(res.userName)
-    //     console.log(res.postalCode)
-    //     console.log(res.provinceName)
-    //     console.log(res.cityName)
-    //     console.log(res.countyName)
-    //     console.log(res.detailInfo)
-    //     console.log(res.nationalCode)
-    //     console.log(res.telNumber)
-    //   }
-    // })
-    // wx.openSetting({
-    //   success(res) {
-    //     console.log(res.authSetting)
-    //     res.authSetting = {
-    //       "scope.userInfo": true,
-    //       "scope.userLocation": true
-    //     }
-    //   }
-    // })
-
-    // console.log(utils.getRandom(6));
-
-    // 获取用户信息
-    wx.getSetting({
-      success: res => {
-        console.log('getSetting success.');
-        console.log(res);
-        if (res.authSetting['scope.userInfo']) {
-          // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
-          wx.getUserInfo({ 
-            success: res => {
-              console.log(res); 
-              this.setData({
-                granted:true,
-                avatarUrl: res.userInfo.avatarUrl,
-                userInfo: res.userInfo
-              })
-              this.queryUser();
-            }
-          })
-        }
-      }
-    })
+    // console.log(moment().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss'));
+    // const uuid = utils.uuid(16,10);
+    // console.log(uuid);
+    // console.log(uuid.length);  
+    this.queryUser();
+ 
   },
 
-  // login: function () {
-  //   const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
-  //   // const response = fyglService.queryFyglList();
-  //   fyglService.handleAfterRemote(response, null,
-  //     (resultData) => {
-  //       console.log('====== login =====:');
-  //       console.log(resultData);
-  //       // let registered,userType, nickName, avatarUrl;
-  //       if (resultData && resultData.length > 0) {
-  //         const { userType, nickName, avatarUrl } = resultData[0];
-  //         this.setGlobalData({ userType, nickName, avatarUrl });
-  //       } else {
-  //         userType = CONSTS.USERTYPE_NONE;
-  //       }
-  //       this.setGlobalData({ userType, nickName, avatarUrl });
-  //     }
-  //   );
-  // },
+  getWxGrantedData: function(){
+    if (!this.data.user.granted) {
+      //获取用户信息
+      wx.getSetting({
+        success: res => {
+          // console.log('getSetting success.');
+          // console.log(res);
+          if (res.authSetting['scope.userInfo']) {
+            // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
+            wx.getUserInfo({
+              success: res => {
+                console.log('get granted userinfo');
+                console.log(res.userInfo);
+                this.setUserData(res.userInfo);
+              }
+            })
+          }
+        }
+      })
+    }    
+  },
 
-
+  radioChange: function (e) {
+    // console.log('radio发生change事件，携带value值为：', e.detail.value);
+    var radioItems = this.data.radioItems;
+    for (var i = 0, len = radioItems.length; i < len; ++i) {
+        radioItems[i].checked = radioItems[i].value == e.detail.value;
+    }
+    this.setData({
+        radioItems: radioItems
+    });
+  },
+ 
 
   onGetUserInfo: function(e) {
-    // console.log(e);
-    if (!this.data.granted && e.detail.userInfo) {
-      this.setData({
-        granted: true,
-        avatarUrl: e.detail.userInfo.avatarUrl,
-        userInfo: e.detail.userInfo
-      })
-      this.queryUser();
-    }
+    console.log('getuserinfo');
+    console.log(e);
+    this.setUserData(e.detail.userInfo);
+
+    // if (!this.data.granted && e.detail.userInfo) {
+    //   this.setData({
+    //     granted: true,
+    //     avatarUrl: e.detail.userInfo.avatarUrl,
+    //     userInfo: e.detail.userInfo
+    //   })
+    //   this.queryUser();
+    // }
   },
 
   onGetOpenid: function() {
@@ -184,23 +143,6 @@ Page({
   },
 
   onSendSjyzm: function(e){ 
-
-    // wx.request({
-    //   url: 'http://sms_developer.zhenzikj.com/sms/send.do',
-    //   data: {
-    //     appId: '100127',
-    //     appSecret: '4d8234e0-9771-4d1c-a673-83c88f943b92',
-    //     message: '',
-    //     number: '13332875650'
-    //   },
-    //   header: {
-    //     'content-type': 'application/x-www-form-urlencoded'
-    //   },
-    //   success(res) {
-    //     console.log(res)
-    //   }
-    // });
-    
     const {sjhm} = this.data;
     if(!utils.checkSjhm(sjhm)){
       wx.showToast({
@@ -212,64 +154,104 @@ Page({
     const response = fyglService.postData(CONSTS.BUTTON_SENDSJYZM,{sjhm});
     fyglService.handleAfterRemote(response, '发送验证码',
       (resultData) => {
-        console.log('======send sjyzm result:');
-        console.log(resultData);
+        this.setData({ sendingYzm:true});
+        this.timer();
       }
     );
-    
+  },
+
+  timer: function () {
+    let promise = new Promise((resolve, reject) => {
+      let setTimer = setInterval(
+        () => {
+          this.setData({
+            second: this.data.second - 1
+          });
+          if (this.data.second <= 0) {
+            this.setData({
+              second: config.conf.yzmYxq,
+              sendingYzm: false,
+            });
+            resolve(setTimer);
+          }
+        }
+        , 1000)
+    });
+    promise.then((setTimer) => {
+      clearInterval(setTimer)
+    });
   },
 
   onRegister: function(e) {
-    e.detail.value.userType = '1';
     console.log(e.detail.value);
-
+    const {sjhm,sjyzm} = e.detail.value;
+    if (!utils.checkSjhm(sjhm) || utils.isEmpty(sjyzm) || sjyzm.length!==6) {
+      wx.showToast({
+        title: '请先输入手机号和验证码',
+        icon: 'none',
+      });
+      return;
+    };
     const response = fyglService.postData(CONSTS.BUTTON_REGISTERUSER,
-      {frontUserInfo:this.data.userInfo,
-       sjData:e.detail.value});
-
+                                          {frontUserInfo:this.data.user,
+                                          sjData:e.detail.value});
     fyglService.handleAfterRemote(response, '用户注册',
       (resultData) => {
         console.log('======register user result:');
         console.log(resultData);
-        // let userType;
-        // if (resultData && resultData.length > 0) {
-        //   userType = resultData[0].userType;
-        // } else { 
-        //   userType = CONSTS.USERTYPE_NONE;
-        // }
-        // this.setData({ userType });
-        // getApp().setPageParams(CONSTS.BUTTON_NONE, null);
-        // this.setData({
-        //   fyList: resultData,
-        // });
+        this.setUserData(resultData && resultData.length > 0 ? resultData[0] : null);
       }
     );
-
   },
  
   queryUser: function(){
-    // if(!this.data.granted) return;
     const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
-    // const response = fyglService.queryFyglList();
     fyglService.handleAfterRemote(response, null,
-      (resultData) => {
+      (resultData) => { 
         console.log('======query user result:');
         console.log(resultData);
-        let userType, nickName, avatarUrl;
-        if(resultData && resultData.length>0){
-          let { userType, nickName, avatarUrl } = resultData[0];
-        }else{
-          userType = CONSTS.USERTYPE_NONE;
-          nickName = '';
-          avatarUrl = '';
-        }
-        app.setGlobalData({ userType, nickName, avatarUrl });
+        this.setUserData(resultData && resultData.length > 0 ? resultData[0]:null);
+        this.getWxGrantedData();
       }
     );
+  }, 
+
+  //设置用户数据，入口对象userInfo:{userType,nickName,avatarUrl,...}或为空
+  setUserData: function(userData){
+    if (userData) {
+      // let { userType, nickName, avatarUrl } = userData;
+      app.setGlobalData({ user: { granted: true, userType: CONSTS.USERTYPE_NONE,...userData}});
+      this.setData({ user: app.globalData.user});
+      console.log(this.data.user);
+    } else {
+      const userType = CONSTS.USERTYPE_NONE;
+      const nickName = '',avatarUrl = '',granted=false;
+      app.setGlobalData({ user: { granted, userType, nickName, avatarUrl } });
+      this.setData({ user: app.globalData.user });
+    }
+  },  
+
+  seeLastzd: function(){
+    const response = fyglService.queryData(CONSTS.BUTTON_ZK_SEELASTZD);
+    fyglService.handleAfterRemote(response, '查看帐单',
+      (resultData) => {
+        console.log('seeLastzd:',resultData);
+        const s = JSON.stringify({ houseid: resultData.houseid });
+        wx.navigateTo({
+          url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s,
+        })
+      }
+    );    
   },
 
   kindToggle: function (e) {
     const page = e.currentTarget.id;
+
+    if (page === 'seeLastzd'){
+      this.seeLastzd();
+      return;
+    }
+
     wx.navigateTo({
       url: page,
     });

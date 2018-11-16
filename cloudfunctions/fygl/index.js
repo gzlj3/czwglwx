@@ -1,16 +1,16 @@
 // 云函数入口文件
 const results = require('results.js');
 const CONSTS = require('constants.js');
-const services = require('services.js');
+const services = require('FyglServices.js');
 const userServices = require('UserServices.js');
 const utils = require('utils.js');
 
-const curUser = {
-  userid:'admin',
-  username:'管理员',
-  dhhm:'13332875650',
-  yzhid:'1',
-}
+// const curUser = {
+//   userid:'admin',
+//   username:'管理员',
+//   dhhm:'13332875650',
+//   yzhid:'1',
+// }
 
 // 云函数入口函数
 /* event 参数对象：
@@ -20,15 +20,17 @@ const curUser = {
 */
 exports.main = async (event, context) => {
   const {action,method,data,userInfo} = event;
-  if(!action) return results.getErrorResults('未确定动作！');
+  if(!action) return results.getErrorResults('未指定操作！');
   console.log("action:"+action+"   method:"+method);
-  // console.log(data);
-  // console.log(context);
-  // console.log(CONSTS.BUTTON_EDITFY);
-  // console.log(action === CONSTS.BUTTON_EDITFY);
+  //检查权限，成功则返回用户的基本数据
+  const curUser = await userServices.checkAuthority(action,userInfo);
+  console.log('操作用户：',curUser);
   try {
     let result;
     switch(action){
+      case CONSTS.BUTTON_ZK_SEELASTZD:
+        result = await userServices.seeLastzd(curUser);
+        return results.getSuccessResults(result);
       case CONSTS.BUTTON_QUERYUSER:
         result = await userServices.queryUser(userInfo);
         return results.getSuccessResults(result);

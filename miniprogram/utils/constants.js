@@ -30,7 +30,10 @@ exports.BUTTON_SENDSJYZM = 102; // 发送手机验证码
 exports.USERTYPE_NONE = '0'; // 用户类型：未注册
 exports.USERTYPE_FD = '1'; // 用户类型：房东
 exports.USERTYPE_ZK = '2'; // 用户类型：租客
+exports.USERTYPE_FDZK = '3'; // 用户类型：房东租客双重身份
 
+//租客操作
+exports.BUTTON_ZK_SEELASTZD = 200;  //租客查看帐单
 
 //帐单类型
 exports.ZDLX_HTZD = '0';  //合同帐单

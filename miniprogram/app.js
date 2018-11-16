@@ -1,4 +1,4 @@
-const fyglService = require('./services/fyglServices.js');
+//const fyglService = require('./services/fyglServices.js');
 const config = require('config.js')
 App({
   onLaunch: function () {
@@ -16,7 +16,8 @@ App({
     this.globalData = {
       buttonAction:0, // 页面之间传递参数的动作
       currentObject: null, // 页面之间传递参数的对象
-    } 
+      user: { granted: true, userType:'', nickName:'', avatarUrl:'' }  //用户登录基本信息
+    }
   },
 
   setGlobalData: function(newData){

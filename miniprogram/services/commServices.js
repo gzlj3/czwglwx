@@ -14,13 +14,13 @@ export function handleAfterRemote(response, tsinfo, successCallback) {
     if (status === CONSTS.REMOTE_SUCCESS) {
       if (tsinfo.length > 0) {
         wx.showToast({
-          title: `处理成功完成！`,
+          title: `${tsinfo}成功！`,
         });
       };
       if (successCallback) successCallback(data);
     } else {
       wx.showToast({
-        title: `${tsinfo}处理失败！${msg}`,
+        title: `${tsinfo}失败！${msg}`,
         icon: 'none',
         duration: 5000,
       });

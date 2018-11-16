@@ -1,15 +1,14 @@
 // miniprogram/pages/fygl/addfy/addfy.js
 import * as CONSTS from '../../../utils/constants.js';
 import * as fyglService from '../../../services/fyglServices.js'; 
+
+const app = getApp()
+
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
   sourceList: [],
   CONSTS,
-  // checkboxItems: [
-  //   { name: 'standard is dealt for u.', value: '0', checked: true },
-  //   { name: 'standard is dealicient for u.', value: '1' }
-  // ],  
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
 }
 
@@ -125,6 +124,9 @@ console.log(params);
         this.setData({
           buttonAction,
           sourceList: resultData,
+          isFd: app.globalData.user.userType === CONSTS.USERTYPE_FD,
+          isZk: app.globalData.user.userType === CONSTS.USERTYPE_ZK,
+          isFdZk: app.globalData.user.userType === CONSTS.USERTYPE_FDZK,
         }); 
       }
     );
