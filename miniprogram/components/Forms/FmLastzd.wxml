@@ -28,15 +28,18 @@
     </view>
     <view class="page__bd">
         <view class="weui-form-preview margin-bottom" wx:for="{{sourceList}}" wx:key="_id">
-            <view class="weui-form-preview__hd">
+            <view class="weui-form-preview__hd " bindtap='onToggleDetailZd'>
                 <view class="weui-form-preview__item">
-                    <view class="weui-form-preview__label">{{m.getZdfy(item)}}:<view class="zdfy">{{item.fyhj+'元'}}</view>
+                    <view class="weui-form-preview__label"><view class="blackColor">{{m.getZdfy(item)}}:</view><view class="zdfy">{{item.fyhj+'元'}}</view>
                     </view>
                     <!-- <view class="weui-form-preview__value_in-hd redColor" wx:if="{{item.sfsz==='0'}}">{{m.getSzzt(item)}}</view> -->
                     <view class="weui-form-preview__value {{item.sfsz!=='0'?'greenColor':'redColor'}}">{{m.getSzzt(item)}}</view>
                 </view>
             </view>
-            <view class="weui-form-preview__bd" >
+            <view bindtap='onToggleDetailZd' class="{{showDetailZd?'weui-cell__ft':'weui-cell__ft_addheight'}} weui-cell__ft_in-access-arrow" >
+              <view class="weui-cell__ft_in-access_{{showDetailZd?'uparrow':'downarrow'}}"></view>
+            </view>
+            <view class="weui-form-preview__bd" wx:if="{{showDetailZd}}">
                 <view class="weui-form-preview__item">
                     <view class="weui-form-preview__label">时间范围</view>                    
                     <view class="weui-form-preview__value">                 

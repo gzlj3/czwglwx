@@ -51,16 +51,20 @@ exports.main = async (event, context) => {
           data.lrsj=utils.getCurrentTimestamp();
           data.zhxgr=curUser.userid;
           data.zhxgsj=data.lrsj;
-          result = await services.saveFy(data);
+          result = await services.saveFy(data,curUser);
           return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_EDITFY:
         console.log("editfy");
         data.zhxgr=curUser.userid;
         data.zhxgsj=utils.getCurrentTimestamp();
-        result = await services.saveFy(data);
+        result = await services.saveFy(data,curUser);
         return results.getSuccessResults(result);
-        break;
+      case CONSTS.BUTTON_DELETEFY:
+        console.log("deletefy");
+        result = await services.deleteFy(data);
+        result = await services.queryFyList(curUser.yzhid);
+        return results.getSuccessResults(result.data);
       case CONSTS.BUTTON_CB:
         if(method==='POST'){
           console.log("cb");

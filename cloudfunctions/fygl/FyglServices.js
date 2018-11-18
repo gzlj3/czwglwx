@@ -3,10 +3,13 @@ const utils = require('utils.js');
 const cloud = require('wx-server-sdk')
 const CONSTS = require('constants.js');
 const config = require('config.js')
+const commService = require('CommServices.js')
 cloud.init({
   env: config.conf.env,   //'jjczwgl-bc6ef9'
   // env: 'jjczwgl-test-2e296e'
 })
+const db = cloud.database();
+const _ = db.command;
 
 // cloud.init({
 //   env: 'jjczwgl-bc6ef9'
@@ -15,7 +18,7 @@ cloud.init({
 
 exports.queryFyList = async (yzhid) => {
   //查询房源列表
-  const db = cloud.database();
+  // const db = cloud.database();
   const result = db.collection('house').where({
     yzhid
   }).get();
@@ -70,29 +73,35 @@ async function queryZdList(yzhid) {
 exports.queryZdList = queryZdList;
 
 
-exports.saveFy = async (house) => {
+exports.saveFy = async (house,curUser) => {
   let result;
   // 检查房屋名称是否重复
+  result = await commService.querySingleDoc('house',{yzhid:curUser.yzhid,_id:_.neq(house._id),fwmc:house.fwmc});
+  // console.log(result); 
+  if(result)
+    throw utils.newException("房屋名称已经存在！");
 
   if (utils.isEmpty(house.housefyid) && !utils.isEmpty(house.zhxm)) {
     // 如果为新签约，则自动生成合同帐单
     const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_HTZD);
     // 结转房屋数据
-    const housefyResult = await addDoc('housefy',newHousefy);
+    const housefyResult = await commService.addDoc('housefy',newHousefy);
     house.housefyid = housefyResult._id;
     if(utils.isEmpty(house.housefyid))
       throw utils.newException("生成签约帐单失败！");
   }
+  let { _id: saveHouseid, dhhm, avatarUrl} = house;
   if (utils.isEmpty(house._id)) {
     //如果是添加房源，则先保存房屋数据，以便拿到ID
-    result = await addDoc('house', house);
+    result = await commService.addDoc('house', house);
     house._id = result._id;
     if (utils.isEmpty(house._id))
       throw utils.newException("添加房源失败！");
     console.log("===house.housefyid:"+house.housefyid+",house._id:"+house._id);
+    saveHouseid = house._id;
     if(!utils.isEmpty(house.housefyid)){
       //更新housefy中的houseid
-      const updatedNum  = await updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
+      const updatedNum  = await commService.updateDoc('housefy', {_id:house.housefyid,houseid:house._id});
       console.log(updatedNum);
       if(updatedNum===0){
         throw utils.newException("关联签约帐单表失败！");
@@ -100,36 +109,91 @@ exports.saveFy = async (house) => {
     }
   } else {
     //更新房源
-    const updatedNum = await updateDoc('house', house);
+    const updatedNum = await commService.updateDoc('house', house);
     // console.log(result);
     // const updatedNum = result.stats.updated;
     if (updatedNum === 0) {
       throw utils.newException("更新房屋表失败！");
     }
   } 
+
+  //关联用户注册的手机号
+  if(utils.isEmpty(avatarUrl)){
+    result = await commService.querySingleDoc('userb', { sjhm:dhhm });
+    if(result){
+      const updatedNum = await commService.updateDoc('house', { _id: saveHouseid, avatarUrl: result.avatarUrl});
+      console.log('关联租户头像：',updatedNum);
+    }
+  }
+
   return null;
 }
 
+exports.exitFy = async (data) => {
+  const { houseid } = data;
+  let house = await utils.queryPrimaryDoc('house',houseid);
+  if(!house)
+    throw utils.newException("未查到房屋数据!");
+    
+  let housefy=null;
+  if (result.sfsz === CONSTS.SFSZ_WJQ){
+    //当前帐单未结清，则刷新当前帐单为退房帐单
+    housefy = await utils.queryPrimaryDoc('housefy',house.housefyid);
+    if (!housefy)
+      throw utils.newException("未查到房屋当前的帐单数据!");
+  } else if (result.sfsz === CONSTS.SFSZ_YTF) {
+    //帐单状态为已退房 ，则直接办理退房
+    return;
+  }else{
+    //帐单状态为已结清或已结转 ，则生成新的退房帐单
+  }
+  newHousefy = makeHousefy(house, housefy, CONSTS.ZDLX_TFZD);
 
-exports.addFy = async (house) => {
-  //添加房源
-  // return saveDoc('house',house);
-  const db = cloud.database();
-  const result = db.collection('house').add({
-    data:house
-  });
-  return result;
+  house.zhxgr = userb.userid;
+  house.zhxgsj = utils.getCurrentTimestamp();
+  housefy.zhxgr = userb.userid;
+  housefy.zhxgsj = house.zhxgsj;
+  const housefyNum = await commService.updateDoc('housefy', housefy);
+  if (housefyNum === 0)
+    throw utils.newException("帐单数据更新失败！");
+  const houseNum = await commService.updateDoc('house', house);
+  if (houseNum === 0)
+    throw utils.newException("房源数据更新失败！");
+  console.log("=====:" + houseid);
+  return queryLastzdList({ houseid });
+
+  // if (utils.isEmpty(house.housefyid) && !utils.isEmpty(house.zhxm)) {
+  //   // 如果为新签约，则自动生成合同帐单
+    const newHousefy = makeHousefy(house, null, CONSTS.ZDLX_TFZD);
 }
 
-exports.updateFy = async (house) => {
-  const db = cloud.database();
-  const {_id} = house;
-  delete house._id;
-  // house.szrq = db.serverDate();
-  const result = db.collection('house').doc(_id).update({
-    data: house
-  });
-  return result;
+
+// exports.addFy = async (house) => {
+//   //添加房源
+//   // return saveDoc('house',house);
+//   const db = cloud.database();
+//   const result = db.collection('house').add({
+//     data:house
+//   });
+//   return result;
+// }
+
+// exports.updateFy = async (house) => {
+//   const db = cloud.database();
+//   const {_id} = house;
+//   delete house._id;
+//   // house.szrq = db.serverDate();
+//   const result = db.collection('house').doc(_id).update({
+//     data: house
+//   });
+//   return result;
+// }
+
+exports.deleteFy = async (house) => {
+  const { houseid } = house;
+  const num = await commService.removeDoc('house',houseid);
+  if(num<1)
+    throw utils.newException('房源ID:'+houseid);
 }
 
 exports.updateSdb = async (houseList) => {
@@ -177,10 +241,10 @@ exports.updateZdList = async (zdList) => {
       const {_id} = house;
       const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_YJZD);
       // console.log(newHousefy);
-      const housefyResult = await addDoc('housefy',newHousefy); 
+      const housefyResult = await commService.addDoc('housefy',newHousefy); 
       console.log("======="+housefyResult._id); 
       house.housefyid = housefyResult._id;
-      const houseNum = await updateDoc('house',house);
+      const houseNum = await commService.updateDoc('house',house);
       if(houseNum===0)
         throw utils.newException("更新房源信息失败！");      
     }catch(e){
@@ -218,10 +282,10 @@ exports.processQrsz = async (params,userb) => {
   house.zhxgsj = utils.getCurrentTimestamp();
   housefy.zhxgr=userb.userid;
   housefy.zhxgsj = house.zhxgsj;
-  const housefyNum = await updateDoc('housefy',housefy);
+  const housefyNum = await commService.updateDoc('housefy',housefy);
   if(housefyNum===0)
     throw utils.newException("帐单数据更新失败！");
-  const houseNum = await updateDoc('house',house);
+  const houseNum = await commService.updateDoc('house',house);
   if (houseNum === 0)
     throw utils.newException("房源数据更新失败！");
   console.log("=====:" + houseid);
@@ -276,7 +340,7 @@ function jsdf(house) {
     - utils.getInteger(house.dscds)
     + utils.getInteger(house.dgtds);
   const df = dsyds * utils.getFloat(house.ddj);
-  return df;
+  return utils.roundNumber(df, 1);
 }
 
 function jssf(house) {
@@ -284,7 +348,7 @@ function jssf(house) {
     - utils.getInteger(house.sscds)
     + utils.getInteger(house.sgtds);
   const sf = ssyds * utils.getFloat(house.sdj);
-  return sf;
+  return utils.roundNumber(sf,1);
 }
 
 function jsqtfhj(house) {
@@ -294,7 +358,7 @@ function jsqtfhj(house) {
     + utils.getInteger(house.ljf)
     + utils.getFloat(house.qtf)
     + utils.getFloat(house.syjzf);
-  return qtfy;
+  return utils.roundNumber(qtfy, 1);
 }
 
 function makeHousefy(house, housefy, zdlx){
@@ -309,7 +373,55 @@ function makeHousefy(house, housefy, zdlx){
   }
 
   let xcszrq, rq1, rq2;
-  if (CONSTS.ZDLX_HTZD === zdlx) {
+  if (CONSTS.ZDLX_TFZD === zdlx) {
+    // 退房帐单的收租日期为当前系统时间
+    xcszrq = moment().startOf('day');
+    szrq = xcszrq;
+    if(sfsz === CONSTS.SFSZ_WJQ){
+      // 未结清，起始日期不变
+      rq1 = house.rq1;
+    }else{
+      // 已结清，起始日期为当前收租日期
+      rq1 = house.szrq;
+    }
+    // rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
+    // if (!rq1.isValid())
+    //   throw utils.newException("合同起始日期不合法！");
+    rq2 = szrq.clone().subtract(1, 'days');
+    const days = rq2.diff(rq1, 'days') + 1;
+    if (days < 0)
+      throw utils.newException("退房日期不能小于上次收租日期！");
+    let yzj;
+    if (days == 30 || days == 31)
+      yzj = house.czje;
+    else
+      yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同签约时月租金
+    housefy.czje = yzj; // 月租金
+    // 电费数据
+    housefy.dbcds = house.dbcds;
+    housefy.dscds = house.dscds;
+    housefy.dsyds = utils.getInteger(housefy.dbcds) - utils.getInteger(housefy.dscds);
+    housefy.dgtds = house.dgtds;
+    housefy.ddj = house.ddj;
+    housefy.dfhj = jsdf(house);
+
+    // 水费数据
+    housefy.sbcds = house.sbcds;
+    housefy.sscds = house.sscds;
+    housefy.ssyds = utils.getInteger(housefy.sbcds) - utils.getInteger(housefy.sscds);
+    housefy.sgtds = house.sgtds;
+    housefy.sdj = house.sdj;
+    housefy.sfhj = jssf(house);
+    
+    housefy.yj = house.yj; // 押金
+    housefy.qtf = house.qtf;
+    housefy.dbcds = house.dscds;
+    housefy.Sbcds = house.Sscds;
+    // 房屋合计费
+    housefy.fyhj = utils.getInteger(housefy.czje)
+      + utils.getInteger(housefy.yj)
+      + utils.getFloat(housefy.qtf);
+  }else if (CONSTS.ZDLX_HTZD === zdlx) {
     // 合同帐单的下次收租日期为当前录入的时间
     xcszrq = szrq;
     rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
@@ -366,8 +478,8 @@ function makeHousefy(house, housefy, zdlx){
     housefy.qtf=house.qtf;
 
     // 房屋合计费
-    housefy.fyhj = utils.getFloat(housefy.dfhj)
-      + utils.getFloat(housefy.sfhj) + jsqtfhj(house);
+    housefy.fyhj = utils.roundNumber(utils.getFloat(housefy.dfhj)
+      + utils.getFloat(housefy.sfhj) + jsqtfhj(house),1);
   }
 
   // 日期范围
@@ -402,22 +514,22 @@ function makeHousefy(house, housefy, zdlx){
 /**
  * 更新表的记录，返回更新成功的记录数
  */
-const updateDoc = async (tableName,docObj) => {
-  const db = cloud.database();
-  const { _id } = docObj;
-  delete docObj._id;
-  const result = await db.collection(tableName).doc(_id).update({
-    data: docObj
-  });
-  const updatedNum = result.stats.updated;
+// const updateDoc = async (tableName,docObj) => {
+//   const db = cloud.database();
+//   const { _id } = docObj;
+//   delete docObj._id;
+//   const result = await db.collection(tableName).doc(_id).update({
+//     data: docObj
+//   });
+//   const updatedNum = result.stats.updated;
 
-  return updatedNum;
-}
+//   return updatedNum;
+// }
 
-const addDoc = async (tableName, docObj) => {
-  const db = cloud.database();
-  const result = db.collection(tableName).add({
-    data: docObj
-  });
-  return result;
-}
+// const addDoc = async (tableName, docObj) => {
+//   const db = cloud.database();
+//   const result = db.collection(tableName).add({
+//     data: docObj
+//   });
+//   return result;
+// }

@@ -11,6 +11,11 @@
   color:green;
 }
 
+.blackColor {
+  display:inline-block;
+  color:black;
+}
+
 .displaynone {
   display:none;
 }

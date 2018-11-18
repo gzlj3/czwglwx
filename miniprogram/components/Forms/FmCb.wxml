@@ -15,7 +15,7 @@
                     <view class="weui-label">水表读数</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="{{index}}.sbcds"  value="{{item.sbcds}}" bindblur="onInputBlur" class="weui-input" placeholder="上次:{{item.sscds}}"/>
+                    <input id="{{index}}.sbcds" type="number" value="{{item.sbcds}}" bindinput="onInputBlur" class="weui-input" placeholder="上次:{{item.sscds}}"/>
                 </view>
             </view>
             <view class="weui-cell weui-cell_input">
@@ -23,7 +23,7 @@
                     <view class="weui-label">电表读数</view>
                 </view>
                 <view class="weui-cell__bd">
-                    <input id="{{index}}.dbcds" value="{{item.dbcds}}" bindblur="onInputBlur" class="weui-input" placeholder="上次:{{item.dscds}}"/>
+                    <input id="{{index}}.dbcds" type="number" value="{{item.dbcds}}" bindinput="onInputBlur" class="weui-input" placeholder="上次:{{item.dscds}}"/>
                 </view>
             </view>
           </view>

@@ -5,9 +5,10 @@ const utils = require('utils.js');
 const CONSTS = require('constants.js');
 const config = require('config.js')
 cloud.init({
-  env: config.conf.env,   //'jjczwgl-bc6ef9'
-  // env: 'jjczwgl-test-2e296e'
+  env: config.conf.env,
 })
+const db = cloud.database();
+const _ = db.command;
 
 //检查权限，成功返回用户基本数据(userType,yzhid)
 exports.checkAuthority = async(action,userInfo) => {
@@ -159,6 +160,13 @@ exports.registerUser = async (data,userInfo) => {
     zhxgsj
   }
   console.log('新用户注册：',userb);
-  const result = await commService.addDoc('userb',userb);
+  let result = await commService.addDoc('userb',userb);
+  //关联房屋头像数据
+  const avatarUrl = userb.avatarUrl;
+  if (!utils.isEmpty(avatarUrl)) {
+    result = await db.collection('house').where({ dhhm: userb.sjhm }).update({ data:{avatarUrl}});
+    console.log('关联房屋租户头像：', result.stats.updated);
+  }
+  
   return await queryUser({ openId});
 }

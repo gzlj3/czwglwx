@@ -30,17 +30,17 @@
         <button  size="default" bindtap="onAddfy">新建房源</button>
         <view class="weui-panel weui-panel_access" wx:key="_id" wx:for="{{fyList}}">
             <view class="weui-panel__bd">
-                <view data-item="{{item}}" class="weui-media-box weui-media-box_appmsg" hover-class="weui-cell_active" bindtap="onEditfy">
-                    <view class="weui-media-box__hd weui-media-box__hd_in-appmsg">
+                <view data-item="{{item}}" class="weui-media-box weui-media-box_appmsg" >
+                    <view class="weui-media-box__hd weui-media-box__hd_in-appmsg" data-item="{{item}}" bindtap="onEditfy" >
                         <image class="weui-media-box__thumb" src="{{item.avatarUrl?item.avatarUrl:emptyAvatarUrl}}" />
                     </view>
-                    <view class="weui-media-box__bd weui-media-box__bd_in-appmsg">
+                    <view class="weui-media-box__bd weui-media-box__bd_in-appmsg" hover-class="weui-cell_active" data-item="{{item._id}}" bindtap="onLastzd">
                         <view class="weui-media-box__title">
                           <view class="weui-cell__bd">{{item.fwmc}} {{item.zhxm?item.zhxm:'(未出租)'}} {{m.getSzzt(item)}}</view>
                         </view>
-                        <view class="weui-media-box__desc">{{m.getZdfy(item)}}</view>
+                        <view class="weui-media-box__desc addfontsize">{{m.getZdfy(item)}}</view>
                         <view wx:if="{{item.zhxm}}">
-                          <view class="weui-media-box__desc">收租日期:{{item.szrq}}</view>
+                          <view class="weui-media-box__desc addfontsize">收租日期:{{item.szrq}}</view>
                           <view class="weui-media-box__desc">
                             <progress percent="{{item.progressState.percent}}" activeColor="{{item.progressState.activeColor}}" backgroundColor="{{item.progressState.backgroundColor}}" active='{{false}}' active-mode="forwards"></progress> 
                           </view>
@@ -49,11 +49,13 @@
                     <view class="weui-cell__ft weui-cell__ft_in-access"></view>
                 </view>
             </view>
-            <view class="weui-panel__ft">
-            
+            <view class="weui-panel__ft">            
                 <view class="weui-cell weui-cell_access weui-cell_link">
+                <!-- <view class="weui-cell weui-cell_link"> -->
                     <!-- <view class="weui-cell__bd">编辑</view> -->
+                    <view data-item="{{item}}" bindtap="onEditfy" class="weui-cell__bd">编辑房源</view>
                     <view data-item="{{item._id}}" bindtap="onLastzd" class="weui-cell__bd">帐单详情</view>
+                    <view data-item="{{item}}" bindtap="onMoreAction" class="weui-cell__bd">更多操作</view>
                     <!-- <view class="weui-cell__ft weui-cell__ft_in-access"></view> -->
                 </view>
             </view>

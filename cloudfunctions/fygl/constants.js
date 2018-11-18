@@ -13,9 +13,19 @@ exports.BUTTON_MAKEZD = 6; // 创建帐单
 exports.BUTTON_LASTZD = 7; // 查看/处理最近帐单
 exports.BUTTON_QUERYSDB = 8; // 查询水电表
 exports.BUTTON_QUERYMAKEZD = 9; // 查询创建帐单列表
+exports.BUTTON_EXITFY = 10; // 退房
+exports.getButtonActionInfo = buttonAction => {
+  try {
+    return ['', '查询房源', '添加房源', '编辑房源', '删除房源', '抄表', '创建帐单', '查看/处理帐单', '', ''][
+      buttonAction
+    ];
+  } catch (e) {
+    return '';
+  }
+};
 
 //用户管理 
-exports.BUTTON_QUERYUSER = 100; // 查询当前用户数据
+exports.BUTTON_QUERYUSER = 100; // 查询用户数据
 exports.BUTTON_REGISTERUSER = 101; // 注册用户
 exports.BUTTON_SENDSJYZM = 102; // 发送手机验证码
 exports.USERTYPE_NONE = '0'; // 用户类型：未注册
@@ -31,12 +41,11 @@ exports.ZDLX_HTZD = '0';  //合同帐单
 exports.ZDLX_YJZD = '1';  //月结帐单
 exports.ZDLX_TFZD = '2';  //退房帐单
 
-exports.getButtonActionInfo = buttonAction => {
-  try {
-    return ['', '查询房源', '添加房源', '编辑房源', '删除房源', '抄表', '创建帐单', '查看/处理帐单', '', ''][
-      buttonAction
-    ];
-  } catch (e) {
-    return '';
-  }
-};
+//收租状态
+exports.SFSZ_WJQ = '0'; //未结清;
+exports.SFSZ_YJQ = '1'; //已结清;
+exports.SFSZ_YJZ = '2'; //已结转;
+exports.SFSZ_YTF = '3'; //已退房;
+exports.getSfszInfo = sfsz => {
+  return { '0': '未结清', '1': '已结清', '2': '已结转', '3': '已退房' }[sfsz];
+}

@@ -8,7 +8,7 @@ const fyxxMetas = {
   fwmc: { label: '房屋名称', name: 'fwmc', require: true },
   zhxm: { label: '租户姓名', name: 'zhxm'},
   sfzh: { label: '身份证号', name: 'sfzh', type:'idcard' },
-  dhhm: { label: '电话号码', name: 'dhhm', type:"number"},
+  dhhm: { label: '手机号码', name: 'dhhm', type:"number"},
   czje: { label: '出租金额', name: 'czje', type:"number" },
   yj: { label: '押金', name: 'yj', type: "number" },
   htrqq: { label: '合同日期起', name: 'htrqq', type: 'date' },
@@ -84,8 +84,19 @@ Page({
       })
       return;
     }
+    //校验手机号
+    const { dhhm } = formObject;
+    if (!utils.isEmpty(dhhm) && !utils.checkSjhm(dhhm)){
+      wx.showToast({
+        title: '请输入正确的手机号码！',
+        icon: 'none',
+        duration: 5000,
+      })
+      return;
+    }
 
-    const response = fyglService.saveFy(buttonAction,e.detail.value);
+
+    const response = fyglService.saveFy(buttonAction, formObject);
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData)=>{

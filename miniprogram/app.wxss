@@ -1,4 +1,4 @@
-@import 'style/weui.wxss';
+@import 'style/weui-src.wxss';
 @import 'style/comm.wxss';
 .container {
   display: flex;

@@ -43,6 +43,20 @@ exports.getRandom = (n) => {
   return result;
 }
 
+
+exports.showModal = (title,content,callback)=>{
+  wx.showModal({
+    title,
+    content,
+    success: function (res) {
+      if (res.confirm) {
+        callback();
+      }
+    }
+  });
+}
+
+
 function uuid(len, radix) {
   var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
   var uuid = [], i;

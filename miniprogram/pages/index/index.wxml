@@ -3,8 +3,8 @@
     {{user.nickName}},欢迎您！
   </view>
   <view class="page__hd"> 
-      <view class="page__title">极简出租</view>
-      <view class="page__desc">为房东提供简洁高效的房屋出租管理，为租客提供方便快捷的帐单查询。</view> 
+      <!-- <view class="page__title"></view> -->
+      <view class="page__desc">极简出租为房东提供简洁高效的房屋出租管理，为租客提供方便快捷的帐单查询。</view> 
   </view>
   <view class="page__bd page__bd_spacing">
       <view class="grant-container grant-container-wxgrant" wx:if="{{!user.granted}}">
@@ -33,7 +33,7 @@
                       <view class="weui-label">手机号</view>
                   </view> -->
                   <view class="weui-cell__bd">
-                      <input class="weui-input" name="sjhm" bindblur="onInputSjhm" placeholder="请输入手机号" />
+                      <input class="weui-input" name="sjhm" type="number" bindblur="onInputSjhm" placeholder="请输入手机号" />
                   </view>
                   <view class="weui-cell__ft">
                       <view class="weui-vcode-btn" bindtap='onSendSjyzm' wx:if="{{!sendingYzm}}">获取验证码</view>
@@ -45,7 +45,7 @@
                       <view class="weui-label"></view>
                   </view> -->
                   <view class="weui-cell__bd">
-                      <input class="weui-input" name="sjyzm" placeholder="请输入验证码" />
+                      <input class="weui-input" name="sjyzm" type="number" placeholder="请输入验证码" />
                   </view>
                   <!-- <view class="weui-cell__ft">
                       <view class="weui-vcode-btn">获取验证码</view>
@@ -100,6 +100,6 @@
       </block>
   </view>
   <view class="page__ft weui-footer_fixed-bottom">
-      <view class="weui-footer__text">极简出租，Copyright©2018-2019 by liujun</view>
+      <view class="weui-footer__text weui-cell__ft_in-access1">极简出租，Copyright©2018-2019 by liujun</view>
   </view>
 </view>

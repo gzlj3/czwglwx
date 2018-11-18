@@ -1,1 +1,15 @@
 /* miniprogram/pages/fyglmain.wxss */
+.addfontsize{
+  font-size: 16px;
+}
+
+/* .weui-form-preview__btn:after {
+  content: " ";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  bottom: 0;
+  border-left: 1rpx solid #d5d5d6;
+  color: #d5d5d6;
+} */

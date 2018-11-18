@@ -10,6 +10,7 @@ const initialState = {
   sourceList: [],
   CONSTS,
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
+  showDetailZd:false,
 }
 
 Page({
@@ -36,18 +37,16 @@ Page({
       (resultData)=>{
         getApp().setPageParams(buttonAction, resultData);
         wx.navigateBack();
-        // console.log("===buttonAction:" + buttonAction);
-        // if (buttonAction === CONSTS.BUTTON_LASTZD) {
-        //   this.setData({
-        //     sourceList: resultData,
-        //   });
-        // } else {
-        //   wx.navigateBack();
-        // }
       }
     );
   },
 
+  onToggleDetailZd: function(e) {
+    console.log(e);
+    this.setData({
+      showDetailZd: !this.data.showDetailZd
+    });
+  },
 
   onQrsz: function (e) {
     const { id: flag } = e.currentTarget;
@@ -153,8 +152,8 @@ console.log(params);
   },
   
   onInputBlur: function(e) {
-    // console.log(e);
-    console.log(e.currentTarget);
+    console.log(e);
+    // console.log(e.currentTarget);
     const idarr = e.currentTarget.id.split('.');
     const index =  Number.parseInt(idarr[0]);
     const name = idarr[1];

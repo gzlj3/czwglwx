@@ -60,10 +60,16 @@ Page({
   },
   
   onLoad: function() {
+    console.log('====sfsz:',CONSTS.getSfszInfo('2'));
+    wx.navigateTo({
+      url: '../fygl/fyglmain',
+      // url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item={"houseid":"W-6zxOJyfGvOuo9u"}',
+    })
     // console.log(moment().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss'));
     // const uuid = utils.uuid(16,10);
     // console.log(uuid);
     // console.log(uuid.length);  
+    console.log(utils.getFloat((4.0).toFixed(1)));
     this.queryUser();
  
   },

@@ -21,6 +21,17 @@ exports.getFloat = (value) => {
   }
 }
 
+//对number四舍五入，保留指定位置，并返回数值型
+exports.roundNumber = (number,precision) => {
+  try{
+    const result = Number.parseFloat(number.toFixed(precision));
+    if (isNaN(result)) return 0;
+    return result;
+  }catch(e){
+    return 0;
+  }
+}
+
 exports.isEmpty = (value) => {
   return !(value && value.length > 0);
 }

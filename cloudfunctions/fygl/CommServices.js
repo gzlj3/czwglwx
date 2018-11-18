@@ -20,6 +20,15 @@ exports.updateDoc = async (tableName, docObj) => {
 
   return updatedNum;
 }
+/**
+ * 删除表的记录，返回删除成功的记录数
+ */
+exports.removeDoc = async (tableName, _id) => {
+  const db = cloud.database();
+  const result = await db.collection(tableName).doc(_id).remove();
+  const removedNum = result.stats.removed;
+  return removedNum;
+}
 
 exports.addDoc = async (tableName, docObj) => {
   const db = cloud.database();
@@ -36,6 +45,14 @@ exports.querySingleDoc = async (tableName, whereObj) => {
     return result.data[0];
   return null;
 }
+
+exports.queryPrimaryDoc = async (tableName, _id) => {
+  const db = cloud.database();
+  const result = await db.collection(tableName).doc(_id).get();
+  if (result) return result.data;
+  return null;
+}
+
 //是否为租客
 exports.isZk = async (userType) => {
   return userType === CONSTS.USERTYPE_ZK;

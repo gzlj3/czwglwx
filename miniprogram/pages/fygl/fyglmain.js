@@ -44,6 +44,42 @@ Page({
     })
   }, 
 
+  onMoreAction(e){
+    const { item } = e.currentTarget.dataset;
+    console.log("moreAction:",item);
+    const self = this;
+    wx.showActionSheet({
+      itemList: ['删除房源', '退房'],
+      success: function (res) {
+        if (res.cancel) return;
+        console.log(res.tapIndex);
+        if(res.tapIndex===0){
+          utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源('+item.fwmc+')吗？', () => { self.deletefy(item._id);});
+        }else if(res.tapIndex=== 1){
+          utils.showModal('退房', '退房步骤（1.生成退房帐单,2.结清退房帐单,3.再次退房)。你真的确定退房(' + item.fwmc + ')吗？', () => { self.exitfy(item._id); });
+        }
+      }
+    });
+  },
+
+  exitfy(houseid) {
+    console.log("exitfy:" + houseid);
+    const response = fyglService.postData(CONSTS.BUTTON_DELETEFY, { houseid });
+    fyglService.handleAfterRemote(response, '退房',
+      (resultData) => {
+        this.refreshFyList(resultData)
+      });
+  },
+
+  deletefy(houseid){
+    console.log("deletefy:"+houseid);
+    const response = fyglService.postData(CONSTS.BUTTON_DELETEFY, { houseid });
+    fyglService.handleAfterRemote(response, '删除房源',
+      (resultData) => {
+        this.refreshFyList(resultData)      
+    });
+  },
+
   onEditfy(e){
     // console.log(e);
     const {item} = e.currentTarget.dataset;
@@ -105,17 +141,29 @@ Page({
     const response = fyglService.queryFyglList(); 
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
+        this.refreshFyList(resultData);
         //计算房源进度条显示数据
-        fyglService.refreshProgessState(resultData);
+        // fyglService.refreshProgessState(resultData);
 
-        getApp().setPageParams(CONSTS.BUTTON_NONE, null);
-        this.setData({
-          fyList: resultData,
-        }); 
+        // getApp().setPageParams(CONSTS.BUTTON_NONE, null);
+        // this.setData({
+        //   fyList: resultData,
+        // }); 
       }
-    );
-    
- },
+    );   
+  },
+
+  refreshFyList: function(resultData) {
+    //计算房源进度条显示数据
+    fyglService.refreshProgessState(resultData);
+    getApp().setPageParams(CONSTS.BUTTON_NONE, null);
+        this.setData({
+      fyList: resultData,
+    }); 
+
+  },
+
+
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
