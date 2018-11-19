@@ -207,6 +207,20 @@ exports.deleteFy = async (house) => {
     throw utils.newException('房源ID:'+houseid);
 }
 
+exports.tfFy = async (data) => {
+  const { houseid } = data;
+  const house = await commService.queryPrimaryDoc('house', houseid);
+  // console.log('tffy:',houseid);
+  const housefyList = await commService.queryDocs('housefy',{houseid});
+  console.log('tffy:', houseid,housefyList);
+  if(housefyList){
+    for(let i=0;i<housefyList.length;i++){
+      await commService.addDoc('housefy_tf', housefyList[i]);
+    }
+  }
+  await commService.addDoc('house_tf', house);
+}
+
 exports.updateSdb = async (houseList) => {
   const db = cloud.database();
   let tasks = [];
@@ -384,7 +398,7 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     if(!zdlx) zdlx = housefy.zdlx;
   }
   // console.log('makehousefy zdlx:', CONSTS.ZDLX_HTZD === zdlx);
-  let xcszrq, rq1, rq2;
+  let xcszrq, rq1, rq2,yffrq1,yffrq2;
   // console.log('housefy tsinfo:', housefy.daysinfo, housefy.monthNum);
   housefy.daysinfo = "";
   housefy.monthNum = "";
@@ -403,16 +417,14 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     szrq = tfrq;
     if(sfsz === CONSTS.SFSZ_WJQ){
       // 未结清，起始日期不变
-      rq1 = moment(house.rq1);
+      yffrq1 = moment(house.yffrq1);
     }else{
-      // 已结清，起始日期为当前收租日期
-      rq1 = moment(house.szrq);
+      // 已结清，起始日期为上段未加1天
+      yffrq1 = moment(house.yffrq2).add(1,'days');
     }
-    rq2 = szrq.clone().subtract(1, 'days');
-    const days = rq2.diff(rq1, 'days') + 1;
-    console.log('rq2 - rq1:',days);
-    // if (days < 0)
-    //   throw utils.newException("退房日期不能小于上次收租日期！");
+    yffrq2 = szrq.clone().subtract(1, 'days');
+    const days = yffrq2.diff(yffrq1, 'days') + 1;
+    console.log('yffrq2 - yffrq1:',days);
     let yzj,daysinfo=null;
     if (days == 30 || days == 31){
       yzj = house.czje;
@@ -446,9 +458,18 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     housefy.syjzf = house.syjzf;
     housefy.qtf = house.qtf;
 
-    const houseRq1 = moment(house.rq1);
-    const qtfDays = tfrq.diff(houseRq1, 'days');
-    console.log('js qtfdays:', tfrq, houseRq1, qtfDays);
+    //后付费时间范围
+    if (sfsz === CONSTS.SFSZ_WJQ) {
+      // 未结清，起始日期不变
+      rq1 = moment(house.rq1);
+    } else {
+      // 已结清，起始日期为当前收租日期
+      // rq1 = moment(house.rq2).add;
+      rq1 = moment(house.rq2).add(1, 'days');
+    }
+    rq2 = yffrq2;
+    const qtfDays = rq2.diff(rq1, 'days');
+    console.log('js qtfdays:', rq2,rq1,qtfDays);
     let monthNum = Math.ceil((qtfDays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
     console.log('monthNum:',monthNum);
     if(monthNum<0) monthNum = 0;
@@ -473,11 +494,11 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     console.log('htzd');    
     // 合同帐单的下次收租日期为当前录入的时间
     xcszrq = szrq;
-    rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
-    if(!rq1.isValid()) 
+    yffrq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
+    if(!yffrq1.isValid()) 
       throw utils.newException("合同起始日期不合法！");
-    rq2 = szrq.clone().subtract(1,'days');
-    const days = rq2.diff(rq1,'days') + 1;
+    yffrq2 = szrq.clone().subtract(1,'days');
+    const days = yffrq2.diff(yffrq1,'days') + 1;
     if (days < 0)
       throw utils.newException("下次收租日期不能小于合同起始日期！");
     let yzj;
@@ -487,6 +508,10 @@ function makeHousefy(house, housefy, zdlx,tfrq){
       yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同签约时月租金
       housefy.daysinfo = '收'+days+'天租金';
     }
+    //合同帐单，赋值后付费与预付费时间范围相同
+    rq1 = yffrq1;
+    rq2 = yffrq2;
+
     housefy.czje = yzj; // 月租金
     housefy.yj = house.yj; // 押金
     housefy.qtf=house.qtf;
@@ -498,12 +523,15 @@ function makeHousefy(house, housefy, zdlx,tfrq){
       + utils.getFloat(housefy.qtf);
   } else {
     xcszrq = szrq.clone().add(1,'months');
-    rq1 = szrq.clone().subtract(1, 'months'); 
+    //后付费时间范围
+    rq1 = szrq.clone().subtract(1, 'months');
     if(rq1.format('YYYY-MM-DD')<house.htrqq){
       rq1 = moment(house.htrqq);
     }
-
     rq2 = szrq.clone().subtract(1, 'days');
+    //预付费时间范围
+    yffrq1 = szrq.clone();
+    yffrq2 = xcszrq.clone().subtract(1, 'days');
 
     housefy.czje=house.czje;
     // 电费数据
@@ -537,6 +565,8 @@ function makeHousefy(house, housefy, zdlx,tfrq){
   housefy.szrq = xcszrq.format('YYYY-MM-DD');
   housefy.rq1 = rq1.format('YYYY-MM-DD');
   housefy.rq2 = rq2.format('YYYY-MM-DD');
+  housefy.yffrq1 = yffrq1.format('YYYY-MM-DD');
+  housefy.yffrq2 = yffrq2.format('YYYY-MM-DD');
 
   // 房屋信息
   housefy.houseid=house._id;
@@ -557,6 +587,8 @@ function makeHousefy(house, housefy, zdlx,tfrq){
   house.zdlx = zdlx;
   house.rq1 = housefy.rq1;
   house.rq2= housefy.rq2;
+  house.yffrq1 = housefy.yffrq1;
+  house.yffrq2 = housefy.yffrq2;
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
   // console.log('housefy tsinfo end:', housefy.daysinfo, housefy.monthNum);

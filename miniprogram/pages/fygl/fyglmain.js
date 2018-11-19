@@ -57,13 +57,18 @@ Page({
         if(res.tapIndex===0){
           utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源('+item.fwmc+')吗？', () => { self.deletefy(item._id);});
         }else if(res.tapIndex=== 1){
-          const tfrq = moment().format('YYYY-MM-DD');
-          self.setData({
-            tfrq,
-            tfItem:item,
-            modalVisible:true,
-            modalTitle:'请输入退房截止日期',
-          });
+          const {sfsz,zdlx} = item;
+          if (CONSTS.ZDLX_TFZD === zdlx && CONSTS.SFSZ_YJQ === sfsz){
+            utils.showModal('退房', '退房后将不能恢复，你真的确定退房(' + item.fwmc + ')吗？', () => {self.tffy(item._id)});
+          }else{
+            const tfrq = moment().format('YYYY-MM-DD');
+            self.setData({
+              tfrq,
+              tfItem:item,
+              modalVisible:true,
+              modalTitle:'请输入退房截止日期',
+            });
+          }
         }
       }
     });
@@ -76,9 +81,18 @@ Page({
     utils.showModal('退房', '退房步骤（1.生成退房帐单,2.结清退房帐单,3.再次退房)。你真的确定退房(' + item.fwmc + ')吗？', () => { self.exitfy(item._id,tfrq); });
   },
 
+  tffy: function(houseid) {
+    console.log("tffy:", houseid);
+    const response = fyglService.postData(CONSTS.BUTTON_EXITFY, { houseid});
+    fyglService.handleAfterRemote(response, '退房',
+      (resultData) => {
+        this.refreshFyList(resultData)
+      });
+  },
+
   exitfy(houseid,tfrq) {
     console.log("exitfy:",houseid,tfrq);
-    const response = fyglService.postData(CONSTS.BUTTON_EXITFY, { houseid,tfrq });
+    const response = fyglService.queryData(CONSTS.BUTTON_EXITFY, { houseid,tfrq });
     fyglService.handleAfterRemote(response, '退房',
       (resultData) => {
         this.refreshFyList(resultData)

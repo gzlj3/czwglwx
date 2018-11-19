@@ -53,6 +53,14 @@ exports.queryPrimaryDoc = async (tableName, _id) => {
   return null;
 }
 
+exports.queryDocs = async (tableName, whereObj) => {
+  const db = cloud.database();
+  const result = await db.collection(tableName).where(whereObj).get();
+  if (result && result.data.length > 0)
+    return result.data;
+  return null;
+}
+
 //是否为租客
 exports.isZk = async (userType) => {
   return userType === CONSTS.USERTYPE_ZK;

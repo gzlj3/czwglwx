@@ -23,6 +23,12 @@
   color:blue;
 }
 
+.sjfw {
+  display:inline-block;
+  color:#999;
+}
+
+
 .weui-form-preview {
   position: relative;
   background-color: #fff;
@@ -154,8 +160,8 @@
   padding: 10px 15px;
   font-size: 1em;
   text-align: left;
-  color: #999;
-  /* color:black; */
+  /* color: #999; */
+  color:black;
   line-height: 1.5;
 }
 
@@ -187,8 +193,8 @@
   float: left;
   margin-right: 1em;
   min-width: 4em;
-  color: #999;
-  /* color: black; */
+  /* color: #999; */
+  color: black;
   text-align: justify;
   text-align-last: justify;
 }

@@ -2,7 +2,7 @@
 <template name="FmCb">
   <view class="page">
     <view class="page__hd">
-      <view class="page__title">集中抄表</view>
+      <view class="page__title">集中抄表</view> 
       <view class="page__desc">上月帐单已经结清，且已接近收租日期的房源在此抄水电表。</view>
     </view>
     <view class="page__bd">
