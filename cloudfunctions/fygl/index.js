@@ -65,6 +65,11 @@ exports.main = async (event, context) => {
         result = await services.deleteFy(data);
         result = await services.queryFyList(curUser.yzhid);
         return results.getSuccessResults(result.data);
+      case CONSTS.BUTTON_EXITFY:
+        console.log("exitfy");
+        result = await services.exitFy(data,curUser);
+        result = await services.queryFyList(curUser.yzhid);
+        return results.getSuccessResults(result.data);
       case CONSTS.BUTTON_CB:
         if(method==='POST'){
           console.log("cb");

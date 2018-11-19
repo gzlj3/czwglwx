@@ -62,30 +62,35 @@
                     <view class="weui-form-preview__label">月租费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.czje}}元
+                      <view class="redColor" wx:if="{{item.daysinfo}}">({{item.daysinfo}})</view>
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.yj}}">
                     <view class="weui-form-preview__label">押金</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.yj}}元
+                        <view class="redColor" wx:if="{{item.yj<0}}">(退)</view>
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.wlf}}">
                     <view class="weui-form-preview__label">网络费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.wlf}}元
+                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.ljf}}">
                     <view class="weui-form-preview__label">卫生费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.ljf}}元
+                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.glf}}">
                     <view class="weui-form-preview__label">管理费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.glf}}元
+                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.syjzf}}">

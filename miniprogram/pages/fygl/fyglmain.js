@@ -14,9 +14,10 @@ const initialState = {
   selectedRowKeys: [], // 列表选中行
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
   modalVisible: false, // 显示弹框
-  modalTitle: null, // 弹框属性标题
+  modalTitle: '', // 弹框属性标题
   modalWidth: 1000, // 弹框属性宽度
-  modalOkText: '保存', // 弹框属性确定按钮文本
+  modalOkText: '确定', // 弹框属性确定按钮文本
+  modalCancelText: '取消', // 弹框属性确定按钮文本
   modalOkDisabled: false, // 弹框属性确定按钮可点击状态
 };
 
@@ -56,15 +57,28 @@ Page({
         if(res.tapIndex===0){
           utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源('+item.fwmc+')吗？', () => { self.deletefy(item._id);});
         }else if(res.tapIndex=== 1){
-          utils.showModal('退房', '退房步骤（1.生成退房帐单,2.结清退房帐单,3.再次退房)。你真的确定退房(' + item.fwmc + ')吗？', () => { self.exitfy(item._id); });
+          const tfrq = moment().format('YYYY-MM-DD');
+          self.setData({
+            tfrq,
+            tfItem:item,
+            modalVisible:true,
+            modalTitle:'请输入退房截止日期',
+          });
         }
       }
     });
   },
 
-  exitfy(houseid) {
-    console.log("exitfy:" + houseid);
-    const response = fyglService.postData(CONSTS.BUTTON_DELETEFY, { houseid });
+  modalConfirm: function(){
+    this.setData({modalVisible:false});
+    const self = this;
+    const {tfItem:item,tfrq} = this.data;
+    utils.showModal('退房', '退房步骤（1.生成退房帐单,2.结清退房帐单,3.再次退房)。你真的确定退房(' + item.fwmc + ')吗？', () => { self.exitfy(item._id,tfrq); });
+  },
+
+  exitfy(houseid,tfrq) {
+    console.log("exitfy:",houseid,tfrq);
+    const response = fyglService.postData(CONSTS.BUTTON_EXITFY, { houseid,tfrq });
     fyglService.handleAfterRemote(response, '退房',
       (resultData) => {
         this.refreshFyList(resultData)
@@ -161,6 +175,15 @@ Page({
       fyList: resultData,
     }); 
 
+  },
+
+  onTfInputBlur: function(e) {
+    const name = e.target.id;
+    this.setData({tfrq:e.detail.value});
+  },
+
+  modalCancel: function(){
+    this.setData({modalVisible:false});
   },
 
 

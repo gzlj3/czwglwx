@@ -60,7 +60,15 @@ Page({
   },
   
   onLoad: function() {
-    console.log('====sfsz:',CONSTS.getSfszInfo('2'));
+    // console.log('====sfsz:',CONSTS.getSfszInfo('2'));
+    // const zdlx=null;
+    // const newzdlx = zdlx | 100;
+    // console.log('取整:',Math.ceil(33 / 30));
+    // console.log(moment().startOf('day'));
+    // wx.showModal({
+    //   title: 'aaa',
+    //   content: '<view>aaaaaa</view>',
+    // })
     wx.navigateTo({
       url: '../fygl/fyglmain',
       // url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item={"houseid":"W-6zxOJyfGvOuo9u"}',
@@ -69,7 +77,7 @@ Page({
     // const uuid = utils.uuid(16,10);
     // console.log(uuid);
     // console.log(uuid.length);  
-    console.log(utils.getFloat((4.0).toFixed(1)));
+    // console.log(utils.getFloat((4.0).toFixed(1)));
     this.queryUser();
  
   },

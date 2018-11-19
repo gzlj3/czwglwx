@@ -1,5 +1,6 @@
 
 .redColor {
+  display:inline-block;
   color:red;
 }
 

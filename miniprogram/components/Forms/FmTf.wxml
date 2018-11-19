@@ -1,0 +1,15 @@
+<!--退房输入界面，传入对象：{label:'房屋名称',name:'fwmc',require:true,currentObject} -->
+<template name="FmTf">
+  <view class="weui-cells">
+    <view class="weui-cell weui-cell_input">
+      <view class="weui-cell__hd">
+        <view class="weui-label">退房日期</view>
+      </view>
+      <view class="weui-cell__bd">
+        <picker mode="date" id="tfrq" name="tfrq" value="{{tfrq}}" bindchange="onTfInputBlur">
+          <view class="weui-input">{{tfrq}}</view>
+        </picker>
+      </view>
+    </view>
+  </view>
+</template>

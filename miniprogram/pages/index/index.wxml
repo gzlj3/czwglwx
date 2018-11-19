@@ -2,6 +2,7 @@
   <view class="nickname" wx:if="{{user.granted}}">
     {{user.nickName}},欢迎您！
   </view>
+  
   <view class="page__hd"> 
       <!-- <view class="page__title"></view> -->
       <view class="page__desc">极简出租为房东提供简洁高效的房屋出租管理，为租客提供方便快捷的帐单查询。</view> 

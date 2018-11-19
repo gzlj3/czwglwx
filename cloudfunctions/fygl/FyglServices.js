@@ -129,42 +129,53 @@ exports.saveFy = async (house,curUser) => {
   return null;
 }
 
-exports.exitFy = async (data) => {
-  const { houseid } = data;
-  let house = await utils.queryPrimaryDoc('house',houseid);
+exports.exitFy = async (data,curUser) => {
+  const { houseid,tfrq } = data;
+  let house = await commService.queryPrimaryDoc('house',houseid);
   if(!house)
     throw utils.newException("未查到房屋数据!");
-    
+
+  if(utils.isEmpty(house.dbcds) || utils.isEmpty(house.sbcds))  
+    throw utils.newException("请先抄当前的水电表再退房!");
+  const {sfsz} = house;
   let housefy=null;
-  if (result.sfsz === CONSTS.SFSZ_WJQ){
+  if (sfsz === CONSTS.SFSZ_WJQ){
     //当前帐单未结清，则刷新当前帐单为退房帐单
-    housefy = await utils.queryPrimaryDoc('housefy',house.housefyid);
+    housefy = await commService.queryPrimaryDoc('housefy',house.housefyid);
     if (!housefy)
       throw utils.newException("未查到房屋当前的帐单数据!");
-  } else if (result.sfsz === CONSTS.SFSZ_YTF) {
+    if(housefy.zdlx === CONSTS.ZDLX_HTZD)
+      throw utils.newException("签约帐单未结清，不能退房!");
+  } else if (sfsz === CONSTS.SFSZ_YTF) {
     //帐单状态为已退房 ，则直接办理退房
     return;
   }else{
     //帐单状态为已结清或已结转 ，则生成新的退房帐单
   }
-  newHousefy = makeHousefy(house, housefy, CONSTS.ZDLX_TFZD);
-
-  house.zhxgr = userb.userid;
+  newHousefy = makeHousefy(house, housefy, CONSTS.ZDLX_TFZD,tfrq);
+  house.zhxgr = curUser.userid;
   house.zhxgsj = utils.getCurrentTimestamp();
-  housefy.zhxgr = userb.userid;
-  housefy.zhxgsj = house.zhxgsj;
-  const housefyNum = await commService.updateDoc('housefy', housefy);
-  if (housefyNum === 0)
-    throw utils.newException("帐单数据更新失败！");
+  newHousefy.zhxgr = curUser.userid;
+  newHousefy.zhxgsj = house.zhxgsj;
+
+  console.log('exitfy sfsz:',sfsz);
+
+  if (sfsz === CONSTS.SFSZ_WJQ) {
+    //未结清，刷新当前帐单
+    const housefyNum = await commService.updateDoc('housefy', newHousefy);
+    if (housefyNum === 0)
+      throw utils.newException("退房帐单数据更新失败！");
+  }else{
+    //已结清，生成新的退房帐单
+    const housefyResult = await commService.addDoc('housefy', newHousefy);
+    console.log('生成新的退房帐单ID:', housefyResult._id);
+    house.housefyid = housefyResult._id;
+    if (utils.isEmpty(house.housefyid))
+      throw utils.newException("生成退房帐单失败！");
+  }
   const houseNum = await commService.updateDoc('house', house);
   if (houseNum === 0)
     throw utils.newException("房源数据更新失败！");
-  console.log("=====:" + houseid);
-  return queryLastzdList({ houseid });
-
-  // if (utils.isEmpty(house.housefyid) && !utils.isEmpty(house.zhxm)) {
-  //   // 如果为新签约，则自动生成合同帐单
-    const newHousefy = makeHousefy(house, null, CONSTS.ZDLX_TFZD);
 }
 
 
@@ -270,9 +281,10 @@ exports.processQrsz = async (params,userb) => {
 
   if ("sxzd" === flag && housefyid !== house.housefyid)
     throw utils.newException("帐单数据与主房屋不匹配，刷新帐单失败！");
-
+  // console.log("qrsz flag:",flag);
   if ("sxzd" === flag) {
     // 刷新帐单
+    // console.log("qrsz zdlx:", housefy.zdlx);
     makeHousefy(house, housefy, null);
   } else {
     jzHouse(house, housefy, flag);
@@ -361,42 +373,59 @@ function jsqtfhj(house) {
   return utils.roundNumber(qtfy, 1);
 }
 
-function makeHousefy(house, housefy, zdlx){
+function makeHousefy(house, housefy, zdlx,tfrq){
   // 计算收租范围
-  const szrq = moment(house.szrq);
+  let szrq = moment(house.szrq);
   if (!szrq.isValid()) throw utils.newException("收租日期不合法！");
 
   if (!housefy) {
     housefy = {};
   } else {
-    zdlx = housefy.zdlx;
+    if(!zdlx) zdlx = housefy.zdlx;
   }
-
+  // console.log('makehousefy zdlx:', CONSTS.ZDLX_HTZD === zdlx);
   let xcszrq, rq1, rq2;
+  // console.log('housefy tsinfo:', housefy.daysinfo, housefy.monthNum);
+  housefy.daysinfo = "";
+  housefy.monthNum = "";
+  // console.log('housefy tsinfo after assign:', housefy.daysinfo, housefy.monthNum);
+
   if (CONSTS.ZDLX_TFZD === zdlx) {
-    // 退房帐单的收租日期为当前系统时间
-    xcszrq = moment().startOf('day');
-    szrq = xcszrq;
+    const { sfsz } = house;
+    if(!tfrq) 
+      throw utils.newException("请在房源列表功能页中重新执行退房操作！");
+
+    tfrq = moment(tfrq);
+    console.log('tfrq:',tfrq,house.rq1);
+
+    // 退房帐单的收租日期为退房日期
+    xcszrq = tfrq;
+    szrq = tfrq;
     if(sfsz === CONSTS.SFSZ_WJQ){
       // 未结清，起始日期不变
-      rq1 = house.rq1;
+      rq1 = moment(house.rq1);
     }else{
       // 已结清，起始日期为当前收租日期
-      rq1 = house.szrq;
+      rq1 = moment(house.szrq);
     }
-    // rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
-    // if (!rq1.isValid())
-    //   throw utils.newException("合同起始日期不合法！");
     rq2 = szrq.clone().subtract(1, 'days');
     const days = rq2.diff(rq1, 'days') + 1;
-    if (days < 0)
-      throw utils.newException("退房日期不能小于上次收租日期！");
-    let yzj;
-    if (days == 30 || days == 31)
+    console.log('rq2 - rq1:',days);
+    // if (days < 0)
+    //   throw utils.newException("退房日期不能小于上次收租日期！");
+    let yzj,daysinfo=null;
+    if (days == 30 || days == 31){
       yzj = house.czje;
-    else
-      yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同签约时月租金
-    housefy.czje = yzj; // 月租金
+      daysinfo = '补1个月租金';
+    }else if (days == -30 || days == -31) {
+      yzj = -house.czje;
+      daysinfo = '退1个月租金';
+    }else{
+      yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同退房时月租金
+      daysinfo = (days>0?'补':'退')+(Math.abs(days))+'天租金';
+    }
+    housefy.daysinfo = daysinfo;
+    housefy.czje = yzj; // 按天计算已住月租金
     // 电费数据
     housefy.dbcds = house.dbcds;
     housefy.dscds = house.dscds;
@@ -413,15 +442,35 @@ function makeHousefy(house, housefy, zdlx){
     housefy.sdj = house.sdj;
     housefy.sfhj = jssf(house);
     
-    housefy.yj = house.yj; // 押金
+    housefy.yj = -house.yj; // 退押金
+    housefy.syjzf = house.syjzf;
     housefy.qtf = house.qtf;
-    housefy.dbcds = house.dscds;
-    housefy.Sbcds = house.Sscds;
+
+    const houseRq1 = moment(house.rq1);
+    const qtfDays = tfrq.diff(houseRq1, 'days');
+    console.log('js qtfdays:', tfrq, houseRq1, qtfDays);
+    let monthNum = Math.ceil((qtfDays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
+    console.log('monthNum:',monthNum);
+    if(monthNum<0) monthNum = 0;
+    housefy.glf = utils.getInteger(house.glf) * monthNum;
+    housefy.wlf = utils.getInteger(house.wlf) * monthNum;
+    housefy.ljf = utils.getInteger(house.ljf) * monthNum;
+    if(monthNum>1){
+      housefy.monthNum = monthNum+"";
+    }
+
     // 房屋合计费
-    housefy.fyhj = utils.getInteger(housefy.czje)
-      + utils.getInteger(housefy.yj)
-      + utils.getFloat(housefy.qtf);
+    housefy.fyhj = utils.roundNumber(utils.getFloat(housefy.dfhj)
+      + utils.getFloat(housefy.sfhj) + utils.getInteger(housefy.yj) + jsqtfhj(housefy), 1);
+    // housefy.qtf = house.qtf;
+    // housefy.dbcds = house.dscds;
+    // housefy.Sbcds = house.Sscds;
+    // 房屋合计费
+    // housefy.fyhj = utils.getInteger(housefy.czje)
+    //   + utils.getInteger(housefy.yj)
+    //   + utils.getFloat(housefy.qtf);
   }else if (CONSTS.ZDLX_HTZD === zdlx) {
+    console.log('htzd');    
     // 合同帐单的下次收租日期为当前录入的时间
     xcszrq = szrq;
     rq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
@@ -432,10 +481,12 @@ function makeHousefy(house, housefy, zdlx){
     if (days < 0)
       throw utils.newException("下次收租日期不能小于合同起始日期！");
     let yzj;
-    if (days == 30 || days == 31)
+    if (days == 30 || days == 31){
       yzj = house.czje;
-    else
+    }else{
       yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同签约时月租金
+      housefy.daysinfo = '收'+days+'天租金';
+    }
     housefy.czje = yzj; // 月租金
     housefy.yj = house.yj; // 押金
     housefy.qtf=house.qtf;
@@ -508,6 +559,7 @@ function makeHousefy(house, housefy, zdlx){
   house.rq2= housefy.rq2;
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
+  // console.log('housefy tsinfo end:', housefy.daysinfo, housefy.monthNum);
   return housefy;
 }
 
