@@ -30,6 +30,26 @@ exports.showLoading = (info) => {
   });
 }
 
+exports.showToast = (info) => {
+  wx.showToast({
+    title: info,
+    icon: 'none',
+    duration: 5000,
+  });  
+}
+
+exports.showModal = (title, content, callback) => {
+  wx.showModal({
+    title,
+    content,
+    success: function (res) {
+      if (res.confirm) {
+        callback();
+      }
+    }
+  });
+}
+
 exports.checkSjhm = (sjhm) => {
   const myreg = /^(14[0-9]|13[0-9]|15[0-9]|17[0-9]|18[0-9])\d{8}$$/;
   return myreg.test(sjhm);
@@ -41,19 +61,6 @@ exports.getRandom = (n) => {
   for (var i = 0; i < n; i++)
     result += Math.floor(Math.random() * 10);
   return result;
-}
-
-
-exports.showModal = (title,content,callback)=>{
-  wx.showModal({
-    title,
-    content,
-    success: function (res) {
-      if (res.confirm) {
-        callback();
-      }
-    }
-  });
 }
 
 

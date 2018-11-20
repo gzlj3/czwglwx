@@ -2,8 +2,8 @@
 <template name="FmMakezd">
   <view class="page">
     <view class="page__hd">
-        <view class="page__title">创建帐单</view>
-        <view class="page__desc">上月帐单已经结清，且已接近收租日期的房源在此创建下月新帐单</view>
+      <view class="page__title">{{pageTitle}}</view> 
+      <view class="page__desc">{{pageDesc}}</view>
     </view>
     <view class="page__bd">
         <view class="weui-cells__title">待创建新帐单房源列表</view>

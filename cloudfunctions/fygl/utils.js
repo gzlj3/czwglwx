@@ -67,10 +67,10 @@ exports.sendPhoneMessage = async (sjhm,message)=>{
       'content-type': 'application/x-www-form-urlencoded',
     }
   };
-  console.log(options);
+  // console.log(options);
   let result = await rp(options);
   result = JSON.parse(result);
-  console.log(result); 
+  // console.log(result); 
   if(result.code!==0)
     throw newException("短信发送失败:【"+result.code+"】"+result.data);
   return result;
@@ -116,4 +116,7 @@ function uuid(len, radix) {
 exports.uuid = uuid;
 exports.newYzhid = () => {
   return uuid(16, 10);
+}
+exports.id = () => {
+  return uuid(16);
 }

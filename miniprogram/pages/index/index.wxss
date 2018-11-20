@@ -43,31 +43,6 @@ page {
   margin: 5px 0px;
 }
 
-.weui-cell__ft_in-access1 {
-  padding-right: 13px;
-  position: relative;
-}
-
-.weui-cell__ft_in-access1:after {
-  content: " ";
-  /* /* content: " "; */
-  display: inline-block;
-  height: 6px;
-  width: 6px;
-  /* border-width: 2px 2px 0 0; */
-  border-width: 0 2px 2px 0;
-  border-color: #c8c8cd;
-  border-style: solid;
-  /* -webkit-transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0); */
-  transform: matrix(0.71, 0.71, -.71, 0.71, 0, 0); 
-  position: relative;
-  top: -2px;
-  position: absolute;
-  top: 50%;
-  margin-top: -4px;
-  right: 2px; 
-}
-
 /* .weui-input{
   border: 1px solid rgba(0, 0, 0, 0.1);
     height: 20px;

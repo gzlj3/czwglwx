@@ -101,6 +101,6 @@
       </block>
   </view>
   <view class="page__ft weui-footer_fixed-bottom">
-      <view class="weui-footer__text weui-cell__ft_in-access1">极简出租，Copyright©2018-2019 by liujun</view>
+      <view class="weui-footer__text">极简出租，Copyright©2018-2019 by liujun</view>
   </view>
 </view>

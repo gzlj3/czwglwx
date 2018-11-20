@@ -80,9 +80,9 @@ exports.main = async (event, context) => {
           console.log("cb");
           result = await services.updateSdb(data);
         }else{
-          console.log("querysdb");
-          result = await services.querySdbList(curUser.yzhid);
-          result = result.data;
+          console.log("querysdb:",data);
+          result = await services.querySdbList(curUser.yzhid,data);
+          // result = result.data;
         }
         return results.getSuccessResults(result);
         break;
@@ -92,7 +92,7 @@ exports.main = async (event, context) => {
           result = await services.updateZdList(data);
         }else{
           console.log("querymakezd");
-          result = await services.queryZdList(curUser.yzhid);
+          result = await services.queryZdList(curUser.yzhid,data);
         }
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_LASTZD:

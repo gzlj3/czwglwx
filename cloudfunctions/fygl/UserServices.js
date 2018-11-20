@@ -66,11 +66,11 @@ exports.sendSjyzm = async (data,userInfo) => {
   const yzm = utils.getRandom(6);
   const message="【极简出租】验证码："+yzm+",您正在注册极简出租，验证码2分钟内有效。";
   console.log(message);
-  try{ 
+  // try{ 
     await utils.sendPhoneMessage(sjhm,message);  //短信发送失败会抛出异常
-  }catch(e){
-    console.log(e);
-  }
+  // }catch(e){
+  //   console.log(e);
+  // }
   //短信发送成功，则将验证码写入缓存
   const yzmCreateTime = utils.currentTimeMillis();
   console.log(yzmCreateTime);
@@ -146,7 +146,7 @@ exports.registerUser = async (data,userInfo) => {
   const db = cloud.database();
   const lrsj = utils.getCurrentTimestamp();
   const zhxgsj = lrsj;
-  const yzhid = utils.newYzhid();
+  const yzhid = utils.yzhid();
 
   const userb = {
     openId,

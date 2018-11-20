@@ -22,7 +22,7 @@ const menuList = [
   },
   {
     id: 'special',
-    name: '生成帐单',
+    name: '集中创建帐单',
     open: false,
     page: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_MAKEZD
   },
@@ -69,10 +69,10 @@ Page({
     //   title: 'aaa',
     //   content: '<view>aaaaaa</view>',
     // })
-    wx.navigateTo({
-      url: '../fygl/fyglmain',
-      // url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item={"houseid":"W-6zxOJyfGvOuo9u"}',
-    })
+    // wx.navigateTo({
+    //   url: '../fygl/fyglmain',
+    //   // url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item={"houseid":"W-6zxOJyfGvOuo9u"}',
+    // })
     // console.log(moment().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss'));
     // const uuid = utils.uuid(16,10);
     // console.log(uuid);

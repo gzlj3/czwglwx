@@ -19,7 +19,7 @@ const initialState = {
   modalOkText: '确定', // 弹框属性确定按钮文本
   modalCancelText: '取消', // 弹框属性确定按钮文本
   modalOkDisabled: false, // 弹框属性确定按钮可点击状态
-};
+}; 
 
 Page({
 
@@ -50,25 +50,46 @@ Page({
     console.log("moreAction:",item);
     const self = this;
     wx.showActionSheet({
-      itemList: ['删除房源', '退房'],
+      itemList: ['删除房源', '退房','抄表','创建帐单','取消'],
+      // fail: function(res){
+      //   console.log(res);
+      // },
       success: function (res) {
         if (res.cancel) return;
-        console.log(res.tapIndex);
-        if(res.tapIndex===0){
-          utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源('+item.fwmc+')吗？', () => { self.deletefy(item._id);});
-        }else if(res.tapIndex=== 1){
-          const {sfsz,zdlx} = item;
-          if (CONSTS.ZDLX_TFZD === zdlx && CONSTS.SFSZ_YJQ === sfsz){
-            utils.showModal('退房', '退房后将不能恢复，你真的确定退房(' + item.fwmc + ')吗？', () => {self.tffy(item._id)});
-          }else{
-            const tfrq = moment().format('YYYY-MM-DD');
-            self.setData({
-              tfrq,
-              tfItem:item,
-              modalVisible:true,
-              modalTitle:'请输入退房截止日期',
+        const index = res.tapIndex;
+        console.log(index);
+        switch (index){
+          case 0:
+            utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源('+item.fwmc+')吗？', () => { self.deletefy(item._id);});
+            break;
+          case 1:
+            const {sfsz,zdlx} = item;
+            if (CONSTS.ZDLX_TFZD === zdlx && CONSTS.SFSZ_YJQ === sfsz){
+              utils.showModal('退房', '退房后将不能恢复，你真的确定退房(' + item.fwmc + ')吗？', () => {self.tffy(item._id)});
+            }else{
+              const tfrq = moment().format('YYYY-MM-DD');
+              self.setData({
+                tfrq,
+                tfItem:item,
+                modalVisible:true,
+                modalTitle:'请输入退房截止日期',
+              });
+            }
+            break;
+          case 2:
+          case 3:
+            if(index ===3 && item.sfsz === CONSTS.SFSZ_WJQ){
+              utils.showToast('当前帐单未结清，不能创建新帐单！');
+              return;
+            }
+            const s = JSON.stringify({ houseid: item._id });
+            const action = index === 2 ? CONSTS.BUTTON_CB : CONSTS.BUTTON_MAKEZD;
+            wx.navigateTo({
+              url: './editlist/editlist?buttonAction=' + action +'&item='+s
             });
-          }
+            break;
+          case 4:
+            return;
         }
       }
     });

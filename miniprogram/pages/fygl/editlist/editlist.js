@@ -1,6 +1,7 @@
 // miniprogram/pages/fygl/addfy/addfy.js
 import * as CONSTS from '../../../utils/constants.js';
 import * as fyglService from '../../../services/fyglServices.js'; 
+const utils = require('../../../utils/utils.js');
 
 const app = getApp()
 
@@ -10,7 +11,11 @@ const initialState = {
   sourceList: [],
   CONSTS,
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
-  showDetailZd:false,
+  showDetailZd:[],
+  showSaveButton:false,
+  saveButtonText:'保存',
+  pageTitle: '',
+  pageDesc: '',
 }
 
 Page({
@@ -31,20 +36,33 @@ Page({
     console.log('form发生了submit事件，携带数据为：')
     console.log(this.data.sourceList);
     const {buttonAction} = this.data;
-    const response = fyglService.postData(buttonAction, this.data.sourceList);
+    if(buttonAction===CONSTS.BUTTON_MAKEZD){
+      const self = this;
+      utils.showModal('创建帐单', '帐单创建成功后，会给已注册系统的租客发出帐单提醒，您确定创建帐单吗？', () => { self.handleSubmit(); });      
+    }else{
+      this.handleSubmit();
+    }
+  },
+
+  handleSubmit(){
+    const { buttonAction, sourceList } = this.data;
+    const response = fyglService.postData(buttonAction,sourceList);
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
-      (resultData)=>{
+      (resultData) => {
         getApp().setPageParams(buttonAction, resultData);
         wx.navigateBack();
       }
-    );
+    );    
   },
 
   onToggleDetailZd: function(e) {
     console.log(e);
+    const { item: index } = e.currentTarget.dataset;
+    let {showDetailZd} = this.data;
+    showDetailZd[index] = !showDetailZd[index];
     this.setData({
-      showDetailZd: !this.data.showDetailZd
+      showDetailZd
     });
   },
 
@@ -59,7 +77,7 @@ Page({
       content = "本月租金未缴费，确认将本月帐单结转到下月吗？"
     } else if ("sxzd" === flag) {
       title = "刷新帐单";
-      content = "确定刷新当前帐单吗？"
+      content = "帐单金额如有变动，会给已注册系统的租客发出帐单提醒，确定刷新当前帐单吗？"
     }else{
       return;
     }
@@ -106,29 +124,70 @@ Page({
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
     }
-    // let queryListAction;
-    // if (buttonAction === CONSTS.BUTTON_CB) {
-    //   queryListAction = CONSTS.BUTTON_QUERYSDB;
-    // } else if (buttonAction === CONSTS.BUTTON_LASTZD) {
-    //   queryListAction = CONSTS.BUTTON_QUERYLASTZD;
-    // } else if (buttonAction === CONSTS.BUTTON_MAKEZD) {
-    //   queryListAction = CONSTS.BUTTON_QUERYMAKEZD;
-    // }
-console.log('editlist:'+buttonAction);
-console.log(params);
+    // console.log('editlist:'+buttonAction);
+    // console.log(params);
     const response = fyglService.queryData(buttonAction, params);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
         getApp().setPageParams(CONSTS.BUTTON_NONE, null);
+        let showDetailZd=null;
+        if(buttonAction === CONSTS.BUTTON_LASTZD){
+          showDetailZd = this.refreshShowDetailZd(resultData);
+        }
         this.setData({
           buttonAction,
           sourceList: resultData,
+          showDetailZd,
           isFd: app.globalData.user.userType === CONSTS.USERTYPE_FD,
           isZk: app.globalData.user.userType === CONSTS.USERTYPE_ZK,
           isFdZk: app.globalData.user.userType === CONSTS.USERTYPE_FDZK,
+          params,
         }); 
+        this.refreshState();
       }
     );
+  },
+
+  refreshShowDetailZd(sourceList){
+    // const {sourceList} = this.data;
+    let showDetailZd=new Array(sourceList.length);
+    sourceList.map((value,index)=>{
+      if(value.sfsz === CONSTS.SFSZ_WJQ) showDetailZd[index] = true;
+      else showDetailZd[index] = false;
+    });
+    return showDetailZd;
+  },
+
+  refreshState(){
+    let { buttonAction, sourceList, saveButtonText, pageTitle, pageDesc, params} = this.data;
+    let showSaveButton = CONSTS.BUTTON_LASTZD !== buttonAction && sourceList && sourceList.length > 0;
+    if(buttonAction === CONSTS.BUTTON_MAKEZD){
+      showSaveButton = false;
+      saveButtonText = '创建帐单';
+      sourceList.map((value, index) => {
+        if (value.checked){
+           showSaveButton = true;
+        }
+        return;
+      });
+      if(params && !utils.isEmpty(params.houseid)){
+        pageTitle = '单户创建帐单';
+        pageDesc = '上月帐单已经结清，单户可在任意时间创建下月新帐单';
+      }else{
+        pageTitle = '集中创建帐单';
+        pageDesc = '上月帐单已经结清，且已接近收租日期的房源在此创建下月新帐单';                
+      }
+    } else if (buttonAction === CONSTS.BUTTON_CB) {
+      if (params && !utils.isEmpty(params.houseid)) {
+        pageTitle = '单户抄表';
+        pageDesc = '单户可在任意时间抄表。';
+      } else {
+        pageTitle = '集中抄表';
+        pageDesc = '上月帐单已经结清，且已接近收租日期的房源在此抄水电表。';
+      }
+    }
+    // console.log('refreshState:',showSaveButton,buttonAction);
+    this.setData({ showSaveButton, saveButtonText,pageTitle,pageDesc});
   },
 
   checkboxChange: function (e) {
@@ -149,7 +208,8 @@ console.log(params);
     this.setData({
       sourceList
     });
-  },
+    this.refreshState();
+ },
   
   onInputBlur: function(e) {
     console.log(e);

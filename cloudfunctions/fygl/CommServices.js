@@ -1,6 +1,7 @@
 const cloud = require('wx-server-sdk')
 const config = require('config.js')
 const CONSTS = require('constants.js');
+const utils = require('utils.js');
 
 cloud.init({
   env: config.conf.env,   //'jjczwgl-bc6ef9'
@@ -17,7 +18,12 @@ exports.updateDoc = async (tableName, docObj) => {
     data: docObj
   });
   const updatedNum = result.stats.updated;
-
+  if(updatedNum===0){
+    console.log('updateDoc result failure:', _id,tableName,docObj,result);
+    // throw utils.newException('更新数据失败！');
+  }else{
+    // console.log('updateDoc result success:', _id,tableName, docObj);    
+  }
   return updatedNum;
 }
 /**
@@ -30,12 +36,17 @@ exports.removeDoc = async (tableName, _id) => {
   return removedNum;
 }
 
+/**
+ * 添加记录，返回添加成功的_ID，错误抛出异常
+ */
 exports.addDoc = async (tableName, docObj) => {
   const db = cloud.database();
   const result = await db.collection(tableName).add({
     data: docObj
   });
-  return result;
+  if(!result || utils.isEmpty(result._id))
+    throw new utils.newException('插入数据失败！');
+  return result._id;
 }
 
 exports.querySingleDoc = async (tableName, whereObj) => {

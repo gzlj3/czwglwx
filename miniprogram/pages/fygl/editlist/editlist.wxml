@@ -3,8 +3,8 @@
 <import src="../../../components/Forms/FmLastzd.wxml"/>
 <form bindsubmit="formSubmit">
   <!-- <view class="weui-toptips weui-toptips_warn" wx:if="{{status!=0}}">{{msg}}</view> -->
-  <template is="FmCb" data="{{sourceList}}" wx:if="{{buttonAction===CONSTS.BUTTON_CB}}"/>
-  <template is="FmMakezd" data="{{sourceList}}" wx:if="{{buttonAction===CONSTS.BUTTON_MAKEZD}}"/>
+  <template is="FmCb" data="{{sourceList,pageTitle,pageDesc}}" wx:if="{{buttonAction===CONSTS.BUTTON_CB}}"/>
+  <template is="FmMakezd" data="{{sourceList,pageTitle,pageDesc}}" wx:if="{{buttonAction===CONSTS.BUTTON_MAKEZD}}"/>
   <template is="FmLastzd" data="{{sourceList,isFd,isZk,isFdZk,showDetailZd}}" wx:if="{{buttonAction===CONSTS.BUTTON_LASTZD}}"/>
-  <button form-type="submit" wx:if="{{CONSTS.BUTTON_LASTZD!==buttonAction && sourceList && sourceList.length>0}}">保存</button>
+  <button form-type="submit" wx:if="{{showSaveButton}}">{{saveButtonText}}</button>
 </form>
