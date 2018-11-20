@@ -72,12 +72,15 @@ Page({
     if("qrsz"===flag){
       title = "确认收租";
       content = "确认收到租金了吗？"
+    } else if ("sjdx" === flag) {
+      title = "发短信";
+      content = "将向租户发送帐单信息，确认发送吗？"
     }else if("jzzd"===flag){
       title = "结转下月";
       content = "本月租金未缴费，确认将本月帐单结转到下月吗？"
     } else if ("sxzd" === flag) {
       title = "刷新帐单";
-      content = "帐单金额如有变动，会给已注册系统的租客发出帐单提醒，确定刷新当前帐单吗？"
+      content = "确定刷新当前帐单吗？"
     }else{
       return;
     }

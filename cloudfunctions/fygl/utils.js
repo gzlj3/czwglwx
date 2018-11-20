@@ -114,7 +114,7 @@ function uuid(len, radix) {
   return uuid.join('');
 }
 exports.uuid = uuid;
-exports.newYzhid = () => {
+exports.yzhid = () => {
   return uuid(16, 10);
 }
 exports.id = () => {

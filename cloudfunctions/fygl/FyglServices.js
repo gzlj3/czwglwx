@@ -19,7 +19,7 @@ const _ = db.command;
 exports.queryFyList = async (yzhid) => {
   //查询房源列表
   // const db = cloud.database();
-  const result = db.collection('house').where({
+  const result = db.collection('house').orderBy('fwmc', 'asc').where({
     yzhid
   }).get();
   return result;
@@ -29,7 +29,7 @@ async function queryLastzdList (params) {
   const {houseid} = params;
   const db = cloud.database();
   const _ = db.command;
-  const result = db.collection('housefy').orderBy('szrq','desc').limit(6).where({
+  const result = db.collection('housefy').orderBy('sfsz','asc').orderBy('szrq','desc').limit(6).where({
     houseid,
   }).get();
   return result;
@@ -347,18 +347,28 @@ exports.updateZdList = async (zdList) => {
 }
 
 const sendZdMessage= async (house,flag)=>{
-  //检查手机是否已经注册
-  const {dhhm,fwmc,zhxm,fyhj} = house;
-  const result = await commService.querySingleDoc('userb', { sjhm:dhhm });
-  if (!result) return;
-  let info;
-  if(flag==='sxzd') 
-    info = '发生变动';
-  else
-    info = '已出';
-  const message = fwmc + '房租户(' + zhxm + ')，您好!您本月帐单'+info+',应缴费用为:' + fyhj + '元，帐单详情请进入极简出租系统查看。【极简出租】';
+  const {dhhm,fwmc,zhxm,fyhj,zdlx} = house;
+  //只发送月结帐单短信
+  if(zdlx !== CONSTS.ZDLX_YJZD)
+    throw utils.newException('只发送月结帐单短信！');
+
+  // const result = await commService.querySingleDoc('userb', { sjhm:dhhm });
+  // if (!result) return;
+  // let info;
+  // if(flag==='sxzd') 
+  //   info = '发生变动';
+  // else
+  //   info = '已出';
+  const message =  getZdMessage(house);
+  // const message = fwmc + '房租户,' + zhxm + ',您好!您本月帐单'+info+',应缴费用为:' + fyhj + '元，帐单详情请进入极简出租系统查看。【极简出租】';
   console.log('sendzdmessage:',dhhm,message);
-  await utils.sendPhoneMessage(dhhm,message);
+  // await utils.sendPhoneMessage(dhhm,message);
+}
+
+const getZdMessage = (house) => {
+  const s = `${house.fwmc}房租户`;
+  return s;
+  // dfhj='合计: { { item.dfhj } } 元(上次: {{ item.dscds }}, 本次: {{ item.dbcds }}, 实用: { { item.dsyds } }, 公摊: { { item.dgtds ? item.dgtds : 0 } }, 单价: { { item.ddj } } 元)
 }
 
 exports.processQrsz = async (params,userb) => {
@@ -383,6 +393,9 @@ exports.processQrsz = async (params,userb) => {
     // console.log("qrsz zdlx:", housefy.zdlx);
     lastFyhj = house.fyhj;
     makeHousefy(house, housefy, null);
+  }else if ("sjdx" === flag) {
+    await sendZdMessage(house);
+    return queryLastzdList({ houseid });
   } else {
     jzHouse(house, housefy, flag);
   }
@@ -401,7 +414,7 @@ exports.processQrsz = async (params,userb) => {
 
   if ("sxzd" === flag && lastFyhj!==house.fyhj) {
   //帐单有变动，发出短信提醒
-    await sendZdMessage(house,'sxzd');
+    // await sendZdMessage(house,'sxzd');
   }
   return queryLastzdList({houseid});
 }
@@ -510,11 +523,11 @@ function makeHousefy(house, housefy, zdlx,tfrq){
       // 未结清，起始日期不变
       yffrq1 = moment(house.yffrq1);
     }else{
-      // 已结清，起始日期为上段未加1天
-      yffrq1 = moment(house.yffrq2).add(1,'days');
+      // 已结清，起始日期为上段未
+      yffrq1 = moment(house.yffrq2);
     }
-    yffrq2 = szrq.clone().subtract(1, 'days');
-    const days = yffrq2.diff(yffrq1, 'days') + 1;
+    yffrq2 = szrq.clone();//.subtract(1, 'days');
+    const days = yffrq2.diff(yffrq1, 'days');
     console.log('yffrq2 - yffrq1:',days);
     let yzj,daysinfo=null;
     if (days == 30 || days == 31){
@@ -556,7 +569,7 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     } else {
       // 已结清，起始日期为当前收租日期
       // rq1 = moment(house.rq2).add;
-      rq1 = moment(house.rq2).add(1, 'days');
+      rq1 = moment(house.rq2);//.add(1, 'days');
     }
     rq2 = yffrq2;
     const qtfDays = rq2.diff(rq1, 'days');
@@ -588,8 +601,8 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     yffrq1 = moment(house.htrqq); // 收租范围起始时间为合同日期起
     if(!yffrq1.isValid()) 
       throw utils.newException("合同起始日期不合法！");
-    yffrq2 = szrq.clone().subtract(1,'days');
-    const days = yffrq2.diff(yffrq1,'days') + 1;
+    yffrq2 = szrq.clone();//.subtract(1,'days');
+    const days = yffrq2.diff(yffrq1,'days');// + 1;
     if (days < 0)
       throw utils.newException("下次收租日期不能小于合同起始日期！");
     let yzj;
@@ -619,10 +632,10 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     if(rq1.format('YYYY-MM-DD')<house.htrqq){
       rq1 = moment(house.htrqq);
     }
-    rq2 = szrq.clone().subtract(1, 'days');
+    rq2 = szrq.clone();//.subtract(1, 'days');
     //预付费时间范围
     yffrq1 = szrq.clone();
-    yffrq2 = xcszrq.clone().subtract(1, 'days');
+    yffrq2 = xcszrq.clone();//.subtract(1, 'days');
 
     housefy.czje=house.czje;
     // 电费数据

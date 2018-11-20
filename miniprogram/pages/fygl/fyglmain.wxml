@@ -55,8 +55,8 @@
                 <!-- <view class="weui-cell weui-cell_link"> -->
                     <!-- <view class="weui-cell__bd">编辑</view> -->
                     <view data-item="{{item}}" bindtap="onEditfy" class="weui-cell__bd">编辑房源</view>
-                    <view data-item="{{item._id}}" bindtap="onLastzd" class="weui-cell__bd">帐单详情</view>
-                    <view data-item="{{item}}" bindtap="onMoreAction" class="weui-cell__bd">更多操作</view>
+                    <view data-item="{{item._id}}" bindtap="onLastzd" class="weui-cell__bd" wx:if="{{item.zhxm}}">帐单详情</view>
+                    <view data-item="{{item}}" bindtap="onMoreAction" class="weui-cell__bd" wx:if="{{item.zhxm}}">更多操作</view>
                     <!-- <view class="weui-cell__ft weui-cell__ft_in-access"></view> -->
                 </view>
             </view>
