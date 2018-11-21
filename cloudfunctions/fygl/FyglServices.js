@@ -29,10 +29,10 @@ async function queryLastzdList (params) {
   const {houseid} = params;
   const db = cloud.database();
   const _ = db.command;
-  const result = db.collection('housefy').orderBy('sfsz','asc').orderBy('szrq','desc').limit(6).where({
+  const result = await db.collection('housefy').orderBy('zdlx','desc').orderBy('szrq','desc').limit(6).where({
     houseid,
   }).get();
-  return result;
+  return result.data;
 }
 exports.queryLastzdList = queryLastzdList;
 
@@ -69,8 +69,10 @@ async function queryZdList(yzhid,data) {
     zdList[index] = {};
     zdList[index]._id = house._id;
 		try {
-      const fwfy = jsFwfy(house);
-      zdList[index].tsinfo = house.fwmc+','+house.zhxm+',帐单:'+fwfy+'元';
+      // const fwfy = jsFwfy(house);
+      const newHousefy = makeHousefy(house,null,CONSTS.ZDLX_YJZD);
+      const s = getZdMessage(newHousefy);
+      zdList[index].tsinfo = s;  //house.fwmc+','+house.zhxm+',帐单:'+fwfy+'元';
       zdList[index].checked = true;
       zdList[index].disabled = false;
     } catch (e) {
@@ -227,28 +229,6 @@ exports.exitFy = async (data,curUser) => {
     throw utils.newException("房源数据更新失败！");
 }
 
-
-// exports.addFy = async (house) => {
-//   //添加房源
-//   // return saveDoc('house',house);
-//   const db = cloud.database();
-//   const result = db.collection('house').add({
-//     data:house
-//   });
-//   return result;
-// }
-
-// exports.updateFy = async (house) => {
-//   const db = cloud.database();
-//   const {_id} = house;
-//   delete house._id;
-//   // house.szrq = db.serverDate();
-//   const result = db.collection('house').doc(_id).update({
-//     data: house
-//   });
-//   return result;
-// }
-
 exports.deleteFy = async (house) => {
   const { houseid } = house;
   const num = await commService.removeDoc('house',houseid);
@@ -301,7 +281,7 @@ exports.updateSdb = async (houseList) => {
   return Promise.all(tasks);
 }
 
-exports.updateZdList = async (zdList) => {
+exports.updateZdList = async (zdList,autoSendMessage) => {
   const db = cloud.database();
   const _ = db.command;
   const houseTable = db.collection('house');
@@ -335,9 +315,10 @@ exports.updateZdList = async (zdList) => {
       const houseNum = await commService.updateDoc('house',house);
       if(houseNum===0)
         throw utils.newException("更新房源信息失败！");      
-      //生成帐单完成，发送短信提醒
-      await sendZdMessage(house);
-
+      if (autoSendMessage){
+        //生成帐单完成，发送短信提醒
+        await sendZdMessage(house,newHousefy);
+      }
     }catch(e){
       errMsg += house.fwmc+','+e.message;
     }
@@ -346,29 +327,57 @@ exports.updateZdList = async (zdList) => {
   return null;
 }
 
-const sendZdMessage= async (house,flag)=>{
+const sendZdMessage= async (house,housefy,flag)=>{
   const {dhhm,fwmc,zhxm,fyhj,zdlx} = house;
-  //只发送月结帐单短信
-  if(zdlx !== CONSTS.ZDLX_YJZD)
-    throw utils.newException('只发送月结帐单短信！');
-
-  // const result = await commService.querySingleDoc('userb', { sjhm:dhhm });
-  // if (!result) return;
-  // let info;
-  // if(flag==='sxzd') 
-  //   info = '发生变动';
-  // else
-  //   info = '已出';
-  const message =  getZdMessage(house);
-  // const message = fwmc + '房租户,' + zhxm + ',您好!您本月帐单'+info+',应缴费用为:' + fyhj + '元，帐单详情请进入极简出租系统查看。【极简出租】';
-  console.log('sendzdmessage:',dhhm,message);
-  // await utils.sendPhoneMessage(dhhm,message);
+  let message = getZdMessage(housefy);
+  message += '【极简出租】';
+  //发送短信
+  await utils.sendPhoneMessage(dhhm,message);
+  //发送短信成功，更新发送次数
+  await db.collection('housefy').doc(housefy._id).update({
+    data: {
+      messageNum: _.inc(1)
+    }
+  });
 }
 
-const getZdMessage = (house) => {
-  const s = `${house.fwmc}房租户`;
-  return s;
-  // dfhj='合计: { { item.dfhj } } 元(上次: {{ item.dscds }}, 本次: {{ item.dbcds }}, 实用: { { item.dsyds } }, 公摊: { { item.dgtds ? item.dgtds : 0 } }, 单价: { { item.ddj } } 元)
+const getFyts = (fyts,fy,lineChar) => {
+  if(!lineChar) lineChar = ',';
+  let ts = '';
+  if(fy && fy<0){ 
+    ts='(退)';
+    fy = Math.abs(fy);
+  }
+  return fy?fyts+ts+':'+fy+'元'+lineChar:'';
+}
+
+const getDfts = (housefy) => {
+  if(housefy.dfhj)
+    return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds},实用:${housefy.dsyds},公摊:${housefy.dgtds},单价:${housefy.ddj}元),\r\n`;
+  return '';
+}
+const getSfts = (housefy) => {
+  if (housefy.sfhj)
+    return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds},实用:${housefy.ssyds},公摊:${housefy.sgtds},单价:${housefy.sdj}元),\r\n`;
+  return '';
+}
+
+const getZdMessage = (housefy) => {
+  let rq1 = housefy.rq1;
+  if (!rq1 || rq1.length < 10) return '';
+  let zdlxinfo;
+  if (housefy.zdlx == '0') zdlxinfo = '(签约帐单),';
+  else if (housefy.zdlx == '2') zdlxinfo = '(退房帐单),';
+  else zdlxinfo = rq1.substring(0, 4) + '年' + rq1.substring(5, 7) + '月';
+  const ts1 = housefy.fyhj<0?'退':'缴';
+  const ts2 = housefy.czje<0?'(退)':'';
+
+  const s = `${housefy.fwmc}房租户,${housefy.zhxm},您好,${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。\r\n`+
+            `${getFyts('月租费', housefy.czje, ',\r\n')}`+
+            `${getFyts('押金', housefy.yj,',\r\n')}`+getDfts(housefy)+getSfts(housefy)+
+            `${getFyts('网络费', housefy.wlf)}${getFyts('卫生费', housefy.ljf)}${getFyts('管理费', housefy.glf)}`+
+            `${getFyts('其它费', housefy.qtf)}${getFyts('上月结转费', housefy.syjzf)}`;
+  return s;   
 }
 
 exports.processQrsz = async (params,userb) => {
@@ -394,12 +403,15 @@ exports.processQrsz = async (params,userb) => {
     lastFyhj = house.fyhj;
     makeHousefy(house, housefy, null);
   }else if ("sjdx" === flag) {
-    await sendZdMessage(house);
+    const message = getZdMessage(housefy);
+    return message;
+  } else if ("sendsjdx" === flag) {
+    await sendZdMessage(house,housefy);
     return queryLastzdList({ houseid });
   } else {
     jzHouse(house, housefy, flag);
   }
-
+  
   house.zhxgr=userb.userid;
   house.zhxgsj = utils.getCurrentTimestamp();
   housefy.zhxgr=userb.userid;
@@ -410,12 +422,12 @@ exports.processQrsz = async (params,userb) => {
   const houseNum = await commService.updateDoc('house',house);
   if (houseNum === 0)
     throw utils.newException("房源数据更新失败！");
-  console.log("processQrsz:",flag,houseid);
+  // console.log("processQrsz:",flag,houseid);
 
-  if ("sxzd" === flag && lastFyhj!==house.fyhj) {
+  // if ("sxzd" === flag && lastFyhj!==house.fyhj) {
   //帐单有变动，发出短信提醒
     // await sendZdMessage(house,'sxzd');
-  }
+  // }
   return queryLastzdList({houseid});
 }
 
@@ -512,6 +524,8 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     const { sfsz } = house;
     if(!tfrq) 
       throw utils.newException("请在房源列表功能页中重新执行退房操作！");
+    if (utils.isEmpty(house.dbcds) || utils.isEmpty(house.sbcds))
+      throw utils.newException("请先抄当前的水电表再退房!");
 
     tfrq = moment(tfrq);
     console.log('tfrq:',tfrq,house.rq1);
@@ -626,6 +640,8 @@ function makeHousefy(house, housefy, zdlx,tfrq){
       + utils.getInteger(housefy.yj)
       + utils.getFloat(housefy.qtf);
   } else {
+    if (utils.isEmpty(house.dbcds) || utils.isEmpty(house.sbcds))
+      throw utils.newException("未抄水电表!");
     xcszrq = szrq.clone().add(1,'months');
     //后付费时间范围
     rq1 = szrq.clone().subtract(1, 'months');

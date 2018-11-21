@@ -9,6 +9,7 @@ const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
   sourceList: [],
+  autoSendMessage: false,
   CONSTS,
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
   showDetailZd:[],
@@ -38,15 +39,18 @@ Page({
     const {buttonAction} = this.data;
     if(buttonAction===CONSTS.BUTTON_MAKEZD){
       const self = this;
-      utils.showModal('创建帐单', '帐单创建成功后，会给已注册系统的租客发出帐单提醒，您确定创建帐单吗？', () => { self.handleSubmit(); });      
+      let tsinfo = '';
+      if (this.data.autoSendMessage) tsinfo = '帐单创建成功后，会自动发出帐单短信，';
+      else tsinfo = '帐单创建成功后，可在帐单处理页面中发送短信，';
+      utils.showModal('创建帐单', `${tsinfo}您确定创建帐单吗？`, () => { self.handleSubmit(); });      
     }else{
       this.handleSubmit();
     }
   },
 
   handleSubmit(){
-    const { buttonAction, sourceList } = this.data;
-    const response = fyglService.postData(buttonAction,sourceList);
+    const { buttonAction, sourceList, autoSendMessage} = this.data;
+    const response = fyglService.postData(buttonAction, sourceList, autoSendMessage);
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData) => {
@@ -67,14 +71,19 @@ Page({
   },
 
   onQrsz: function (e) {
-    const { id: flag } = e.currentTarget;
+    let { id: flag } = e.currentTarget;
+    if(!utils.isEmpty(e.flag)) flag = e.flag;
+
     let title,content;
     if("qrsz"===flag){
-      title = "确认收租";
+      title = "确认收费";
       content = "确认收到租金了吗？"
-    } else if ("sjdx" === flag) {
+    // } else if ("sjdx" === flag) {
+    //   title = "发短信";
+    //   content = "将向租户发送帐单信息，确认发送吗？"
+    } else if ("sendsjdx" === flag) {
       title = "发短信";
-      content = "将向租户发送帐单信息，确认发送吗？"
+      content = e.dxcontent + '内容已写入剪贴板。是否确定向租户发送此帐单短信？';
     }else if("jzzd"===flag){
       title = "结转下月";
       content = "本月租金未缴费，确认将本月帐单结转到下月吗？"
@@ -84,6 +93,7 @@ Page({
     }else{
       return;
     }
+    e.title = title;
     let self = this;
     wx.showModal({
       title,
@@ -104,12 +114,26 @@ Page({
   onQrszCz: function (e) {
     console.log(e);
     const { item:housefyid } = e.currentTarget.dataset;
-    const {id:flag} = e.currentTarget;
+    let {id:flag} = e.currentTarget;
     const { buttonAction } = this.data;
-    
+    if (!utils.isEmpty(e.flag)){
+       flag = e.flag;
+       e.flag = null;
+    }
     const response = fyglService.postData(buttonAction,{housefyid,flag});
-    fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
+    const self = this;
+    const tsinfo = e.title;
+    e.title = null;
+    fyglService.handleAfterRemote(response, tsinfo,
       (resultData) => {
+        if(flag==='sjdx'){
+          //取手机短信返回，提示确认
+          wx.setClipboardData({ data: resultData});
+          e.flag = 'sendsjdx';
+          e.dxcontent = resultData;
+          self.onQrsz(e);
+          return;
+        }
         getApp().setPageParams(buttonAction, resultData);
         this.setData({
           sourceList: resultData,
@@ -191,6 +215,11 @@ Page({
     }
     // console.log('refreshState:',showSaveButton,buttonAction);
     this.setData({ showSaveButton, saveButtonText,pageTitle,pageDesc});
+  },
+  autoSendMessageChange:function(e){
+    console.log('autoSendMessageChange:', e.detail.value);
+    const checked = e.detail.value.length>0;
+    this.setData({ autoSendMessage:checked});
   },
 
   checkboxChange: function (e) {

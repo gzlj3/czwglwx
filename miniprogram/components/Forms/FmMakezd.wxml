@@ -20,6 +20,18 @@
                 </label>
             </checkbox-group>
         </view>
+        <view class="weui-cells" wx:if="{{showSaveButton}}">
+          <checkbox-group bindchange="checkboxChange" bindchange="autoSendMessageChange">
+            <label class="weui-cell weui-check__label">
+              <checkbox class="weui-check" value="1"/>
+              <view class="weui-cell__hd weui-check__hd_in-checkbox">
+                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!autoSendMessage}}"></icon>
+                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{autoSendMessage}}"></icon>
+              </view>
+              <view class="weui-cell__bd">自动发送手机短信</view>
+            </label>
+          </checkbox-group>
+        </view>
     </view>
   </view>
 </template>

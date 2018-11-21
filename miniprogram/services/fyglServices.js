@@ -17,7 +17,7 @@ export function queryData(action,params) {
   return result;
 }
 
-export function postData(action, params) {
+export function postData(action, params,...restParams) {
   utils.showLoading();
   const result = wx.cloud.callFunction({
     name: 'fygl',
@@ -25,6 +25,7 @@ export function postData(action, params) {
       action,
       method: 'POST',
       data: params,
+      restData: restParams,
     },
   });
   return result;

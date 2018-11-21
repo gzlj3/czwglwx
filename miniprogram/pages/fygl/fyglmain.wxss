@@ -1,7 +1,4 @@
 /* miniprogram/pages/fyglmain.wxss */
-.addfontsize{
-  font-size: 16px;
-}
 
 /* .weui-form-preview__btn:after {
   content: " ";

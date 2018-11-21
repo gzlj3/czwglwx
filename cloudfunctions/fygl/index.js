@@ -19,12 +19,18 @@ const utils = require('utils.js');
 }
 */
 exports.main = async (event, context) => {
-  const {action,method,data,userInfo} = event;
+  const { action, method, data,restData,userInfo} = event;
   if(!action) return results.getErrorResults('未指定操作！');
   console.log("action:"+action+"   method:"+method);
   //检查权限，成功则返回用户的基本数据
   const curUser = await userServices.checkAuthority(action,userInfo);
   console.log('操作用户：',curUser);
+  if(action === 300){
+    // console.log(data);
+    const result = await utils.sendTemplateMessage(data);
+    return results.getSuccessResults(result);
+  }
+
   try {
     let result;
     switch(action){
@@ -88,8 +94,9 @@ exports.main = async (event, context) => {
         break;
       case CONSTS.BUTTON_MAKEZD:
         if (method === 'POST') {
-          console.log("makezd");
-          result = await services.updateZdList(data);
+          const autoSendMessage = restData && restData.length>0?restData[0]:false;
+          console.log("makezd autoSendMessage", autoSendMessage);
+          result = await services.updateZdList(data, autoSendMessage);
         }else{
           console.log("querymakezd");
           result = await services.queryZdList(curUser.yzhid,data);
@@ -99,11 +106,11 @@ exports.main = async (event, context) => {
         if (method === 'POST') {
           console.log("post lastzd");
           result = await services.processQrsz(data,curUser);
-          result = result.data;
+          // result = result.data;
         } else {
           console.log("querylastzd");
           result = await services.queryLastzdList(data);
-          result = result.data;
+          // result = result.data;
         }
         return results.getSuccessResults(result);
       default:
