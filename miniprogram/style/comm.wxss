@@ -28,3 +28,10 @@
 .addfontsize18{
   font-size: 18px;
 }
+.addfontsize20{
+  font-size: 20px;
+}
+
+.addfontsize24{
+  font-size: 24px;
+}

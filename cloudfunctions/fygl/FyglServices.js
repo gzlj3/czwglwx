@@ -342,7 +342,7 @@ const sendZdMessage= async (house,housefy,flag)=>{
 }
 
 const getFyts = (fyts,fy,lineChar) => {
-  if(!lineChar) lineChar = ',';
+  if(!lineChar) lineChar = ';\r\n';
   let ts = '';
   if(fy && fy<0){ 
     ts='(退)';
@@ -353,12 +353,12 @@ const getFyts = (fyts,fy,lineChar) => {
 
 const getDfts = (housefy) => {
   if(housefy.dfhj)
-    return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds},实用:${housefy.dsyds},公摊:${housefy.dgtds},单价:${housefy.ddj}元),\r\n`;
+    return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds},实用:${housefy.dsyds},公摊:${housefy.dgtds});\r\n`;
   return '';
 }
 const getSfts = (housefy) => {
   if (housefy.sfhj)
-    return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds},实用:${housefy.ssyds},公摊:${housefy.sgtds},单价:${housefy.sdj}元),\r\n`;
+    return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds},实用:${housefy.ssyds},公摊:${housefy.sgtds});\r\n`;
   return '';
 }
 
@@ -373,8 +373,8 @@ const getZdMessage = (housefy) => {
   const ts2 = housefy.czje<0?'(退)':'';
 
   const s = `${housefy.fwmc}房租户,${housefy.zhxm},您好,${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。\r\n`+
-            `${getFyts('月租费', housefy.czje, ',\r\n')}`+
-            `${getFyts('押金', housefy.yj,',\r\n')}`+getDfts(housefy)+getSfts(housefy)+
+            `${getFyts('月租费', housefy.czje, ';\r\n')}`+
+            `${getFyts('押金', housefy.yj,';\r\n')}`+getDfts(housefy)+getSfts(housefy)+
             `${getFyts('网络费', housefy.wlf)}${getFyts('卫生费', housefy.ljf)}${getFyts('管理费', housefy.glf)}`+
             `${getFyts('其它费', housefy.qtf)}${getFyts('上月结转费', housefy.syjzf)}`;
   return s;   

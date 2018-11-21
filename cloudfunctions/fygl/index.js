@@ -25,11 +25,11 @@ exports.main = async (event, context) => {
   //检查权限，成功则返回用户的基本数据
   const curUser = await userServices.checkAuthority(action,userInfo);
   console.log('操作用户：',curUser);
-  if(action === 300){
-    // console.log(data);
-    const result = await utils.sendTemplateMessage(data);
-    return results.getSuccessResults(result);
-  }
+  // if(action === 300){
+  //   // console.log(data);
+  //   const result = await utils.sendTemplateMessage(data);
+  //   return results.getSuccessResults(result);
+  // }
 
   try {
     let result;

@@ -64,7 +64,7 @@
           <block wx:for="{{list}}" wx:key="id">
               <view class="kind-list__item">
                   <view id="{{item.page}}" class="weui-flex kind-list__item-hd {{item.open ? 'kind-list__item-hd_show' : ''}}" bindtap="kindToggle">
-                      <view class="weui-flex__item addfontsize18">{{item.name}}</view>
+                      <view class="weui-flex__item  weui-cell_access weui-cell_link addfontsize20">{{item.name}}</view>
                       <image class="kind-list__img" src="../../images/icon_nav_{{item.id}}.png"></image>
                   </view>
                   <view class="kind-list__item-bd {{item.open ? 'kind-list__item-bd_show' : ''}}">
@@ -81,12 +81,12 @@
           </block>
       </view>
   </view>
- <form bind:submit="testSubmit" report-submit="true" report-submit="true">
+ <!-- <form bind:submit="testSubmit" report-submit="true" report-submit="true">
       <button formType="submit">发送模板消息</button>
- </form>  
+ </form>   -->
   <view class="kind-list" wx:if="{{user.userType===CONSTS.USERTYPE_ZK || user.userType===CONSTS.USERTYPE_FDZK}}">
       <block wx:for="{{zkMenuList}}" wx:key="id">
-          <view class="kind-list__item addfontsize18">
+          <view class="kind-list__item  weui-cell_access weui-cell_link addfontsize20">
               <view id="{{item.page}}" class="weui-flex kind-list__item-hd {{item.open ? 'kind-list__item-hd_show' : ''}}" bindtap="kindToggle">
                   <view class="weui-flex__item">{{item.name}}</view>
                   <image class="kind-list__img" src="../../images/icon_nav_{{item.id}}.png"></image>
