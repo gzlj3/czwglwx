@@ -55,7 +55,13 @@ Page({
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData) => {
         getApp().setPageParams(buttonAction, resultData);
-        wx.navigateBack();
+        if(buttonAction === CONSTS.BUTTON_CB){
+          utils.redirectToSuccessPage('抄表完成后，如果帐单已经结清，可以创建新帐单。', '开始创建帐单','/pages/fygl/editlist/editlist',CONSTS.BUTTON_MAKEZD,this.data.params);
+        }else if (buttonAction === CONSTS.BUTTON_MAKEZD && this.data.params) {
+          utils.redirectToSuccessPage('创建帐单完成后，可以进入帐单处理页面查看或处理新创建的帐单。', '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, this.data.params);
+        }else{
+          wx.navigateBack();
+        }
       }
     );    
   },
@@ -135,9 +141,13 @@ Page({
           return;
         }
         getApp().setPageParams(buttonAction, resultData);
-        this.setData({
-          sourceList: resultData,
-        }); 
+        if(resultData === null){
+          wx.navigateBack();
+        }else{
+          this.setData({
+            sourceList: resultData,
+          }); 
+        }
       }
     );
   },

@@ -59,7 +59,13 @@ Page({
     ], 
   },
   
-  onLoad: function() {
+  onLoad: function() { 
+    // const obj = {
+    //   100:'aaaaaaaaa',
+    //   aaa:'bbbbbbbb',
+    // }
+    // const b=1000;
+    // console.log(obj[b]);
     // console.log('====sfsz:',CONSTS.getSfszInfo('2'));
     // const zdlx=null;
     // const newzdlx = zdlx | 100;
@@ -132,35 +138,35 @@ Page({
   },
 
 
-  testSubmit: function (e) {
-    var self = this;
-    console.log(e);
-    let _access_token = '5_E1pZJQzTC-lC0r-JJz9wVAZv5Zv22CNtmV_7C1T0sqC9TV7mGE4FTmDX2B0PVM4LaGtaTfXwzfJLnD7fDKTg8DOICJNkKBQgn_Ot2zYmBJyY1g1VXoBNdtwUE0QaP8_9tWlbR-Zq7L1OyrrPKCIjAEAOGM';
-    let url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=' + _access_token; 
+  // testSubmit: function (e) {
+  //   var self = this;
+  //   console.log(e);
+  //   let _access_token = '5_E1pZJQzTC-lC0r-JJz9wVAZv5Zv22CNtmV_7C1T0sqC9TV7mGE4FTmDX2B0PVM4LaGtaTfXwzfJLnD7fDKTg8DOICJNkKBQgn_Ot2zYmBJyY1g1VXoBNdtwUE0QaP8_9tWlbR-Zq7L1OyrrPKCIjAEAOGM';
+  //   let url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=' + _access_token; 
                
-    const openid = 'on_Li5Pa4d5XQklE_NCiI2IoPKsM';
-    let _jsonData = {
-        access_token: _access_token,
-        touser: openid,
-        template_id: '50_-U2e4vq8STuhhDTqEWVywu1RQYFSzujZv_NG2h6k',
-        form_id: e.detail.formId,
-        page: "pages/index/index",
-        data: {
-          "keyword1": { "value": "测试数据一", "color": "#173177" },
-          "keyword2": { "value": "测试数据二", "color": "#173177" },
-          "keyword3": { "value": "测试数据三", "color": "#173177" },
-          "keyword4": { "value": "测试数据四", "color": "#173177" },
-          "keyword5": { "value": "测试数据五", "color": "#173177" },
-        }
-      }
-    const response = fyglService.postData(300,  _jsonData );
-    fyglService.handleAfterRemote(response, '测试',
-      (resultData) => {
-        console.log(resultData);
-        // this.setData({ sendingYzm: true });
-        // this.timer();
-      }
-    );
+  //   const openid = 'on_Li5Pa4d5XQklE_NCiI2IoPKsM';
+  //   let _jsonData = {
+  //       access_token: _access_token,
+  //       touser: openid,
+  //       template_id: '50_-U2e4vq8STuhhDTqEWVywu1RQYFSzujZv_NG2h6k',
+  //       form_id: e.detail.formId,
+  //       page: "pages/index/index",
+  //       data: {
+  //         "keyword1": { "value": "测试数据一", "color": "#173177" },
+  //         "keyword2": { "value": "测试数据二", "color": "#173177" },
+  //         "keyword3": { "value": "测试数据三", "color": "#173177" },
+  //         "keyword4": { "value": "测试数据四", "color": "#173177" },
+  //         "keyword5": { "value": "测试数据五", "color": "#173177" },
+  //       }
+  //     }
+  //   const response = fyglService.postData(300,  _jsonData );
+  //   fyglService.handleAfterRemote(response, '测试',
+  //     (resultData) => {
+  //       console.log(resultData);
+  //       // this.setData({ sendingYzm: true });
+  //       // this.timer();
+  //     }
+  //   );
       
     // wx.request({
     //   url: url,
@@ -177,7 +183,7 @@ Page({
     //   }
 
     // });
-  },
+  // },
 
   onGetOpenid: function() {
     // 调用云函数
@@ -259,8 +265,8 @@ Page({
                                           sjData:e.detail.value});
     fyglService.handleAfterRemote(response, '用户注册',
       (resultData) => {
-        console.log('======register user result:');
-        console.log(resultData);
+        // console.log('======register user result:');
+        // console.log(resultData);
         this.setUserData(resultData && resultData.length > 0 ? resultData[0] : null);
       }
     );
@@ -270,8 +276,8 @@ Page({
     const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
-        console.log('======query user result:');
-        console.log(resultData);
+        // console.log('======query user result:');
+        // console.log(resultData);
         this.setUserData(resultData && resultData.length > 0 ? resultData[0]:null);
         this.getWxGrantedData();
       }
@@ -284,7 +290,7 @@ Page({
       // let { userType, nickName, avatarUrl } = userData;
       app.setGlobalData({ user: { granted: true, userType: CONSTS.USERTYPE_NONE,...userData}});
       this.setData({ user: app.globalData.user});
-      console.log(this.data.user);
+      // console.log(this.data.user);
     } else {
       const userType = CONSTS.USERTYPE_NONE;
       const nickName = '',avatarUrl = '',granted=false;

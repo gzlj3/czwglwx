@@ -49,3 +49,9 @@ exports.SFSZ_YTF = '3'; //已退房;
 exports.getSfszInfo = sfsz => {
   return { '0': '未结清', '1': '已结清','2': '已结转','3': '已退房' }[sfsz];
 }
+
+// 异常信息
+exports.EXCEPTION = {
+  100: '用户未注册',
+  101: '用户数据异常',
+}

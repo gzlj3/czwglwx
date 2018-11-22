@@ -49,12 +49,19 @@ Page({
     const { item } = e.currentTarget.dataset;
     console.log("moreAction:",item);
     const self = this;
+    let itemList;
+    if(utils.isEmpty(item.zhxm)){
+      itemList = ['删除房源', '取消']; 
+    }else{
+      itemList = ['删除房源', '退房', '抄表', '创建帐单', '取消']; 
+    }
     wx.showActionSheet({
-      itemList: ['删除房源', '退房','抄表','创建帐单','取消'],
+      itemList,
       // fail: function(res){
       //   console.log(res);
       // },
       success: function (res) {
+        console.log('actionsheet:',res);
         if (res.cancel) return;
         const index = res.tapIndex;
         console.log(index);
@@ -63,6 +70,7 @@ Page({
             utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源('+item.fwmc+')吗？', () => { self.deletefy(item._id);});
             break;
           case 1:
+            if (utils.isEmpty(item.zhxm)) return;
             const {sfsz,zdlx} = item;
             if (CONSTS.ZDLX_TFZD === zdlx && CONSTS.SFSZ_YJQ === sfsz){
               utils.showModal('退房', '退房后将不能恢复，你真的确定退房(' + item.fwmc + ')吗？', () => {self.tffy(item._id)});
@@ -99,7 +107,7 @@ Page({
     this.setData({modalVisible:false});
     const self = this;
     const {tfItem:item,tfrq} = this.data;
-    utils.showModal('退房', '退房步骤（1.生成退房帐单,2.结清退房帐单,3.再次退房)。你真的确定退房(' + item.fwmc + ')吗？', () => { self.exitfy(item._id,tfrq); });
+    utils.showModal('退房', '退房步骤（1.生成退房帐单,2.结清退房帐单)。你真的确定退房(' + item.fwmc + ')吗？', () => { self.exitfy(item._id,tfrq); });
   },
 
   tffy: function(houseid) {

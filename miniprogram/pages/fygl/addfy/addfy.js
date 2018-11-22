@@ -10,7 +10,7 @@ const fyxxMetas = {
   sfzh: { label: '身份证号', name: 'sfzh', type:'idcard' },
   dhhm: { label: '手机号码', name: 'dhhm', type:"number"},
   czje: { label: '出租金额', name: 'czje', type:"number" },
-  yj: { label: '押金', name: 'yj', type: "number" },
+  yj: { label: '押金', name: 'yj', type: "number"},
   htrqq: { label: '合同日期起', name: 'htrqq', type: 'date' },
   htrqz: { label: '合同日期止', name: 'htrqz', type: 'date' },
   szrq: { label: '收租日期', name: 'szrq',type:'date' },
@@ -62,8 +62,8 @@ Page({
   },
 
   formSubmit: function(e){
-    console.log('form发生了submit事件，携带数据为：', e.detail.value)
-    console.log('formid：', e.detail.formId);
+    console.log('form提交数据：', e.detail.value)
+    // console.log('formid：', e.detail.formId);
     const {buttonAction} = this.data;
     // 校验必录项
     let { fmMetas } = this.data;
@@ -100,8 +100,31 @@ Page({
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData)=>{
+        console.log('savefy return:',resultData);
         getApp().setPageParams(buttonAction, resultData);
-        wx.navigateBack();
+        if(!utils.isEmpty(formObject.zhxm)){
+          const s = JSON.stringify({ houseid: resultData._id });
+          let pageDesc;
+          if(buttonAction===CONSTS.BUTTON_EDITFY){
+            pageDesc = '数据修改完成后，如帐单数据有变动，可进入帐单详情页查看并刷新帐单。';
+          }else{
+            pageDesc = '房源新建完成后，可进入帐单详细页查看签约帐单。';
+          }
+          utils.redirectToSuccessPage(pageDesc, '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id });
+          // const returnUrl = '/pages/fygl/editlist/editlist';
+          // console.log('returnUrl:',returnUrl);
+          // const button2Obj = {
+          //   buttonText:'查看帐单详情',
+          //   returnUrl,
+          //   returnAction: CONSTS.BUTTON_LASTZD,
+          //   returnItem: { houseid: resultData._id }
+          // }
+          // wx.redirectTo({
+          //   url: '/pages/fygl/msg/msg_success?pageDesc='+pageDesc+'&button2=' + JSON.stringify(button2Obj)
+          // });
+        }else{
+          wx.navigateBack();
+        }
       }
     );
   },
@@ -160,7 +183,7 @@ Page({
     if(name === 'zhxm'){
       const isRequire = !utils.isEmpty(e.detail.value);
       // const {fmMetas} = this.data;
-      ['dhhm','czje','htrqq','htrqz','szrq','dscds','sscds','ddj','sdj'].map(value=>{
+      ['dhhm','czje','yj','htrqq','htrqz','szrq','dscds','sscds','ddj','sdj'].map(value=>{
         if (fmMetas[value]){
           fmMetas[value].require = isRequire;
           if(isRequire){

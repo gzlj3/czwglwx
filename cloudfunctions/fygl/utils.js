@@ -1,6 +1,7 @@
 const moment = require('moment.min.js');
 const rp = require('request-promise');
 const request = require('request');
+const CONSTS = require('constants.js');
 
 exports.getInteger = (value) => {
   try{
@@ -51,6 +52,13 @@ function newException (message,code){
   return {message,code};
 }
 exports.newException = newException;
+function codeException(errCode) {
+  // console.log('exception:', errCode, CONSTS.EXCEPTION[errCode]);
+  let msg = CONSTS.EXCEPTION[errCode];
+  if(!msg) msg = errCode;
+  return newException(msg,errCode);
+}
+exports.codeException = codeException;
 
 //通过榛子云短信平台发送手机短信（http://smsow.zhenzikj.com）
 //其中的appId,appSecret为榛子云平台注册的帐号信息

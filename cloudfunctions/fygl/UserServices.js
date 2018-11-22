@@ -17,16 +17,17 @@ exports.checkAuthority = async(action,userInfo) => {
     //用户注册等基本操作不检查权限
     return {};
   }
+  // throw utils.codeException(100);
   const db = cloud.database();
   const result = await db.collection('userb').field({ userType: true, yzhid: true,sjhm:true }).where({
     openId
   }).get();
   if(!result || result.data.length<=0)
-    throw utils.newException('未查到用户数据！');
+    throw utils.codeException(100);
   const curUser = { userid: openId, ...result.data[0] };
   const {userType,yzhid,sjhm} = curUser;
   if (utils.isEmpty(userType) || utils.isEmpty(yzhid) || utils.isEmpty(sjhm))
-    throw utils.newException('用户数据异常！');
+    throw utils.codeException(101);
 
   if ([CONSTS.BUTTON_ZK_SEELASTZD,].indexOf(action) >= 0) {
     //租客功能

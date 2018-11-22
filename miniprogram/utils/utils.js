@@ -63,6 +63,17 @@ exports.getRandom = (n) => {
   return result;
 }
 
+exports.redirectToSuccessPage = (pageDesc, buttonText,returnUrl,returnAction,returnItem) => {
+  const button2Obj = {
+    buttonText,
+    returnUrl,
+    returnAction,
+    returnItem
+  }
+  wx.redirectTo({
+    url: '/pages/fygl/msg/msg_success?pageDesc=' + pageDesc + '&button2=' + JSON.stringify(button2Obj)
+  });
+}
 
 function uuid(len, radix) {
   var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');

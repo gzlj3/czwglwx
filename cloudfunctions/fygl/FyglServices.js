@@ -122,7 +122,7 @@ exports.saveFy = async (house,curUser) => {
       // console.log('关联租户头像：',updatedNum);
     }
   }
-  return null;
+  return {_id:saveHouseid};
 }
 // exports.saveFy = async (house, curUser) => {
 //   let result;
@@ -243,19 +243,19 @@ exports.deleteFy = async (house) => {
   }
 }
 
-exports.tfFy = async (data) => {
+async function tfFy(data){
   const { houseid } = data;
   const house = await commService.queryPrimaryDoc('house', houseid);
   // console.log('tffy:',houseid);
   const housefyList = await commService.queryDocs('housefy',{houseid});
-  console.log('tffy:', houseid,housefyList);
+  // console.log('tffy:', houseid,housefyList);
   if(housefyList){
     for(let i=0;i<housefyList.length;i++){
       await commService.addDoc('housefy_tf', housefyList[i]);
     }
   }
   await commService.addDoc('house_tf', house);
-  // 房源数据保存进退房表扣，删除再数据
+  // 房源数据保存进退房表后，再删除数据
   await commService.removeDoc('house',house._id);
   if (housefyList) {
     for (let i = 0; i < housefyList.length; i++) {
@@ -263,6 +263,7 @@ exports.tfFy = async (data) => {
     }
   }
 }
+exports.tfFy = tfFy;
 
 exports.updateSdb = async (houseList) => {
   const db = cloud.database();
@@ -353,12 +354,14 @@ const getFyts = (fyts,fy,lineChar) => {
 
 const getDfts = (housefy) => {
   if(housefy.dfhj)
-    return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds},实用:${housefy.dsyds},公摊:${housefy.dgtds});\r\n`;
+    return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds});\r\n`;
+  // return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds},实用:${housefy.dsyds},公摊:${housefy.dgtds});\r\n`;
   return '';
 }
 const getSfts = (housefy) => {
   if (housefy.sfhj)
-    return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds},实用:${housefy.ssyds},公摊:${housefy.sgtds});\r\n`;
+    return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds});\r\n`;
+  // return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds},实用:${housefy.ssyds},公摊:${housefy.sgtds});\r\n`;
   return '';
 }
 
@@ -428,6 +431,14 @@ exports.processQrsz = async (params,userb) => {
   //帐单有变动，发出短信提醒
     // await sendZdMessage(house,'sxzd');
   // }
+  // console.log('qrsz result:',flag,house.zdlx);
+  if ("qrsz" === flag && house.zdlx === CONSTS.ZDLX_TFZD){
+    // console.log('start tf:',houseid);
+  //退房帐单的确认收费成功，则直接退房
+    await tfFy({ houseid });
+    return null;
+  }
+
   return queryLastzdList({houseid});
 }
 

@@ -22,9 +22,6 @@ exports.main = async (event, context) => {
   const { action, method, data,restData,userInfo} = event;
   if(!action) return results.getErrorResults('未指定操作！');
   console.log("action:"+action+"   method:"+method);
-  //检查权限，成功则返回用户的基本数据
-  const curUser = await userServices.checkAuthority(action,userInfo);
-  console.log('操作用户：',curUser);
   // if(action === 300){
   //   // console.log(data);
   //   const result = await utils.sendTemplateMessage(data);
@@ -32,6 +29,10 @@ exports.main = async (event, context) => {
   // }
 
   try {
+    //检查权限，成功则返回用户的基本数据
+    const curUser = await userServices.checkAuthority(action, userInfo);
+
+    console.log('操作用户：', curUser);
     let result;
     switch(action){
       case CONSTS.BUTTON_ZK_SEELASTZD:
@@ -106,6 +107,7 @@ exports.main = async (event, context) => {
         if (method === 'POST') {
           console.log("post lastzd");
           result = await services.processQrsz(data,curUser);
+          
           // result = result.data;
         } else {
           console.log("querylastzd");
@@ -118,6 +120,6 @@ exports.main = async (event, context) => {
     }
   } catch (e) {
     console.log(e);
-    return results.getErrorResults(e.message);
+    return results.getErrorResults(e.message,e.code);
   }
 }
