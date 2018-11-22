@@ -53,7 +53,7 @@ Page({
     if(utils.isEmpty(item.zhxm)){
       itemList = ['删除房源', '取消']; 
     }else{
-      itemList = ['删除房源', '退房', '抄表', '创建帐单', '取消']; 
+      itemList = ['删除房源', '退房', '抄表', '出帐单', '取消']; 
     }
     wx.showActionSheet({
       itemList,
@@ -87,7 +87,7 @@ Page({
           case 2:
           case 3:
             if(index ===3 && item.sfsz === CONSTS.SFSZ_WJQ){
-              utils.showToast('当前帐单未结清，不能创建新帐单！');
+              utils.showToast('当前帐单未结清，不能出新帐单！');
               return;
             }
             const s = JSON.stringify({ houseid: item._id });

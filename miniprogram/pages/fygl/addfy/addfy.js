@@ -4,7 +4,7 @@ import * as utils from '../../../utils/utils.js';
 import * as fyglService from '../../../services/fyglServices.js'; 
 import moment from '../../../utils/moment.min.js';
 
-const fyxxMetas = {
+const fyxxMetas = { 
   fwmc: { label: '房屋名称', name: 'fwmc', require: true },
   zhxm: { label: '租户姓名', name: 'zhxm'},
   sfzh: { label: '身份证号', name: 'sfzh', type:'idcard' },
@@ -13,9 +13,9 @@ const fyxxMetas = {
   yj: { label: '押金', name: 'yj', type: "number"},
   htrqq: { label: '合同日期起', name: 'htrqq', type: 'date' },
   htrqz: { label: '合同日期止', name: 'htrqz', type: 'date' },
-  szrq: { label: '收租日期', name: 'szrq',type:'date' },
-  dscds: { label: '电起始读数', name: 'dscds', type: "number" },
-  sscds: { label: '水起始读数', name: 'sscds', type: "number" },
+  szrq: { label: '下次收租日期', name: 'szrq',type:'date' },
+  dscds: { label: '电上次读数', name: 'dscds', type: "number" },
+  sscds: { label: '水上次读数', name: 'sscds', type: "number" },
   ddj: { label: '电费单价', name: 'ddj', type: "digit" },
   sdj: { label: '水费单价', name: 'sdj', type: "digit" },
   dgtds: { label: '电公摊度数', name: 'dgtds', type: "number" },
@@ -193,15 +193,16 @@ Page({
       })
     }else if(name==='htrqq'){
       const htrqq = moment(e.detail.value);
+      // console.log('htrqq:',htrqq);
       const szrq = currentObject.szrq;
       if (utils.isEmpty(szrq)) {
         // 根据合同日期起自动生成下次收租日期,加1月
-        currentObject.szrq = htrqq.add(1, 'months').format('YYYY-MM-DD');
+        currentObject.szrq = htrqq.clone().add(1, 'months').format('YYYY-MM-DD');
       }
       const htrqz = currentObject.htrqz;
       if (utils.isEmpty(htrqz)) {
         // 根据合同日期起自动生成下次收租日期，加1年
-        currentObject.htrqz = htrqq.add(1, 'years').format('YYYY-MM-DD');
+        currentObject.htrqz = htrqq.clone().add(1, 'years').format('YYYY-MM-DD');
       }
       refreshFmMetas(fmMetas, currentObject);
     }else{

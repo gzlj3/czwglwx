@@ -6,7 +6,7 @@
       <view class="page__desc">{{pageDesc}}</view>
     </view>
     <view class="page__bd">
-        <view class="weui-cells__title">待创建新帐单房源列表</view>
+        <view class="weui-cells__title">待出新帐单房源列表</view>
         <view class="weui-cells weui-cells_after-title">
             <checkbox-group bindchange="checkboxChange">
                 <label class="weui-cell weui-check__label" wx:for="{{sourceList}}" wx:key="_id">

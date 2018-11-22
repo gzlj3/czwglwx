@@ -16,7 +16,7 @@ exports.BUTTON_QUERYMAKEZD = 9; // 查询创建帐单列表
 exports.BUTTON_EXITFY = 10; // 退房
 exports.getButtonActionInfo = buttonAction => {
   try {
-    return ['', '查询房源', '添加房源', '编辑房源', '删除房源', '抄表', '创建帐单', '查看/处理帐单', '', ''][
+    return ['', '查询房源', '添加房源', '编辑房源', '删除房源', '抄表', '出帐单', '查看/处理帐单', '', ''][
       buttonAction
     ];
   } catch (e) {

@@ -40,9 +40,9 @@ Page({
     if(buttonAction===CONSTS.BUTTON_MAKEZD){
       const self = this;
       let tsinfo = '';
-      if (this.data.autoSendMessage) tsinfo = '帐单创建成功后，会自动发出帐单短信，';
-      else tsinfo = '帐单创建成功后，可在帐单处理页面中发送短信，';
-      utils.showModal('创建帐单', `${tsinfo}您确定创建帐单吗？`, () => { self.handleSubmit(); });      
+      if (this.data.autoSendMessage) tsinfo = '出帐单成功后，会自动发出帐单短信，';
+      else tsinfo = '出帐单成功后，可在帐单处理页面中发送短信，';
+      utils.showModal('出帐单', `${tsinfo}您确定出帐单吗？`, () => { self.handleSubmit(); });      
     }else{
       this.handleSubmit();
     }
@@ -56,9 +56,9 @@ Page({
       (resultData) => {
         getApp().setPageParams(buttonAction, resultData);
         if(buttonAction === CONSTS.BUTTON_CB){
-          utils.redirectToSuccessPage('抄表完成后，如果帐单已经结清，可以创建新帐单。', '开始创建帐单','/pages/fygl/editlist/editlist',CONSTS.BUTTON_MAKEZD,this.data.params);
+          utils.redirectToSuccessPage('抄表完成后，如果帐单已经结清，可以出新帐单。', '开始出帐单','/pages/fygl/editlist/editlist',CONSTS.BUTTON_MAKEZD,this.data.params);
         }else if (buttonAction === CONSTS.BUTTON_MAKEZD && this.data.params) {
-          utils.redirectToSuccessPage('创建帐单完成后，可以进入帐单处理页面查看或处理新创建的帐单。', '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, this.data.params);
+          utils.redirectToSuccessPage('出帐单完成后，可以进入帐单处理页面查看或处理新出的帐单。', '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, this.data.params);
         }else{
           wx.navigateBack();
         }
@@ -200,7 +200,7 @@ Page({
     let showSaveButton = CONSTS.BUTTON_LASTZD !== buttonAction && sourceList && sourceList.length > 0;
     if(buttonAction === CONSTS.BUTTON_MAKEZD){
       showSaveButton = false;
-      saveButtonText = '创建帐单';
+      saveButtonText = '出帐单';
       sourceList.map((value, index) => {
         if (value.checked){
            showSaveButton = true;
@@ -208,11 +208,11 @@ Page({
         return;
       });
       if(params && !utils.isEmpty(params.houseid)){
-        pageTitle = '单户创建帐单';
-        pageDesc = '上月帐单已经结清，单户可在任意时间创建下月新帐单';
+        pageTitle = '单户出帐单';
+        pageDesc = '上月帐单已经结清，单户可在任意时间出下月新帐单';
       }else{
-        pageTitle = '集中创建帐单';
-        pageDesc = '上月帐单已经结清，且已接近收租日期的房源在此创建下月新帐单';                
+        pageTitle = '出帐单';
+        pageDesc = '上月帐单已经结清，且已接近收租日期的房源在此出下月新帐单';                
       }
     } else if (buttonAction === CONSTS.BUTTON_CB) {
       if (params && !utils.isEmpty(params.houseid)) {

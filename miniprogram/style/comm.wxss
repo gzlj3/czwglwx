@@ -35,3 +35,7 @@
 .addfontsize24{
   font-size: 24px;
 }
+
+.addwidth {
+  width: 115px;
+}

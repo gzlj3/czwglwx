@@ -22,7 +22,7 @@ const menuList = [
   },
   {
     id: 'special',
-    name: '集中创建帐单',
+    name: '出帐单',
     open: false,
     page: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_MAKEZD
   },

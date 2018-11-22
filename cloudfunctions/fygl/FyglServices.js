@@ -65,7 +65,7 @@ async function queryZdList(yzhid,data) {
   let zdList = new Array(resultList.length);
   resultList.map((house,index)=>{
     if(house.sfsz === CONSTS.SFSZ_WJQ)
-      throw utils.newException('当前帐单未结清，不能创建新帐单！');
+      throw utils.newException('当前帐单未结清，不能出新帐单！');
     zdList[index] = {};
     zdList[index]._id = house._id;
 		try {
