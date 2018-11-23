@@ -35,8 +35,18 @@ exports.roundNumber = (number,precision) => {
 }
 
 exports.isEmpty = (value) => {
-  return !(value && value.length > 0);
+  return !value;
+  // return !(value && value.length > 0);
 }
+
+const isEmptyObj = (obj) => {
+  if (!obj) return true;
+  for (var key in obj) {
+    return false
+  }
+  return true;
+}
+exports.isEmptyObj = isEmptyObj;
 
 exports.getCurrentTimestamp = ()=>{
   // return moment().format('YYYY-MM-DD HH:mm:ss');
@@ -64,6 +74,7 @@ exports.codeException = codeException;
 //其中的appId,appSecret为榛子云平台注册的帐号信息
 exports.sendPhoneMessage = async (sjhm,message)=>{
   // throw newException("短信发送失败:【帐户金额不足】");
+  return;
   const options = {
     method: 'POST',
     uri: 'http://sms_developer.zhenzikj.com/sms/send.do',
@@ -126,6 +137,9 @@ function uuid(len, radix) {
 exports.uuid = uuid;
 exports.yzhid = () => {
   return uuid(16, 10);
+}
+exports.collid = () => {
+  return uuid(5);
 }
 exports.id = () => {
   return uuid(16);

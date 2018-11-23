@@ -4,9 +4,9 @@ const CONSTS = require('constants.js');
 const utils = require('utils.js');
 
 cloud.init({
-  env: config.conf.env,   //'jjczwgl-bc6ef9'
-  // env: 'jjczwgl-test-2e296e'
+  env: config.conf.env,
 })
+const db = cloud.database();
 /**
  * 更新表的记录，返回更新成功的记录数
  */
@@ -73,16 +73,79 @@ exports.queryDocs = async (tableName, whereObj) => {
 }
 
 //是否为租客
-exports.isZk = async (userType) => {
+exports.isZk = (userType) => {
+  // console.log('iszk:', userType, utils.isEmpty(userType));
+  if(utils.isEmpty(userType))
+    throw utils.newException('用户身份判断异常！');
   return userType === CONSTS.USERTYPE_ZK;
 }
 //是否为房东
-exports.isFd = async (userType) => {
+exports.isFd = (userType) => {
+  if (utils.isEmpty(userType))
+    throw utils.newException('用户身份判断异常！');
   return userType === CONSTS.USERTYPE_FD;
 }
 //是否为房东租客
-exports.isFdZk = async (userType) => {
+exports.isFdZk = (userType) => {
+  if (utils.isEmpty(userType))
+    throw utils.newException('用户身份判断异常！');
   return userType === CONSTS.USERTYPE_FDZK;
+}
+
+//查询所有collid
+async function queryAllCollids(){
+  const db = cloud.database();
+  const result = await db.collection('userb').field({collid:true}).get();
+  if(result && result.data.length>0)
+    return result.data;
+  return null;
+}
+exports.queryAllCollids = queryAllCollids;
+
+exports.updateAllDoc = async (tablename,whereObj,updateObj)=>{
+  if (utils.isEmptyObj(whereObj) || utils.isEmptyObj(updateObj))
+    throw utils.newException('参数异常！');
+  const collids = await queryAllCollids();
+  if(!collids) return;
+  let updatedNum=0;
+  for(let i=0;i<collids.length;i++){
+    let collid = collids[i].collid;
+    if (utils.isEmpty(collid)) collid = '';
+    else collid = '_' + collid;
+    try{
+      const result = await db.collection(tablename + collid).where(whereObj).update({data:updateObj});
+      console.log('updateAllDoc:',result,whereObj,updateObj);
+      updatedNum += result.stats.updated;
+    }catch(e){
+      //更新批表如果出错，暂不抛出异常
+      console.log('updateAllDoc:',e);
+    }
+  }
+  return updatedNum;
+}
+
+exports.queryAllDoc = async (tablename,whereObj) => {
+  if (utils.isEmptyObj(whereObj))
+    throw utils.newException('参数异常！');
+  const collids = await queryAllCollids();
+  if (!collids) return;
+  console.log('collids:',collids);
+  let resultList = [];
+  for (let i = 0; i < collids.length; i++) {
+    let collid = collids[i].collid;
+    if(utils.isEmpty(collid)) collid='';
+    else collid = '_'+collid;
+    try {
+      result = await db.collection(tablename+collid).where(whereObj).get();
+      if(result && result.data.length>0){
+        resultList.push(...result.data);
+      }
+    } catch (e) {
+      //批表查询如果出错，暂不抛出异常
+      console.log('updateAllDoc:', e);
+    }
+  }
+  return resultList;
 }
 
 //如果记录已经存在，则更新，否则插入

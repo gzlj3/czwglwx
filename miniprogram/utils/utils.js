@@ -19,9 +19,19 @@ exports.getFloat = (value) => {
 }
 
 const isEmpty = (value) => {
-  return !(value && value.length>0);
+  return !value;
+  // return !(value && value.length>0);
 }
 exports.isEmpty = isEmpty;
+
+const isEmptyObj = (obj) => {
+  if(!obj) return true;
+  for (var key in obj) {
+    return false
+  }
+  return true;
+}
+exports.isEmptyObj = isEmptyObj;
 
 exports.showLoading = (info) => {
   wx.showLoading({

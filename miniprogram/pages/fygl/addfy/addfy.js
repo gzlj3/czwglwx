@@ -46,6 +46,8 @@ const refreshFmMetas = (fmMetas,currentObject) => {
       fmMetas[value].isEmpty = utils.isEmpty(currentObject[value]);
     }
   });
+  console.log('currentobject:',currentObject);
+  console.log('fmMetas:',fmMetas);
 }
 
 Page({
@@ -101,7 +103,7 @@ Page({
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData)=>{
         console.log('savefy return:',resultData);
-        getApp().setPageParams(buttonAction, resultData);
+        getApp().setFyListDirty(true);
         if(!utils.isEmpty(formObject.zhxm)){
           const s = JSON.stringify({ houseid: resultData._id });
           let pageDesc;

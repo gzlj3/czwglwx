@@ -5,12 +5,6 @@ const services = require('FyglServices.js');
 const userServices = require('UserServices.js');
 const utils = require('utils.js');
 
-// const curUser = {
-//   userid:'admin',
-//   username:'管理员',
-//   dhhm:'13332875650',
-//   yzhid:'1',
-// }
 
 // 云函数入口函数
 /* event 参数对象：
@@ -31,6 +25,7 @@ exports.main = async (event, context) => {
   try {
     //检查权限，成功则返回用户的基本数据
     const curUser = await userServices.checkAuthority(action, userInfo);
+    //{userid,userType,yzhid,sjhm,collid}
 
     console.log('操作用户：', curUser);
     let result;
@@ -49,8 +44,8 @@ exports.main = async (event, context) => {
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_QUERYFY:
         // console.log('queryfy');
-          result = await services.queryFyList(curUser.yzhid);
-          return results.getSuccessResults(result.data);
+          result = await services.queryFyList(curUser);
+          return results.getSuccessResults(result);
       case CONSTS.BUTTON_ADDFY:
         // console.log('addfy');
           data.yzhid = curUser.yzhid;
@@ -69,9 +64,9 @@ exports.main = async (event, context) => {
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_DELETEFY:
         console.log("deletefy");
-        result = await services.deleteFy(data);
-        result = await services.queryFyList(curUser.yzhid);
-        return results.getSuccessResults(result.data);
+        result = await services.deleteFy(data, curUser);
+        result = await services.queryFyList(curUser);
+        return results.getSuccessResults(result);
       case CONSTS.BUTTON_EXITFY:
         if (method === 'POST') {
           console.log("tffy");
@@ -80,15 +75,15 @@ exports.main = async (event, context) => {
           console.log("exitfy");
           result = await services.exitFy(data, curUser);
         }
-        result = await services.queryFyList(curUser.yzhid);
-        return results.getSuccessResults(result.data);
+        result = await services.queryFyList(curUser);
+        return results.getSuccessResults(result);
       case CONSTS.BUTTON_CB:
         if(method==='POST'){
           console.log("cb");
-          result = await services.updateSdb(data);
+          result = await services.updateSdb(data,curUser);
         }else{
           console.log("querysdb:",data);
-          result = await services.querySdbList(curUser.yzhid,data);
+          result = await services.querySdbList(curUser,data);
           // result = result.data;
         }
         return results.getSuccessResults(result);
@@ -97,10 +92,10 @@ exports.main = async (event, context) => {
         if (method === 'POST') {
           const autoSendMessage = restData && restData.length>0?restData[0]:false;
           console.log("makezd autoSendMessage", autoSendMessage);
-          result = await services.updateZdList(data, autoSendMessage);
+          result = await services.updateZdList(data, autoSendMessage,curUser);
         }else{
           console.log("querymakezd");
-          result = await services.queryZdList(curUser.yzhid,data);
+          result = await services.queryZdList(curUser,data);
         }
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_LASTZD:
@@ -111,7 +106,7 @@ exports.main = async (event, context) => {
           // result = result.data;
         } else {
           console.log("querylastzd");
-          result = await services.queryLastzdList(data);
+          result = await services.queryLastzdList(data,curUser);
           // result = result.data;
         }
         return results.getSuccessResults(result);

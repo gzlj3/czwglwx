@@ -16,37 +16,47 @@ const _ = db.command;
 //   // env: 'jjczwgl-test-2e296e'
 // })
 
-exports.queryFyList = async (yzhid) => {
+exports.queryFyList = async (curUser) => {
   //查询房源列表
-  // const db = cloud.database();
-  const result = db.collection('house').orderBy('fwmc', 'asc').where({
-    yzhid
-  }).get();
+  const {sjhm,yzhid,userType,collid} = curUser;
+  let result;
+  if(commService.isZk(userType)){
+    result = await commService.queryAllDoc('house',{dhhm:sjhm});
+  }else{
+    result = await db.collection('house'+collid).orderBy('fwmc', 'asc').where({
+      yzhid
+    }).get();
+    result = result.data;
+  }
   return result;
 }
 
-async function queryLastzdList (params) {
+async function queryLastzdList (params,curUser) {
+  const {collid} = curUser;
   const {houseid} = params;
+  if(utils.isEmpty(houseid))
+    throw utils.newException('查询数据异常！');
   const db = cloud.database();
   const _ = db.command;
-  const result = await db.collection('housefy').orderBy('zdlx','desc').orderBy('szrq','desc').limit(6).where({
+  const result = await db.collection('housefy'+collid).orderBy('zdlx','desc').orderBy('szrq','desc').limit(6).where({
     houseid,
   }).get();
   return result.data;
 }
 exports.queryLastzdList = queryLastzdList;
 
-async function querySdbList (yzhid,data) {  
+async function querySdbList (curUser,data) {  
+  const {yzhid,collid} = curUser
   const db = cloud.database();  
   const _ = db.command;
   let result;
   if(data && !utils.isEmpty(data.houseid)){
-    result = await commService.queryPrimaryDoc('house',data.houseid);
+    result = await commService.queryPrimaryDoc('house'+collid,data.houseid);
     if(result) result = Array.of(result);
   }else{
     const szrqCond = moment().startOf('day').add(4, 'days').format('YYYY-MM-DD');
     console.log('szrqcond:'+szrqCond);
-    result = await db.collection('house').where({
+    result = await db.collection('house'+collid).where({
       yzhid,
       sfsz: _.in([CONSTS.SFSZ_YJQ, CONSTS.SFSZ_YJZ]),
       szrq: _.lte(szrqCond),
@@ -58,9 +68,9 @@ async function querySdbList (yzhid,data) {
 }
 exports.querySdbList = querySdbList;
 
-async function queryZdList(yzhid,data) {
+async function queryZdList(curUser,data) {
   console.log('===queryzdlist:',data);
-  const fyList = await querySdbList(yzhid,data);
+  const fyList = await querySdbList(curUser,data);
   const resultList = fyList;
   let zdList = new Array(resultList.length);
   resultList.map((house,index)=>{
@@ -88,8 +98,9 @@ exports.queryZdList = queryZdList;
 
 exports.saveFy = async (house,curUser) => {
   let result;
+  const {collid} = curUser;
   // 检查房屋名称是否重复
-  result = await commService.querySingleDoc('house',{yzhid:curUser.yzhid,_id:_.neq(house._id),fwmc:house.fwmc});
+  result = await commService.querySingleDoc('house'+collid,{yzhid:curUser.yzhid,_id:_.neq(house._id),fwmc:house.fwmc});
   // console.log(result); 
   if(result)
     throw utils.newException("房屋名称已经存在！");
@@ -100,89 +111,34 @@ exports.saveFy = async (house,curUser) => {
   }else{
     isAddDoc = false;
   }
-// console.log('savefy:',isAddDoc,house._id);
   let { _id: saveHouseid, dhhm, avatarUrl } = house;
   if (utils.isEmpty(house.housefyid) && !utils.isEmpty(house.zhxm)) {
     // 如果为新签约，则自动生成合同帐单
     const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_HTZD);
-    await commService.addDoc('housefy',newHousefy);
+    await commService.addDoc('housefy'+collid,newHousefy);
   }
   // console.log('save house:',house);
   if(isAddDoc){
-    await commService.addDoc('house', house);
+    await commService.addDoc('house'+collid, house);
   }else{
-    await commService.updateDoc('house', house);
+    await commService.updateDoc('house'+collid, house);
   }  
 
   //关联用户注册的手机号
   if(utils.isEmpty(avatarUrl) && !utils.isEmpty(dhhm)){
     result = await commService.querySingleDoc('userb', { sjhm:dhhm });
     if(result){
-      await commService.updateDoc('house', { _id: saveHouseid, avatarUrl:result.avatarUrl});
+      await commService.updateDoc('house'+collid, { _id: saveHouseid, avatarUrl:result.avatarUrl});
       // console.log('关联租户头像：',updatedNum);
     }
   }
   return {_id:saveHouseid};
 }
-// exports.saveFy = async (house, curUser) => {
-//   let result;
-//   // 检查房屋名称是否重复
-//   result = await commService.querySingleDoc('house', { yzhid: curUser.yzhid, _id: _.neq(house._id), fwmc: house.fwmc });
-//   // console.log(result); 
-//   if (result)
-//     throw utils.newException("房屋名称已经存在！");
-
-//   if (utils.isEmpty(house.housefyid) && !utils.isEmpty(house.zhxm)) {
-//     // 如果为新签约，则自动生成合同帐单
-//     const newHousefy = makeHousefy(house, null, CONSTS.ZDLX_HTZD);
-//     // 结转房屋数据
-//     const housefyResult = await commService.addDoc('housefy', newHousefy);
-//     house.housefyid = housefyResult._id;
-//     if (utils.isEmpty(house.housefyid))
-//       throw utils.newException("生成签约帐单失败！");
-//   }
-//   let { _id: saveHouseid, dhhm, avatarUrl } = house;
-//   if (utils.isEmpty(house._id)) {
-//     //如果是添加房源，则先保存房屋数据，以便拿到ID
-//     result = await commService.addDoc('house', house);
-//     house._id = result._id;
-//     if (utils.isEmpty(house._id))
-//       throw utils.newException("添加房源失败！");
-//     console.log("===house.housefyid:" + house.housefyid + ",house._id:" + house._id);
-//     saveHouseid = house._id;
-//     if (!utils.isEmpty(house.housefyid)) {
-//       //更新housefy中的houseid
-//       const updatedNum = await commService.updateDoc('housefy', { _id: house.housefyid, houseid: house._id });
-//       console.log(updatedNum);
-//       if (updatedNum === 0) {
-//         throw utils.newException("关联签约帐单表失败！");
-//       }
-//     }
-//   } else {
-//     //更新房源
-//     const updatedNum = await commService.updateDoc('house', house);
-//     // console.log(result);
-//     // const updatedNum = result.stats.updated;
-//     if (updatedNum === 0) {
-//       throw utils.newException("更新房屋表失败！");
-//     }
-//   }
-
-//   //关联用户注册的手机号
-//   if (utils.isEmpty(avatarUrl)) {
-//     result = await commService.querySingleDoc('userb', { sjhm: dhhm });
-//     if (result) {
-//       const updatedNum = await commService.updateDoc('house', { _id: saveHouseid, avatarUrl: result.avatarUrl });
-//       console.log('关联租户头像：', updatedNum);
-//     }
-//   }
-
-//   return null;
-// }
 
 exports.exitFy = async (data,curUser) => {
   const { houseid,tfrq } = data;
-  let house = await commService.queryPrimaryDoc('house',houseid);
+  const {collid} = curUser;
+  let house = await commService.queryPrimaryDoc('house'+collid,houseid);
   if(!house)
     throw utils.newException("未查到房屋数据!");
 
@@ -192,7 +148,7 @@ exports.exitFy = async (data,curUser) => {
   let housefy=null;
   if (sfsz === CONSTS.SFSZ_WJQ){
     //当前帐单未结清，则刷新当前帐单为退房帐单
-    housefy = await commService.queryPrimaryDoc('housefy',house.housefyid);
+    housefy = await commService.queryPrimaryDoc('housefy'+collid,house.housefyid);
     if (!housefy)
       throw utils.newException("未查到房屋当前的帐单数据!");
     if(housefy.zdlx === CONSTS.ZDLX_HTZD)
@@ -209,46 +165,44 @@ exports.exitFy = async (data,curUser) => {
   newHousefy.zhxgr = curUser.userid;
   newHousefy.zhxgsj = house.zhxgsj;
 
-  console.log('exitfy sfsz:',sfsz);
-
   if (sfsz === CONSTS.SFSZ_WJQ) {
     //未结清，刷新当前帐单
-    const housefyNum = await commService.updateDoc('housefy', newHousefy);
+    const housefyNum = await commService.updateDoc('housefy'+collid, newHousefy);
     if (housefyNum === 0)
       throw utils.newException("退房帐单数据更新失败！");
   }else{
     //已结清，生成新的退房帐单
-    const housefyResult = await commService.addDoc('housefy', newHousefy);
+    const housefyResult = await commService.addDoc('housefy'+collid, newHousefy);
     console.log('生成新的退房帐单ID:', housefyResult);
     house.housefyid = housefyResult;
     if (utils.isEmpty(house.housefyid))
       throw utils.newException("生成退房帐单失败！");
   }
-  const houseNum = await commService.updateDoc('house', house);
+  const houseNum = await commService.updateDoc('house'+collid, house);
   if (houseNum === 0)
     throw utils.newException("房源数据更新失败！");
 }
 
-exports.deleteFy = async (house) => {
+exports.deleteFy = async (house,curUser) => {
+  const {collid} = curUser;
   const { houseid } = house;
-  const num = await commService.removeDoc('house',houseid);
+  const num = await commService.removeDoc('house'+collid,houseid);
   if(num<1)
     throw utils.newException('房源ID:'+houseid);
   //删除对应的帐单数据
-  const housefyList = await commService.queryDocs('housefy', { houseid });
+  const housefyList = await commService.queryDocs('housefy'+collid, { houseid });
   if (housefyList) {
     for (let i = 0; i < housefyList.length; i++) {
-      await commService.removeDoc('housefy', housefyList[i]._id);
+      await commService.removeDoc('housefy'+collid, housefyList[i]._id);
     } 
   }
 }
 
-async function tfFy(data){
+async function tfFy(data,curUser){
+  const {collid} = curUser;
   const { houseid } = data;
-  const house = await commService.queryPrimaryDoc('house', houseid);
-  // console.log('tffy:',houseid);
-  const housefyList = await commService.queryDocs('housefy',{houseid});
-  // console.log('tffy:', houseid,housefyList);
+  const house = await commService.queryPrimaryDoc('house'+collid, houseid);
+  const housefyList = await commService.queryDocs('housefy'+collid,{houseid});
   if(housefyList){
     for(let i=0;i<housefyList.length;i++){
       await commService.addDoc('housefy_tf', housefyList[i]);
@@ -256,22 +210,23 @@ async function tfFy(data){
   }
   await commService.addDoc('house_tf', house);
   // 房源数据保存进退房表后，再删除数据
-  await commService.removeDoc('house',house._id);
+  await commService.removeDoc('house'+collid,house._id);
   if (housefyList) {
     for (let i = 0; i < housefyList.length; i++) {
-      await commService.removeDoc('housefy', housefyList[i]._id);
+      await commService.removeDoc('housefy'+collid, housefyList[i]._id);
     }
   }
 }
 exports.tfFy = tfFy;
 
-exports.updateSdb = async (houseList) => {
+exports.updateSdb = async (houseList,curUser) => {
+  const {collid} = curUser;
   const db = cloud.database();
   let tasks = [];
   const _ = db.command;
   houseList.map((house)=>{
     const { _id } = house;
-    const promise = db.collection('house').doc(_id).update({
+    const promise = db.collection('house'+collid).doc(_id).update({
       data: {
         dbcds: house.dbcds && house.dbcds !== '' ? house.dbcds : _.remove(),
         sbcds: house.sbcds && house.sbcds !== '' ? house.sbcds : _.remove(),
@@ -282,11 +237,12 @@ exports.updateSdb = async (houseList) => {
   return Promise.all(tasks);
 }
 
-exports.updateZdList = async (zdList,autoSendMessage) => {
+exports.updateZdList = async (zdList,autoSendMessage,curUser) => {
+  const {collid} = curUser;
   const db = cloud.database();
   const _ = db.command;
-  const houseTable = db.collection('house');
-  const housefyTable = db.collection('housefy');
+  const houseTable = db.collection('house'+collid);
+  const housefyTable = db.collection('housefy'+collid);
   let selectedRowkeys = [];
   zdList.map((zd) => {
     const { _id, checked } = zd;
@@ -310,15 +266,15 @@ exports.updateZdList = async (zdList,autoSendMessage) => {
       const {_id} = house;
       const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_YJZD);
       // console.log(newHousefy);
-      const housefyResult = await commService.addDoc('housefy',newHousefy); 
+      const housefyResult = await commService.addDoc('housefy'+collid,newHousefy); 
       console.log("makezd housefyid:",housefyResult); 
       house.housefyid = housefyResult;
-      const houseNum = await commService.updateDoc('house',house);
+      const houseNum = await commService.updateDoc('house'+collid,house);
       if(houseNum===0)
         throw utils.newException("更新房源信息失败！");      
       if (autoSendMessage){
         //生成帐单完成，发送短信提醒
-        await sendZdMessage(house,newHousefy);
+        await sendZdMessage(house,newHousefy,curUser);
       }
     }catch(e){
       errMsg += house.fwmc+','+e.message;
@@ -328,14 +284,21 @@ exports.updateZdList = async (zdList,autoSendMessage) => {
   return null;
 }
 
-const sendZdMessage= async (house,housefy,flag)=>{
+const sendZdMessage= async (house,housefy,curUser)=>{
   const {dhhm,fwmc,zhxm,fyhj,zdlx} = house;
+  const {collid,userid} = curUser;
   let message = getZdMessage(housefy);
   message += '【极简出租】';
   //发送短信
   await utils.sendPhoneMessage(dhhm,message);
-  //发送短信成功，更新发送次数
-  await db.collection('housefy').doc(housefy._id).update({
+  //发送短信成功，更新帐单表发送次数
+  await db.collection('housefy'+collid).doc(housefy._id).update({
+    data: {
+      messageNum: _.inc(1)
+    }
+  });
+  //发送短信成功，更新用户表当前帐户发送次数
+  await db.collection('userb').where({openId:userid}).update({
     data: {
       messageNum: _.inc(1)
     }
@@ -384,17 +347,16 @@ const getZdMessage = (housefy) => {
 }
 
 exports.processQrsz = async (params,userb) => {
+  const {collid} = userb;
   const { housefyid, flag } = params;
   const db = cloud.database();
   const _ = db.command;
 
-  let housefy = await commService.queryPrimaryDoc('housefy',housefyid);// db.collection('housefy').doc(housefyid).get();
+  let housefy = await commService.queryPrimaryDoc('housefy'+collid,housefyid);
   // const housefy = result.data;
   if (!housefy) throw utils.newException("未查到房源帐单记录：" + housefyid);
   const {houseid} = housefy;
-  // result = await db.collection('house').doc(houseid).get();
-  // const house = result.data;
-  let house = await commService.queryPrimaryDoc('house', houseid);
+  let house = await commService.queryPrimaryDoc('house'+collid, houseid);
   if (!house) throw utils.newException("未查到房源记录：" + houseid);
 
   if ("sxzd" === flag && housefyid !== house.housefyid)
@@ -409,8 +371,8 @@ exports.processQrsz = async (params,userb) => {
     const message = getZdMessage(housefy);
     return message;
   } else if ("sendsjdx" === flag) {
-    await sendZdMessage(house,housefy);
-    return queryLastzdList({ houseid });
+    await sendZdMessage(house,housefy,userb);
+    return queryLastzdList({ houseid },userb);
   } else {
     jzHouse(house, housefy, flag);
   }
@@ -419,27 +381,19 @@ exports.processQrsz = async (params,userb) => {
   house.zhxgsj = utils.getCurrentTimestamp();
   housefy.zhxgr=userb.userid;
   housefy.zhxgsj = house.zhxgsj;
-  const housefyNum = await commService.updateDoc('housefy',housefy);
+  const housefyNum = await commService.updateDoc('housefy'+collid,housefy);
   if(housefyNum===0)
     throw utils.newException("帐单数据更新失败！");
-  const houseNum = await commService.updateDoc('house',house);
+  const houseNum = await commService.updateDoc('house'+collid,house);
   if (houseNum === 0)
     throw utils.newException("房源数据更新失败！");
-  // console.log("processQrsz:",flag,houseid);
-
-  // if ("sxzd" === flag && lastFyhj!==house.fyhj) {
-  //帐单有变动，发出短信提醒
-    // await sendZdMessage(house,'sxzd');
-  // }
-  // console.log('qrsz result:',flag,house.zdlx);
   if ("qrsz" === flag && house.zdlx === CONSTS.ZDLX_TFZD){
-    // console.log('start tf:',houseid);
-  //退房帐单的确认收费成功，则直接退房
-    await tfFy({ houseid });
+    //退房帐单的确认收费成功，则直接退房
+    await tfFy({ houseid },userb);
     return null;
   }
 
-  return queryLastzdList({houseid});
+  return queryLastzdList({houseid},userb);
 }
 
 function jzHouse(house, housefy, flag) {

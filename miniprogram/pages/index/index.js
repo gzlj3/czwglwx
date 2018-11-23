@@ -59,13 +59,14 @@ Page({
     ], 
   },
   
-  onLoad: function() { 
-    // const obj = {
-    //   100:'aaaaaaaaa',
-    //   aaa:'bbbbbbbb',
-    // }
-    // const b=1000;
-    // console.log(obj[b]);
+  onLoad: function() {  
+    // let obj={a:1};
+    // console.log(utils.isEmptyObj(obj));
+
+    // console.log(obj=={});
+    // const b='';
+    // if(!b) console.log(false);
+    // console.log(typeof(b));
     // console.log('====sfsz:',CONSTS.getSfszInfo('2'));
     // const zdlx=null;
     // const newzdlx = zdlx | 100;
@@ -300,16 +301,20 @@ Page({
   },  
 
   seeLastzd: function(){
-    const response = fyglService.queryData(CONSTS.BUTTON_ZK_SEELASTZD);
-    fyglService.handleAfterRemote(response, '查看帐单',
-      (resultData) => {
-        console.log('seeLastzd:',resultData);
-        const s = JSON.stringify({ houseid: resultData.houseid });
-        wx.navigateTo({
-          url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s,
-        })
-      }
-    );    
+    // const response = fyglService.queryData(CONSTS.BUTTON_ZK_SEELASTZD);
+    // fyglService.handleAfterRemote(response, '查看帐单',
+    //   (resultData) => {
+    //     console.log('seeLastzd:',resultData);
+    //     const s = JSON.stringify({ houseid: resultData.houseid });
+        // wx.navigateTo({
+        //   url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s,
+        // })
+    //   }
+    // );    
+    wx.navigateTo({
+      url: '../fygl/fyglmain',
+    })
+
   },
 
   kindToggle: function (e) {

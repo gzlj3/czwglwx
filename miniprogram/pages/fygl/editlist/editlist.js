@@ -54,10 +54,10 @@ Page({
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData) => {
-        getApp().setPageParams(buttonAction, resultData);
+        getApp().setFyListDirty(true);
         if(buttonAction === CONSTS.BUTTON_CB){
           utils.redirectToSuccessPage('抄表完成后，如果帐单已经结清，可以出新帐单。', '开始出帐单','/pages/fygl/editlist/editlist',CONSTS.BUTTON_MAKEZD,this.data.params);
-        }else if (buttonAction === CONSTS.BUTTON_MAKEZD && this.data.params) {
+        }else if (buttonAction === CONSTS.BUTTON_MAKEZD && !utils.isEmptyObj(this.data.params)) {
           utils.redirectToSuccessPage('出帐单完成后，可以进入帐单处理页面查看或处理新出的帐单。', '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, this.data.params);
         }else{
           wx.navigateBack();
@@ -140,7 +140,7 @@ Page({
           self.onQrsz(e);
           return;
         }
-        getApp().setPageParams(buttonAction, resultData);
+        getApp().setFyListDirty(true);
         if(resultData === null){
           wx.navigateBack();
         }else{
@@ -166,7 +166,6 @@ Page({
     const response = fyglService.queryData(buttonAction, params);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
-        getApp().setPageParams(CONSTS.BUTTON_NONE, null);
         let showDetailZd=null;
         if(buttonAction === CONSTS.BUTTON_LASTZD){
           showDetailZd = this.refreshShowDetailZd(resultData);

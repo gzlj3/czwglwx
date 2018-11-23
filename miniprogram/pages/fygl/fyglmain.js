@@ -3,7 +3,7 @@ import * as CONSTS from '../../utils/constants.js';
 import moment from '../../utils/moment.min.js';
 import * as fyglService from '../../services/fyglServices.js'; 
 const utils = require('../../utils/utils.js');
- 
+
 const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
@@ -198,14 +198,8 @@ Page({
     const response = fyglService.queryFyglList(); 
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
+        getApp().setFyListDirty(false);
         this.refreshFyList(resultData);
-        //计算房源进度条显示数据
-        // fyglService.refreshProgessState(resultData);
-
-        // getApp().setPageParams(CONSTS.BUTTON_NONE, null);
-        // this.setData({
-        //   fyList: resultData,
-        // }); 
       }
     );   
   },
@@ -213,9 +207,10 @@ Page({
   refreshFyList: function(resultData) {
     //计算房源进度条显示数据
     fyglService.refreshProgessState(resultData);
-    getApp().setPageParams(CONSTS.BUTTON_NONE, null);
-        this.setData({
+    this.setData({
       fyList: resultData,
+      isFd: getApp().globalData.user.userType === CONSTS.USERTYPE_FD,
+      isZk: getApp().globalData.user.userType === CONSTS.USERTYPE_ZK,
     }); 
 
   },
@@ -242,10 +237,9 @@ Page({
    */
   onShow: function () {
     // 检查返回值，刷新数据
-    const {buttonAction,currentObject} = getApp().globalData;
-    console.log(buttonAction);
-    // if ([CONSTS.BUTTON_ADDFY, CONSTS.BUTTON_EDITFY, CONSTS.BUTTON_CB].includes(buttonAction)){
-    if (![CONSTS.BUTTON_NONE].includes(buttonAction)) {
+    const {fyListDirty} = getApp().globalData;
+    console.log('fyListDirty:', fyListDirty);
+    if (fyListDirty) {
       this.onLoad();
     }
   },

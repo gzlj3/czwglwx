@@ -9,7 +9,7 @@
   </view>
   <view class="page__bd page__bd_spacing">
       <view class="grant-container grant-container-wxgrant" wx:if="{{!user.granted}}">
-        <view class='grant-item'>我们需要获得你的授权</view>
+        <view class='grant-item'>需要获得你微信的部分授权</view>
         <view class='grant-item'>
           <button size='mini' type='primary' open-type="getUserInfo" 
       bindgetuserinfo="onGetUserInfo">微信授权</button>
@@ -17,7 +17,7 @@
       </view>
       <view class="grant-container" wx:if="{{user.granted && user.userType===CONSTS.USERTYPE_NONE}}"> 
       <!-- <view class="grant-container" >  -->
-          <view class='grant-item'>需要注册后才能使用</view>
+          <view class='grant-item'>需要注册确定你的身份</view>
           <view class='grant-item'>
             <form bindsubmit="onRegister">
               <radio-group bindchange="radioChange" name='userType'>

@@ -19,14 +19,16 @@ exports.checkAuthority = async(action,userInfo) => {
   }
   // throw utils.codeException(100);
   const db = cloud.database();
-  const result = await db.collection('userb').field({ userType: true, yzhid: true,sjhm:true }).where({
+  const result = await db.collection('userb').field({ userType: true, yzhid: true,sjhm:true,collid:true }).where({
     openId
   }).get();
   if(!result || result.data.length<=0)
     throw utils.codeException(100);
-  const curUser = { userid: openId, ...result.data[0] };
-  const {userType,yzhid,sjhm} = curUser;
-  if (utils.isEmpty(userType) || utils.isEmpty(yzhid) || utils.isEmpty(sjhm))
+  let curUser = { userid: openId, ...result.data[0] };
+  if(utils.isEmpty(curUser.collid)) curUser.collid='';
+  else curUser.collid = '_' + curUser.collid;
+  const { userType, yzhid, sjhm, collid} = curUser;
+  if (utils.isEmpty(userType) || utils.isEmpty(yzhid) || utils.isEmpty(sjhm) || utils.isEmpty(openId))
     throw utils.codeException(101);
 
   if ([CONSTS.BUTTON_ZK_SEELASTZD,].indexOf(action) >= 0) {
@@ -37,15 +39,15 @@ exports.checkAuthority = async(action,userInfo) => {
   return curUser;
 }
 
-exports.seeLastzd = async (curUser) => {
-  const { sjhm } = curUser;
-  console.log(sjhm);
+// exports.seeLastzd = async (curUser) => {
+//   const { sjhm } = curUser;
+//   console.log(sjhm);
 
-  const result = await commService.querySingleDoc('house', { dhhm:sjhm });
-  if (!result)
-    throw utils.newException('未查到你的租房数据，请找房东确认手机号是否输入正确！');
-  return {houseid:result._id}
-}
+//   const result = await commService.querySingleDoc('house', { dhhm:sjhm });
+//   if (!result)
+//     throw utils.newException('未查到你的租房数据，请找房东确认手机号是否输入正确！');
+//   return {houseid:result._id}
+// }
 
 exports.sendSjyzm = async (data,userInfo) => {
   const { sjhm } = data;
@@ -148,10 +150,11 @@ exports.registerUser = async (data,userInfo) => {
   const lrsj = utils.getCurrentTimestamp();
   const zhxgsj = lrsj;
   const yzhid = utils.yzhid();
-
+  const collid = utils.collid();
   const userb = {
     openId,
     yzhid,
+    collid,
     nickName:frontUserInfo.nickName,
     avatarUrl: frontUserInfo.avatarUrl,
     sjhm:sjData.sjhm,
@@ -162,11 +165,16 @@ exports.registerUser = async (data,userInfo) => {
   }
   console.log('新用户注册：',userb);
   let result = await commService.addDoc('userb',userb);
+  //创建新用户的集合表
+  await db.createCollection('house_' + collid);
+  await db.createCollection('housefy_' + collid);
+  
   //关联房屋头像数据
   const avatarUrl = userb.avatarUrl;
-  if (!utils.isEmpty(avatarUrl)) {
-    result = await db.collection('house').where({ dhhm: userb.sjhm }).update({ data:{avatarUrl}});
-    console.log('关联房屋租户头像：', result.stats.updated);
+  if (!utils.isEmpty(avatarUrl) && !utils.isEmpty(userb.sjhm)) {
+    // result = await db.collection('house').where({ dhhm: userb.sjhm }).update({ data:{avatarUrl}});
+    result = await commService.updateAllDoc('house',{ dhhm: userb.sjhm },{ avatarUrl });
+    console.log('关联房屋数：', result);
   }
   
   return await queryUser({ openId});
