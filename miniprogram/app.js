@@ -14,7 +14,7 @@ App({
 
     this.globalData = {
       fyListDirty:false,  //房源列表是否有更新
-      user: { granted: true, userType:'', nickName:'', avatarUrl:'' }  //用户登录基本信息
+      user: { granted: true, userType:'', nickName:'', avatarUrl:'',collid:'',rights:'' }  //用户登录基本信息
     }
   },
 

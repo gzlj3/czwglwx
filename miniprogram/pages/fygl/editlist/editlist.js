@@ -121,12 +121,13 @@ Page({
     console.log(e);
     const { item:housefyid } = e.currentTarget.dataset;
     let {id:flag} = e.currentTarget;
-    const { buttonAction } = this.data;
+    const { buttonAction,params} = this.data;
     if (!utils.isEmpty(e.flag)){
        flag = e.flag;
        e.flag = null;
     }
-    const response = fyglService.postData(buttonAction,{housefyid,flag});
+    console.log('onqrczCz:', { housefyid, flag, collid: params.collid });
+    const response = fyglService.postData(buttonAction,{housefyid,flag,collid:params.collid});
     const self = this;
     const tsinfo = e.title;
     e.title = null;
@@ -161,8 +162,7 @@ Page({
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
     }
-    // console.log('editlist:'+buttonAction);
-    // console.log(params);
+    console.log('editlist:',buttonAction,params);
     const response = fyglService.queryData(buttonAction, params);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 

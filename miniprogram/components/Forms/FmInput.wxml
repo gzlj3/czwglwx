@@ -11,6 +11,6 @@
                     <input id="{{name}}" name="{{name}}" type="{{type}}" value="{{currentObject[name]}}" bindblur="onInputBlur" class="weui-input" placeholder="请输入{{label}}" wx:else/>
                 </view>
             </view>
-            <view class="weui-cells__tips" wx:if="{{name==='szrq'}}">签约后的下一次收租日期</view>
-            <view class="weui-cells__tips" wx:if="{{name==='dscds' || name==='sscds'}}">之前已租房屋输入上个月的读数</view>
+            <view class="weui-cells__tips" wx:if="{{name==='szrq'}}">现已租房屋输入下次收租日期,一般应大于当前日期</view>
+            <view class="weui-cells__tips" wx:if="{{name==='dscds' || name==='sscds'}}">现已租房屋输入上个月的读数</view>
 </template>

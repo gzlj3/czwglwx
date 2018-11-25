@@ -4,7 +4,8 @@
     "pages/fygl/fyglmain",
     "pages/fygl/addfy/addfy",
     "pages/fygl/editlist/editlist",
-    "pages/fygl/msg/msg_success"
+    "pages/fygl/msg/msg_success",
+    "pages/user/userGrant"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",
@@ -18,7 +19,7 @@
     "navigationBarTitleText": "极简出租",
     "navigationBarBackgroundColor": "#f8f8f8",
     "backgroundColor": "#f8f8f8",
-    "enablePullDownRefresh":false
+    "enablePullDownRefresh": false
   },
   "networkTimeout": {
     "request": 10000,
@@ -26,5 +27,5 @@
     "uploadFile": 10000,
     "downloadFile": 10000
   },
-  "debug": false  
+  "debug": false
 }

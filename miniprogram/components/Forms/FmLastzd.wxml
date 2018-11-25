@@ -113,7 +113,7 @@
                 </view>
             </view>
             
-            <view class="weui-form-preview__ft" wx:if="{{item.sfsz==='0' && (isFd || isFdZk)}}">
+            <view class="weui-form-preview__ft" wx:if="{{item.sfsz==='0' && (isFd)}}">
                 <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="jzzd" data-item="{{item._id}}" bindtap="onQrsz">结转下月</view>
                 <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="sxzd" data-item="{{item._id}}" bindtap="onQrsz">刷新帐单</view>
                 <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" id="sjdx" data-item="{{item._id}}" bindtap="onQrszCz">发短信{{item.messageNum?'['+item.messageNum+']':''}}</view>

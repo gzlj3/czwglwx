@@ -46,8 +46,8 @@ const refreshFmMetas = (fmMetas,currentObject) => {
       fmMetas[value].isEmpty = utils.isEmpty(currentObject[value]);
     }
   });
-  console.log('currentobject:',currentObject);
-  console.log('fmMetas:',fmMetas);
+  // console.log('currentobject:',currentObject);
+  // console.log('fmMetas:',fmMetas);
 }
 
 Page({
@@ -98,7 +98,8 @@ Page({
     }
 
 
-    const response = fyglService.saveFy(buttonAction, formObject);
+    // const response = fyglService.saveFy(buttonAction, formObject);
+    const response = fyglService.postData(buttonAction, formObject,this.data.collid);
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData)=>{
@@ -112,18 +113,7 @@ Page({
           }else{
             pageDesc = '房源新建完成后，可进入帐单详细页查看签约帐单。';
           }
-          utils.redirectToSuccessPage(pageDesc, '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id });
-          // const returnUrl = '/pages/fygl/editlist/editlist';
-          // console.log('returnUrl:',returnUrl);
-          // const button2Obj = {
-          //   buttonText:'查看帐单详情',
-          //   returnUrl,
-          //   returnAction: CONSTS.BUTTON_LASTZD,
-          //   returnItem: { houseid: resultData._id }
-          // }
-          // wx.redirectTo({
-          //   url: '/pages/fygl/msg/msg_success?pageDesc='+pageDesc+'&button2=' + JSON.stringify(button2Obj)
-          // });
+          utils.redirectToSuccessPage(pageDesc, '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id,collid:this.data.collid });
         }else{
           wx.navigateBack();
         }
@@ -135,13 +125,23 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    const currentObject = options.item?JSON.parse(options.item):{};
+    const item = options.item?JSON.parse(options.item):null;
+    let currentObject,collid;
+    if(item){
+      currentObject = item.house;
+      collid = item.collid;
+    }else{
+      currentObject = {};
+      collid = getApp().globalData.user.collid;
+    }
+
     let buttonAction = options.buttonAction;
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
-    }
+    } 
     this.setData({
-      buttonAction,
+      buttonAction, 
+      collid,
       currentObject,
     });
 
@@ -177,8 +177,6 @@ Page({
   },
 
   onInputBlur: function(e) {
-    // console.log(e);
-    // console.log(e.target);
     const name = e.target.id;
     let { currentObject,fmMetas } = this.data;
     currentObject[name] = e.detail.value;

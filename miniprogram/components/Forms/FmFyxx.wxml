@@ -10,6 +10,7 @@
         <!-- <view class="weui-toptips weui-toptips_warn" wx:if="{{showTopTips}}">错误提示</view> -->
         <input id="_id" name="_id" class="displaynone" value="{{currentObject._id}}"/>
         <input id="housefyid" name="housefyid" class="displaynone" value="{{currentObject.housefyid}}"/>
+        <input id="yzhid" name="yzhid" class="displaynone" value="{{currentObject.yzhid}}"/>
         <view class="weui-cells weui-cells_after-title">
             <template is="FmInput" data="{{...fmMetas.fwmc,currentObject}}"/>
         </view> 

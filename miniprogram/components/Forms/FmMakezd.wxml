@@ -21,7 +21,7 @@
             </checkbox-group>
         </view>
         <view class="weui-cells" wx:if="{{showSaveButton}}">
-          <checkbox-group bindchange="checkboxChange" bindchange="autoSendMessageChange">
+          <checkbox-group bindchange="autoSendMessageChange">
             <label class="weui-cell weui-check__label">
               <checkbox class="weui-check" value="1"/>
               <view class="weui-cell__hd weui-check__hd_in-checkbox">

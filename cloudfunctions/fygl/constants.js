@@ -28,13 +28,14 @@ exports.getButtonActionInfo = buttonAction => {
 exports.BUTTON_QUERYUSER = 100; // 查询用户数据
 exports.BUTTON_REGISTERUSER = 101; // 注册用户
 exports.BUTTON_SENDSJYZM = 102; // 发送手机验证码
+exports.BUTTON_USERGRANT = 103; // 用户授权
 exports.USERTYPE_NONE = '0'; // 用户类型：未注册
 exports.USERTYPE_FD = '1'; // 用户类型：房东
 exports.USERTYPE_ZK = '2'; // 用户类型：租客
 exports.USERTYPE_FDZK = '3'; // 用户类型：房东租客双重身份
 
-//租客操作
-exports.BUTTON_ZK_SEELASTZD = 200;  //租客查看帐单
+// //租客操作
+// exports.BUTTON_ZK_SEELASTZD = 200;  //租客查看帐单
 
 //帐单类型
 exports.ZDLX_HTZD = '0';  //合同帐单

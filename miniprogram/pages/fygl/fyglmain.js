@@ -8,7 +8,8 @@ const initialState = {
   status: CONSTS.REMOTE_SUCCESS, // 远程处理返回状态
   msg: '', // 远程处理返回信息
   emptyAvatarUrl: '../../images/avatar-empty.png',
-  fyList: [], // 房源列表数据
+  fyList: [], // 当前操作的房源列表数据
+  allFyList:[], //总房源列表数据
   currentObject: {}, // 当前form操作对象
   sourceList: [], // 保存列表
   selectedRowKeys: [], // 列表选中行
@@ -34,19 +35,8 @@ Page({
     }) 
   }, 
 
-  onMakezd(){
-    wx.navigateTo({
-      url: 'editlist/editlist?buttonAction=' + CONSTS.BUTTON_MAKEZD,
-    }) 
-  }, 
-  onCb() {
-    wx.navigateTo({
-      url: 'editlist/editlist?buttonAction=' + CONSTS.BUTTON_CB,
-    })
-  }, 
-
   onMoreAction(e){
-    const { item } = e.currentTarget.dataset;
+    const { item,fyitem } = e.currentTarget.dataset;
     console.log("moreAction:",item);
     const self = this;
     let itemList;
@@ -90,7 +80,7 @@ Page({
               utils.showToast('当前帐单未结清，不能出新帐单！');
               return;
             }
-            const s = JSON.stringify({ houseid: item._id });
+            const s = JSON.stringify({ houseid: item._id,collid: fyitem });
             const action = index === 2 ? CONSTS.BUTTON_CB : CONSTS.BUTTON_MAKEZD;
             wx.navigateTo({
               url: './editlist/editlist?buttonAction=' + action +'&item='+s
@@ -139,8 +129,8 @@ Page({
 
   onEditfy(e){
     // console.log(e);
-    const {item} = e.currentTarget.dataset;
-    const s = JSON.stringify(item);
+    const { item, fyitem} = e.currentTarget.dataset;
+    const s = JSON.stringify({house:item, collid: fyitem });
     // console.log(s);
     // console.log('addfy/addfy?buttonAction=' + CONSTS.BUTTON_EDITFY + '&item=' + s);
     wx.navigateTo({
@@ -150,7 +140,9 @@ Page({
 
   onLastzd(e){
     const { item } = e.currentTarget.dataset;
-    const s = JSON.stringify({houseid:item});
+    const { fyitem } = e.currentTarget.dataset;
+    console.log('fyitem:',fyitem);
+    const s = JSON.stringify({houseid:item,collid:fyitem});
     // console.log(s);
     console.log('editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s);
     wx.navigateTo({
@@ -162,39 +154,6 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    // this.setData({
-    //   fyList: [
-    //     {
-    //       _id: '1',
-    //       fwmc:'101',
-    //       zhxm:'张三',
-    //       szrq:'2018-11-01',
-    //       avatarUrl:'../../images/avatar-empty.png',
-    //     },
-    //     {
-    //       _id: '2',
-    //       fwmc: '102',
-    //       zhxm: '李四',
-    //       avatarUrl: '../../images/avatar-empty.png',
-    //     },
-    //     {
-    //       _id: '3',
-    //       fwmc: '103',
-    //       zhxm: '王五',
-    //       avatarUrl: '../../images/avatar-empty.png',
-    //     },
-    //   ]
-    // });
-
-    // console.log(moment('2018-01-31','YYYY-MM-DD').add(1,'months').format('YYYY-MM-DD'));
-    // console.log(moment().startOf('day').add(4, 'days').format('YYYY-MM-DD'));
-    // console.log(utils.getInteger('fff')); 
-    // console.log(moment('2018-11-aa','YYYY-MM-DD')); 
-    // let sszrq = '2018-11-15';
-    // const szrq = moment(sszrq);
-    // const xcszrq = szrq.clone();
-    // szrq.subtract(1, 'days');
-    // console.log(xcszrq.format('YYYY-MM-DD'));
     const response = fyglService.queryFyglList(); 
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
@@ -206,9 +165,11 @@ Page({
 
   refreshFyList: function(resultData) {
     //计算房源进度条显示数据
-    fyglService.refreshProgessState(resultData);
+    console.log(resultData);
+    fyglService.refreshProgessState(resultData[0].sourceList);
     this.setData({
-      fyList: resultData,
+      // fyList: resultData,
+      allFyList: resultData,
       isFd: getApp().globalData.user.userType === CONSTS.USERTYPE_FD,
       isZk: getApp().globalData.user.userType === CONSTS.USERTYPE_ZK,
     }); 

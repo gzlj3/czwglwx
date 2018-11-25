@@ -1,7 +1,7 @@
 const cloud = require('wx-server-sdk')
-const config = require('config.js')
 const CONSTS = require('constants.js');
 const utils = require('utils.js');
+const config = require('config.js')
 
 cloud.init({
   env: config.conf.env,
@@ -95,7 +95,8 @@ exports.isFdZk = (userType) => {
 //查询所有collid
 async function queryAllCollids(){
   const db = cloud.database();
-  const result = await db.collection('userb').field({collid:true}).get();
+  // const result = await db.collection('userb').field({ collid: true, nickName:true}).where({userType:'1'}).get();
+  const result = await db.collection('userb').field({ collid: true, nickName: true }).get();
   if(result && result.data.length>0)
     return result.data;
   return null;
@@ -114,7 +115,7 @@ exports.updateAllDoc = async (tablename,whereObj,updateObj)=>{
     else collid = '_' + collid;
     try{
       const result = await db.collection(tablename + collid).where(whereObj).update({data:updateObj});
-      console.log('updateAllDoc:',result,whereObj,updateObj);
+      // console.log('updateAllDoc:', result, tablename + collid,whereObj,updateObj);
       updatedNum += result.stats.updated;
     }catch(e){
       //更新批表如果出错，暂不抛出异常
@@ -132,13 +133,13 @@ exports.queryAllDoc = async (tablename,whereObj) => {
   console.log('collids:',collids);
   let resultList = [];
   for (let i = 0; i < collids.length; i++) {
-    let collid = collids[i].collid;
-    if(utils.isEmpty(collid)) collid='';
-    else collid = '_'+collid;
+    const { collid, nickName} = collids[i];
+    // if(utils.isEmpty(collid)) collid='';
+    // else collid = '_'+collid;
     try {
-      result = await db.collection(tablename+collid).where(whereObj).get();
+      result = await db.collection(getTableName(tablename,collid)).where(whereObj).get();
       if(result && result.data.length>0){
-        resultList.push(...result.data);
+        resultList.push({collid,nickName,sourceList:result.data});
       }
     } catch (e) {
       //批表查询如果出错，暂不抛出异常
@@ -148,11 +149,9 @@ exports.queryAllDoc = async (tablename,whereObj) => {
   return resultList;
 }
 
-//如果记录已经存在，则更新，否则插入
-// exports.saveDoc = async (tableName, docObj) => {
-//   const db = cloud.database();
-//   const result = await db.collection(tableName).add({
-//     data: docObj
-//   });
-//   return result;
-// }
+const getTableName = (tableName, collid) => {
+  if (utils.isEmpty(collid)) collid = '';
+  else collid = '_' + collid;
+  return tableName+collid;
+}
+exports.getTableName = getTableName;

@@ -39,6 +39,9 @@ exports.main = async (event, context) => {
       case CONSTS.BUTTON_REGISTERUSER:
         result = await userServices.registerUser(data,userInfo);
         return results.getSuccessResults(result);
+      case CONSTS.BUTTON_USERGRANT  :
+        result = await userServices.grantUser(data, curUser);
+        return results.getSuccessResults(result);
       case CONSTS.BUTTON_SENDSJYZM:
         result = await userServices.sendSjyzm(data,userInfo);
         return results.getSuccessResults(result);
@@ -53,14 +56,16 @@ exports.main = async (event, context) => {
           data.lrsj=utils.getCurrentTimestamp();
           data.zhxgr=curUser.userid;
           data.zhxgsj=data.lrsj;
-          result = await services.saveFy(data,curUser);
+          result = await services.saveFy(data,curUser.collid);
           return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_EDITFY:
         console.log("editfy");
         data.zhxgr=curUser.userid;
-        data.zhxgsj=utils.getCurrentTimestamp();
-        result = await services.saveFy(data,curUser);
+        data.zhxgsj=utils.getCurrentTimestamp();       
+        const collid = restData && restData.length > 0 ? restData[0] : curUser.collid;
+        console.log('editfy',collid);
+        result = await services.saveFy(data,collid);
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_DELETEFY:
         console.log("deletefy");

@@ -10,3 +10,12 @@
   border-left: 1rpx solid #d5d5d6;
   color: #d5d5d6;
 } */
+.weui-cells__title {
+    margin-top: .77em;
+    margin-bottom: .3em; 
+    padding-left: 15px;
+    padding-right: 15px;
+    color: black;
+    font-size:16;
+    background-color: rgb(205, 236, 247);
+}

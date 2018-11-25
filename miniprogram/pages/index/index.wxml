@@ -1,7 +1,7 @@
 <view class="page">
   <view class="nickname" wx:if="{{user.granted}}">
     {{user.nickName}},欢迎您！
-  </view>
+  </view> 
   
   <view class="page__hd"> 
       <!-- <view class="page__title"></view> -->

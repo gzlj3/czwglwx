@@ -19,14 +19,14 @@ exports.checkAuthority = async(action,userInfo) => {
   }
   // throw utils.codeException(100);
   const db = cloud.database();
-  const result = await db.collection('userb').field({ userType: true, yzhid: true,sjhm:true,collid:true }).where({
+  const result = await db.collection('userb').
+        field({ userType: true, yzhid: true,sjhm:true,collid:true,granted:true,nickName:true }).where({
     openId
   }).get();
   if(!result || result.data.length<=0)
     throw utils.codeException(100);
   let curUser = { userid: openId, ...result.data[0] };
   if(utils.isEmpty(curUser.collid)) curUser.collid='';
-  else curUser.collid = '_' + curUser.collid;
   const { userType, yzhid, sjhm, collid} = curUser;
   if (utils.isEmpty(userType) || utils.isEmpty(yzhid) || utils.isEmpty(sjhm) || utils.isEmpty(openId))
     throw utils.codeException(101);
@@ -127,12 +127,60 @@ const getCachedSjyzm = async (openId)=>{
 const queryUser = async (userInfo) => {
   const {openId} = userInfo;
   const db = cloud.database();
-  const result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true}).where({
+  const result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true}).where({
     openId
   }).get();
   return result.data;
 }
 exports.queryUser = queryUser;
+
+
+exports.grantUser = async (data, curUser) => {
+  const { sjhm,rights } = data;
+  const { yzhid:sourceYzhid } = curUser;
+  const userb = await commService.querySingleDoc('userb', { sjhm });
+  if (!userb)
+    throw utils.newException(`手机号(${sjhm})还未注册！`);
+  if(sourceYzhid === userb.yzhid)
+    throw utils.newException(`不能授权给本人！`);
+  
+  const oldGranted = userb.granted
+  let newGranted = [];
+  let found = false;
+  if (oldGranted){
+    oldGranted.map(value=>{
+      if(!value) return;
+      const {yzhid} = value;
+      console.log('1:',yzhid,sourceYzhid);
+      if (sourceYzhid === yzhid){
+        if (rights.length > 0){
+          //之前已经有授权，且本次有授权，则修改授权
+          console.log('found.......');
+          found = true;
+          newGranted.push(getNewGrant(curUser,rights));
+        }
+      }else{
+        newGranted.push(value);
+      }
+    })
+  }
+  if (!found && rights.length>0){
+    //新授权
+    newGranted.push(getNewGrant(curUser, rights));
+  }
+  userb.granted = newGranted;
+  // console.log('granted userb:',userb);
+  const updatedNum = await commService.updateDoc('userb', userb);
+  if(updatedNum===0)
+    throw utils.newException('授权更新失败');  
+  return updatedNum;
+}
+
+const getNewGrant = (curUser,rights)=>{
+//{"collid":null,"nickName":"馨馨","rights":['101','102','103']],"yzhid":"0598194113654221"}
+  const { collid, nickName, yzhid } = curUser;
+  return {collid,nickName,yzhid,rights};
+}
 
 exports.registerUser = async (data,userInfo) => {
   const { frontUserInfo,sjData} = data;
@@ -165,13 +213,15 @@ exports.registerUser = async (data,userInfo) => {
   }
   console.log('新用户注册：',userb);
   let result = await commService.addDoc('userb',userb);
-  //创建新用户的集合表
-  await db.createCollection('house_' + collid);
-  await db.createCollection('housefy_' + collid);
-  
-  //关联房屋头像数据
+  if (commService.isFd(sjData.userType)){
+    //房东注册，则创建新用户的集合表
+    await db.createCollection('house_' + collid);
+    await db.createCollection('housefy_' + collid);
+  }
+
+  //租客注册完成，关联房屋头像数据
   const avatarUrl = userb.avatarUrl;
-  if (!utils.isEmpty(avatarUrl) && !utils.isEmpty(userb.sjhm)) {
+  if (commService.isZk(sjData.userType) && !utils.isEmpty(avatarUrl) && !utils.isEmpty(userb.sjhm)) {
     // result = await db.collection('house').where({ dhhm: userb.sjhm }).update({ data:{avatarUrl}});
     result = await commService.updateAllDoc('house',{ dhhm: userb.sjhm },{ avatarUrl });
     console.log('关联房屋数：', result);

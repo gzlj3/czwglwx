@@ -1,0 +1,52 @@
+<template name="FmUserGrant">
+  <view class="page">
+    <view class="page__hd">
+      <view class="page__title">用户授权</view>
+      <view class="page__desc">将我的房源授予他人查看和管理，慎重操作。</view>
+    </view>
+    <view class="page__bd">
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+          <view class="weui-cell__hd">
+            <view class="weui-label">授权手机号</view>
+          </view>
+          <view class="weui-cell__bd">
+            <input class="weui-input" name="sjhm" type="number" maxlength='11' placeholder="请输入被授权人手机号" />
+          </view>
+        </view>
+        <view class="weui-cell weui-cell_input">
+          <checkbox-group name="rights" bindchange="grantCheckboxChange">
+            <label class="weui-cell weui-check__label">
+              <checkbox class="weui-check" value="101"/>
+              <view class="weui-cell__hd weui-check__hd_in-checkbox">
+              <!-- {{...rights}} -->
+                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rights['101']}}"></icon>
+                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rights['101']}}"></icon>
+              </view>
+              <view class="weui-cell__bd">查看我的房源</view>
+            </label>
+            <label class="weui-cell weui-check__label">
+              <checkbox class="weui-check" value="102"/>
+              <view class="weui-cell__hd weui-check__hd_in-checkbox">
+                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rights['102']}}"></icon>
+                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rights['102']}}"></icon>
+              </view>
+              <view class="weui-cell__bd">修改我的房源</view>
+            </label>
+            <label class="weui-cell weui-check__label">
+              <checkbox class="weui-check" value="103"/>
+              <view class="weui-cell__hd weui-check__hd_in-checkbox">
+                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rights['103']}}"></icon>
+                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rights['103']}}"></icon>
+              </view>
+              <view class="weui-cell__bd">管理我的帐单</view>
+            </label>
+          </checkbox-group>
+          <!-- <view class='weui-cell'>
+            <button size='mini' type='primary' form-type="submit">保存</button>
+          </view> -->
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
