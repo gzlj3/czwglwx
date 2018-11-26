@@ -75,10 +75,10 @@ exports.codeException = codeException;
 //其中的appId,appSecret为榛子云平台注册的帐号信息
 exports.sendPhoneMessage = async (sjhm,message)=>{
   // throw newException("短信发送失败:【帐户金额不足】");
-  if(!config.production) {
-    //测试环境不真正发短信
-    return;
-  }
+  // if(!config.production) {
+  //   //测试环境不真正发短信
+  //   return;
+  // }
 
   const options = {
     method: 'POST',

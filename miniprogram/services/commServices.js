@@ -24,7 +24,7 @@ export function handleAfterRemote(response, tsinfo, successCallback) {
       });
       if (errCode === 100 || errCode === 101) {
         //用户未注册或用户数据异常，回到主页面
-        wx.navigateTo({
+        wx.redirectTo({
           url: '/pages/index/index',
         })
       }

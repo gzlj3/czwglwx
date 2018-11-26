@@ -11,7 +11,7 @@ const db = cloud.database();
 const _ = db.command;
 
 //检查权限，成功返回用户基本数据(userType,yzhid)
-exports.checkAuthority = async(action,userInfo) => {
+exports.checkAuthority = async(action,method,userInfo) => {
   const { openId } = userInfo;
   if ([CONSTS.BUTTON_QUERYUSER, CONSTS.BUTTON_REGISTERUSER,CONSTS.BUTTON_SENDSJYZM].indexOf(action)>=0){
     //用户注册等基本操作不检查权限
@@ -31,11 +31,20 @@ exports.checkAuthority = async(action,userInfo) => {
   if (utils.isEmpty(userType) || utils.isEmpty(yzhid) || utils.isEmpty(sjhm) || utils.isEmpty(openId))
     throw utils.codeException(101);
 
-  if ([CONSTS.BUTTON_ZK_SEELASTZD,].indexOf(action) >= 0) {
-    //租客功能
-    if(!commService.isZk(userType) && !commService.isZkFd(userType))
-      throw utils.newException('你无权操作此功能！');
-  }
+  // if ([CONSTS.BUTTON_ZK_SEELASTZD,].indexOf(action) >= 0) {
+  //   //租客功能
+  //   if(!commService.isZk(userType) && !commService.isZkFd(userType))
+  //     throw utils.newException('你无权操作此功能！');
+  // }
+
+  if(commService.isZk(userType)){
+    if ([CONSTS.BUTTON_CB, CONSTS.BUTTON_MAKEZD, CONSTS.BUTTON_ADDFY, CONSTS.EDITFY, CONSTS.DELETEFY, CONSTS.BUTTON_EXITFY].indexOf(action) >= 0) {
+      throw utils.codeException(101);
+    }
+    if ([CONSTS.BUTTON_LASTZD].indexOf(action) >= 0 && method === 'POST') {
+      throw utils.codeException(101);
+    }
+  }  
   return curUser;
 }
 
@@ -172,7 +181,7 @@ exports.grantUser = async (data, curUser) => {
   // console.log('granted userb:',userb);
   const updatedNum = await commService.updateDoc('userb', userb);
   if(updatedNum===0)
-    throw utils.newException('授权更新失败');  
+    throw utils.newException('本次授权无修改！');  
   return updatedNum;
 }
 

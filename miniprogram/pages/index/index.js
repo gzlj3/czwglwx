@@ -65,42 +65,8 @@ Page({
     ], 
   },
   
-  // test:function(s){
-  //   s.a = 'aaaaa';
-  // },
-
   onLoad: function() {  
-    // console.log(undefined === undefined);
-    // let s = {a:'bbbbbbbbbb'};
-    // this.test(s);
-    // console.log(s);
-    // let obj={a:1};
-    // console.log(utils.isEmptyObj(obj));
-
-    // console.log(obj=={});
-    // const b='';
-    // if(!b) console.log(false);
-    // console.log(typeof(b));
-    // console.log('====sfsz:',CONSTS.getSfszInfo('2'));
-    // const zdlx=null;
-    // const newzdlx = zdlx | 100;
-    // console.log('取整:',Math.ceil(33 / 30));
-    // console.log(moment().startOf('day'));
-    // wx.showModal({
-    //   title: 'aaa',
-    //   content: '<view>aaaaaa</view>',
-    // })
-    // wx.navigateTo({
-    //   url: '../fygl/fyglmain',
-    //   // url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item={"houseid":"W-6zxOJyfGvOuo9u"}',
-    // })
-    // console.log(moment().utcOffset(+8).format('YYYY-MM-DD HH:mm:ss'));
-    // const uuid = utils.uuid(16,10);
-    // console.log(uuid);
-    // console.log(uuid.length);  
-    // console.log(utils.getFloat((4.0).toFixed(1)));
-    this.queryUser();
- 
+    this.queryUser(); 
   },
 
   getWxGrantedData: function(){
@@ -141,15 +107,6 @@ Page({
     console.log('getuserinfo');
     console.log(e);
     this.setUserData(e.detail.userInfo);
-
-    // if (!this.data.granted && e.detail.userInfo) {
-    //   this.setData({
-    //     granted: true,
-    //     avatarUrl: e.detail.userInfo.avatarUrl,
-    //     userInfo: e.detail.userInfo
-    //   })
-    //   this.queryUser();
-    // }
   },
 
 
@@ -268,16 +225,6 @@ Page({
   },  
 
   seeLastzd: function(){
-    // const response = fyglService.queryData(CONSTS.BUTTON_ZK_SEELASTZD);
-    // fyglService.handleAfterRemote(response, '查看帐单',
-    //   (resultData) => {
-    //     console.log('seeLastzd:',resultData);
-    //     const s = JSON.stringify({ houseid: resultData.houseid });
-        // wx.navigateTo({
-        //   url: '../fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s,
-        // })
-    //   }
-    // );    
     wx.navigateTo({
       url: '../fygl/fyglmain',
     })

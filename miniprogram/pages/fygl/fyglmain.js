@@ -37,54 +37,73 @@ Page({
 
   onMoreAction(e){
     const { item,fyitem } = e.currentTarget.dataset;
-    console.log("moreAction:",item);
-    const self = this;
+    // console.log("moreAction:",item);
     let itemList;
     if(utils.isEmpty(item.zhxm)){
-      itemList = ['删除房源', '取消']; 
+      this.actionSheet2(e);
     }else{
-      itemList = ['删除房源', '退房', '抄表', '出帐单', '取消']; 
+      this.actionSheet1(e);
     }
+  },
+
+  actionSheet2: function (e) {
+    const { item, fyitem } = e.currentTarget.dataset;
+    const itemList = ['删除房源', '取消']; 
+    const self = this;
     wx.showActionSheet({
       itemList,
-      // fail: function(res){
-      //   console.log(res);
-      // },
       success: function (res) {
-        console.log('actionsheet:',res);
         if (res.cancel) return;
         const index = res.tapIndex;
         console.log(index);
-        switch (index){
+        switch (index) {
           case 0:
-            utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源('+item.fwmc+')吗？', () => { self.deletefy(item._id);});
+            utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源(' + item.fwmc + ')吗？', () => { self.deletefy(item._id); });
             break;
+        }
+      }
+    });
+  },
+
+  actionSheet1: function(e){
+    const { item, fyitem } = e.currentTarget.dataset;
+    const itemList = ['抄表', '出帐单', '删除房源', '退房', '取消']; 
+    const self = this;
+    wx.showActionSheet({
+      itemList,
+      success: function (res) {
+        if (res.cancel) return;
+        const index = res.tapIndex;
+        console.log(index);
+        switch (index) {
+          case 0:
           case 1:
-            if (utils.isEmpty(item.zhxm)) return;
-            const {sfsz,zdlx} = item;
-            if (CONSTS.ZDLX_TFZD === zdlx && CONSTS.SFSZ_YJQ === sfsz){
-              utils.showModal('退房', '退房后将不能恢复，你真的确定退房(' + item.fwmc + ')吗？', () => {self.tffy(item._id)});
-            }else{
-              const tfrq = moment().format('YYYY-MM-DD');
-              self.setData({
-                tfrq,
-                tfItem:item,
-                modalVisible:true,
-                modalTitle:'请输入退房截止日期',
-              });
-            }
-            break;
-          case 2:
-          case 3:
-            if(index ===3 && item.sfsz === CONSTS.SFSZ_WJQ){
+            if (index === 1 && item.sfsz === CONSTS.SFSZ_WJQ) {
               utils.showToast('当前帐单未结清，不能出新帐单！');
               return;
             }
-            const s = JSON.stringify({ houseid: item._id,collid: fyitem });
-            const action = index === 2 ? CONSTS.BUTTON_CB : CONSTS.BUTTON_MAKEZD;
+            const s = JSON.stringify({ houseid: item._id, collid: fyitem });
+            const action = index === 0 ? CONSTS.BUTTON_CB : CONSTS.BUTTON_MAKEZD;
             wx.navigateTo({
-              url: './editlist/editlist?buttonAction=' + action +'&item='+s
+              url: './editlist/editlist?buttonAction=' + action + '&item=' + s
             });
+            break;
+          case 2:
+            utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源(' + item.fwmc + ')吗？', () => { self.deletefy(item._id); });
+            break;
+          case 3:
+            const { sfsz, zdlx } = item;
+            if (CONSTS.ZDLX_TFZD === zdlx && CONSTS.SFSZ_YJQ === sfsz) {
+              utils.showModal('退房', '退房后将不能恢复，你真的确定退房(' + item.fwmc + ')吗？', () => { self.tffy(item._id) });
+            } else {
+              const tfrq = moment().format('YYYY-MM-DD');
+              self.setData({
+                tfrq,
+                tfItem: item,
+                modalVisible: true,
+                modalTitle: '请输入退房截止日期',
+              });
+            }
             break;
           case 4:
             return;
@@ -165,8 +184,11 @@ Page({
 
   refreshFyList: function(resultData) {
     //计算房源进度条显示数据
-    console.log(resultData);
-    fyglService.refreshProgessState(resultData[0].sourceList);
+    // console.log(resultData);
+    resultData.map(value=>{
+      fyglService.refreshProgessState(value.sourceList);
+    });
+
     this.setData({
       // fyList: resultData,
       allFyList: resultData,

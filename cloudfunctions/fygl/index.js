@@ -24,7 +24,7 @@ exports.main = async (event, context) => {
 
   try {
     //检查权限，成功则返回用户的基本数据
-    const curUser = await userServices.checkAuthority(action, userInfo);
+    const curUser = await userServices.checkAuthority(action, method,userInfo);
     //{userid,userType,yzhid,sjhm,collid}
 
     console.log('操作用户：', curUser);

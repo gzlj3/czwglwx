@@ -18,7 +18,8 @@ const _ = db.command;
 
 exports.queryFyList = async (curUser) => {
   //查询房源列表
-  const {sjhm,yzhid,userType,collid,granted} = curUser;
+  const {sjhm,yzhid,userType,collid} = curUser;
+  let { granted} = curUser;
   let result;
   if(commService.isZk(userType)){
     result = await commService.queryAllDoc('house',{dhhm:sjhm});
@@ -130,6 +131,9 @@ exports.saveFy = async (house,collid) => {
     isAddDoc = false;
   }
   let { _id: saveHouseid, dhhm, avatarUrl } = house;
+  //清除house的avatarUrl,重新关联
+  avatarUrl = '';
+  house.avatarUrl = "";
   if (utils.isEmpty(house.housefyid) && !utils.isEmpty(house.zhxm)) {
     // 如果为新签约，则自动生成合同帐单
     const newHousefy = makeHousefy(house, null,CONSTS.ZDLX_HTZD);

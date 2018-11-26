@@ -37,7 +37,13 @@ Page({
       });
       return;
     };
-    const response = fyglService.postData(CONSTS.BUTTON_USERGRANT, formObject);
+    const self = this;
+    utils.showModal('房源授权', `你确定将我的房源授权给${sjhm}操作吗？`, () => { self.handleSubmit(e); });      
+  },
+
+  handleSubmit: function (e) {
+    const formObject = e.detail.value;
+    const response = fyglService.postData(CONSTS.BUTTON_USERGRANT, formObject); 
     fyglService.handleAfterRemote(response, '用户授权',
       (resultData) => {
         console.log(resultData);
