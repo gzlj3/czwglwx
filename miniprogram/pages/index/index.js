@@ -59,14 +59,24 @@ Page({
     sendingYzm:false,
     second:config.conf.yzmYxq,
     CONSTS,
-    radioItems: [
+    onLoadState:null,
+    radioItems: [ 
       { name: '我是房东，想管理我的房源', value: '1', checked: true  },
       { name: '我是租客，想查询我的帐单', value: '2'}
     ], 
   },
   
   onLoad: function() {  
+    console.log('index onload')
+    this.setData({ onLoadState: 'onLoading' });
     this.queryUser(); 
+  },
+  onShow: function () {
+    console.log('index onshow')
+    const {onLoadState} = this.data; 
+    if (onLoadState !=='onLoading' &&  onLoadState!=='onLoadSuccess'){
+      this.onLoad(); 
+    }
   },
 
   getWxGrantedData: function(){
@@ -203,8 +213,12 @@ Page({
       (resultData) => { 
         // console.log('======query user result:');
         // console.log(resultData);
+        this.setData({onLoadState:'onLoadSuccess'});
         this.setUserData(resultData && resultData.length > 0 ? resultData[0]:null);
         this.getWxGrantedData();
+      },
+      err => {
+        this.setData({ onLoadState: 'onLoadFail' });
       }
     );
   }, 

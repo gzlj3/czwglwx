@@ -35,11 +35,20 @@ exports.queryFyList = async (curUser) => {
       if (!granted[i]) continue;
       const { collid, nickName, yzhid, rights } = granted[i];
       // result = await db.collection(getTableName(tablename, collid)).where(whereObj).get();
-      result = await db.collection(commService.getTableName('house', collid)).orderBy('fwmc', 'asc').where({
+      result = await db.collection(commService.getTableName('house', collid)).orderBy('sfsz','asc').orderBy('fwmc', 'asc').where({
         yzhid
       }).get();
+      //计算费用合计数
+      let czjehj=0,sfhj=0,dfhj=0,fyhj=0;
+      result.data.map(value=>{
+        czjehj += utils.getInteger(value.czje);
+        sfhj += utils.getFloat(value.syhj);
+        dfhj += utils.getFloat(value.dyhj);
+        fyhj += utils.getFloat(value.fyhj);
+      });
+      fyhj = utils.roundNumber(fyhj,1);
       if (result && result.data.length > 0) {
-        resultList.push({ collid, nickName,rights,sourceList: result.data });
+        resultList.push({ collid, nickName,rights,czjehj,dfhj,dfhj,fyhj,sourceList: result.data });
       }
     }
     result = resultList;
@@ -696,6 +705,8 @@ function makeHousefy(house, housefy, zdlx,tfrq){
   house.rq2= housefy.rq2;
   house.yffrq1 = housefy.yffrq1;
   house.yffrq2 = housefy.yffrq2;
+  house.sfhj = housefy.sfhj;
+  house.dfhj = housefy.dfhj;
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
   // console.log('housefy tsinfo end:', housefy.daysinfo, housefy.monthNum);

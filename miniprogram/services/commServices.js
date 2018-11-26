@@ -1,5 +1,5 @@
 const CONSTS = require('../utils/constants.js');
-export function handleAfterRemote(response, tsinfo, successCallback) {
+export function handleAfterRemote(response, tsinfo, successCallback,failCallback) {
   if (!response) return;
   // const { buttonAction } = this.data;
   // const tsinfo = CONSTS.getButtonActionInfo(buttonAction);
@@ -37,5 +37,6 @@ export function handleAfterRemote(response, tsinfo, successCallback) {
       icon: 'none',
       duration: 5000,
     });
+    if (failCallback) failCallback(err);
   })
 }
