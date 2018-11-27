@@ -66,13 +66,13 @@ Page({
     ], 
   },
   
-  onLoad: function() {  
-    console.log('index onload')
+  onLoad: function (options) {  
+    // console.log('index onload',options)
     this.setData({ onLoadState: 'onLoading' });
     this.queryUser(); 
   },
   onShow: function () {
-    console.log('index onshow')
+    // console.log('index onshow')
     const {onLoadState} = this.data; 
     if (onLoadState !=='onLoading' &&  onLoadState!=='onLoadSuccess'){
       this.onLoad(); 
@@ -90,8 +90,8 @@ Page({
             // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
             wx.getUserInfo({
               success: res => {
-                console.log('get granted userinfo');
-                console.log(res.userInfo);
+                // console.log('get granted userinfo');
+                // console.log(res.userInfo);
                 this.setUserData(res.userInfo);
               }
             })

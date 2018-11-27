@@ -18,10 +18,10 @@ exports.updateDoc = async (tableName, docObj) => {
     data: docObj
   });
   const updatedNum = result.stats.updated;
-  if(updatedNum===0){
-    console.log('updateDoc result failure:', _id,tableName,docObj,result);
+  if (updatedNum === 0) {
+    console.log('updateDoc result failure:', _id, tableName, docObj, result);
     // throw utils.newException('更新数据失败！');
-  }else{
+  } else {
     // console.log('updateDoc result success:', _id,tableName, docObj);    
   }
   return updatedNum;
@@ -44,7 +44,7 @@ exports.addDoc = async (tableName, docObj) => {
   const result = await db.collection(tableName).add({
     data: docObj
   });
-  if(!result || utils.isEmpty(result._id))
+  if (!result || utils.isEmpty(result._id))
     throw new utils.newException('插入数据失败！');
   return result._id;
 }
@@ -52,7 +52,7 @@ exports.addDoc = async (tableName, docObj) => {
 exports.querySingleDoc = async (tableName, whereObj) => {
   const db = cloud.database();
   const result = await db.collection(tableName).where(whereObj).get();
-  if(result && result.data.length>0)
+  if (result && result.data.length > 0)
     return result.data[0];
   return null;
 }
@@ -75,7 +75,7 @@ exports.queryDocs = async (tableName, whereObj) => {
 //是否为租客
 exports.isZk = (userType) => {
   // console.log('iszk:', userType, utils.isEmpty(userType));
-  if(utils.isEmpty(userType))
+  if (utils.isEmpty(userType))
     throw utils.newException('用户身份判断异常！');
   return userType === CONSTS.USERTYPE_ZK;
 }
@@ -93,53 +93,53 @@ exports.isFdZk = (userType) => {
 }
 
 //查询所有房东collid
-async function queryAllCollids(){
+async function queryAllCollids() {
   const db = cloud.database();
-  const result = await db.collection('userb').field({ collid: true, nickName:true}).where({userType:'1'}).get();
+  const result = await db.collection('userb').field({ collid: true, nickName: true }).where({ userType: '1' }).get();
   // const result = await db.collection('userb').field({ collid: true, nickName: true }).get();
-  if(result && result.data.length>0)
+  if (result && result.data.length > 0)
     return result.data;
   return null;
 }
 exports.queryAllCollids = queryAllCollids;
 
-exports.updateAllDoc = async (tablename,whereObj,updateObj)=>{
+exports.updateAllDoc = async (tablename, whereObj, updateObj) => {
   if (utils.isEmptyObj(whereObj) || utils.isEmptyObj(updateObj))
     throw utils.newException('参数异常！');
   const collids = await queryAllCollids();
-  if(!collids) return;
-  let updatedNum=0;
-  for(let i=0;i<collids.length;i++){
+  if (!collids) return;
+  let updatedNum = 0;
+  for (let i = 0; i < collids.length; i++) {
     let collid = collids[i].collid;
     if (utils.isEmpty(collid)) collid = '';
     else collid = '_' + collid;
-    try{
-      const result = await db.collection(tablename + collid).where(whereObj).update({data:updateObj});
+    try {
+      const result = await db.collection(tablename + collid).where(whereObj).update({ data: updateObj });
       // console.log('updateAllDoc:', result, tablename + collid,whereObj,updateObj);
       updatedNum += result.stats.updated;
-    }catch(e){
+    } catch (e) {
       //更新批表如果出错，暂不抛出异常
-      console.log('updateAllDoc:',e);
+      console.log('updateAllDoc:', e);
     }
   }
   return updatedNum;
 }
 
-exports.queryAllDoc = async (tablename,whereObj) => {
+exports.queryAllDoc = async (tablename, whereObj) => {
   if (utils.isEmptyObj(whereObj))
     throw utils.newException('参数异常！');
   const collids = await queryAllCollids();
   if (!collids) return;
-  console.log('collids:',collids);
+  console.log('collids:', collids);
   let resultList = [];
   for (let i = 0; i < collids.length; i++) {
-    const { collid, nickName} = collids[i];
+    const { collid, nickName } = collids[i];
     // if(utils.isEmpty(collid)) collid='';
     // else collid = '_'+collid;
     try {
-      result = await db.collection(getTableName(tablename,collid)).where(whereObj).get();
-      if(result && result.data.length>0){
-        resultList.push({collid,nickName,sourceList:result.data});
+      result = await db.collection(getTableName(tablename, collid)).where(whereObj).get();
+      if (result && result.data.length > 0) {
+        resultList.push({ collid, nickName, sourceList: result.data });
       }
     } catch (e) {
       //批表查询如果出错，暂不抛出异常
@@ -152,6 +152,6 @@ exports.queryAllDoc = async (tablename,whereObj) => {
 const getTableName = (tableName, collid) => {
   if (utils.isEmpty(collid)) collid = '';
   else collid = '_' + collid;
-  return tableName+collid;
+  return tableName + collid;
 }
 exports.getTableName = getTableName;
