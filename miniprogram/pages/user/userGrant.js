@@ -1,5 +1,6 @@
 const utils = require('../../utils/utils.js');
 const fyglService = require('../../services/fyglServices.js');
+const commService = require('../../services/commServices.js');
 const CONSTS = require('../../utils/constants.js');
 Page({
 
@@ -14,6 +15,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    commService.checkAuthority(CONSTS.BUTTON_USERGRANT);
   },
 
   grantCheckboxChange: function (e) {

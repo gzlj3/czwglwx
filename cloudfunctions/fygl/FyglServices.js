@@ -42,13 +42,15 @@ exports.queryFyList = async (curUser) => {
       let czjehj=0,sfhj=0,dfhj=0,fyhj=0;
       result.data.map(value=>{
         czjehj += utils.getInteger(value.czje);
-        sfhj += utils.getFloat(value.syhj);
-        dfhj += utils.getFloat(value.dyhj);
+        sfhj += utils.getFloat(value.sfhj);
+        dfhj += utils.getFloat(value.dfhj);
         fyhj += utils.getFloat(value.fyhj);
       });
       fyhj = utils.roundNumber(fyhj,1);
+      dfhj = utils.roundNumber(dfhj,1);
+      sfhj = utils.roundNumber(sfhj,1);
       if (result && result.data.length > 0) {
-        resultList.push({ collid, nickName,rights,czjehj,dfhj,dfhj,fyhj,sourceList: result.data });
+        resultList.push({ collid, nickName,rights,czjehj,sfhj,dfhj,fyhj,sourceList: result.data });
       }
     }
     result = resultList;
@@ -709,6 +711,7 @@ function makeHousefy(house, housefy, zdlx,tfrq){
   house.dfhj = housefy.dfhj;
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
+  console.log('makehousefy:',house.sfhj,house.dfhj);
   // console.log('housefy tsinfo end:', housefy.daysinfo, housefy.monthNum);
   return housefy;
 }

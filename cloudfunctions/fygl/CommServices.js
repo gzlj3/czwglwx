@@ -92,11 +92,11 @@ exports.isFdZk = (userType) => {
   return userType === CONSTS.USERTYPE_FDZK;
 }
 
-//查询所有collid
+//查询所有房东collid
 async function queryAllCollids(){
   const db = cloud.database();
-  // const result = await db.collection('userb').field({ collid: true, nickName:true}).where({userType:'1'}).get();
-  const result = await db.collection('userb').field({ collid: true, nickName: true }).get();
+  const result = await db.collection('userb').field({ collid: true, nickName:true}).where({userType:'1'}).get();
+  // const result = await db.collection('userb').field({ collid: true, nickName: true }).get();
   if(result && result.data.length>0)
     return result.data;
   return null;

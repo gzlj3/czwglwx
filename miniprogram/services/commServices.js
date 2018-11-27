@@ -40,3 +40,33 @@ export function handleAfterRemote(response, tsinfo, successCallback,failCallback
     if (failCallback) failCallback(err);
   })
 }
+
+const isZk = ()=>{
+  return getApp().globalData.user.userType === CONSTS.USERTYPE_ZK;
+}
+
+const isFd = ()=> {
+  return getApp().globalData.user.userType === CONSTS.USERTYPE_FD;
+}
+export { isZk, isFd };
+
+export function checkAuthority(action){
+  if (!checkRights(action)){
+    wx.redirectTo({
+      url: '/pages/index/index',
+    })
+  }
+}
+
+const checkRights = (action)=>{
+  if (!isZk() && !isFd()) {
+    //用户未注册或用户数据异常，回到主页面
+    return false;
+  }
+  if (isZk()) {
+    if ([CONSTS.BUTTON_CB, CONSTS.BUTTON_MAKEZD, CONSTS.BUTTON_ADDFY, CONSTS.EDITFY, CONSTS.DELETEFY, CONSTS.BUTTON_EXITFY, CONSTS.BUTTON_USERGRANT].indexOf(action) >= 0) {
+      return false;
+    }
+  }
+  return true;
+}
