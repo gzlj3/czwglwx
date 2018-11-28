@@ -748,11 +748,12 @@ function assignFwqtf(house,housefy,zdlx,flag,yffdays,hffdays){
   } else if (zdlx === CONSTS.ZDLX_YJZD){
     housefy.ljf = house.ljf;
     housefy.glf = house.glf;
-    if (flag !== 'sxzd') {
-      //刷新帐单不刷网络费
+    if (flag !== 'sxzd' || utils.getInteger(house.wlfys) < 2) {
+      //刷新帐单不刷月数大于1的网络费
       if (utils.getInteger(house.wlfnum)<=0) {
         housefy.wlf = house.wlf;
         house.wlfnum = utils.getInteger(house.wlfys) - 1;
+        if (house.wlfnum < 0) house.wlfnum = 0;
       }else{
         housefy.wlf = "";
         house.wlfnum = utils.getInteger(house.wlfnum) - 1;
@@ -761,7 +762,7 @@ function assignFwqtf(house,housefy,zdlx,flag,yffdays,hffdays){
     }
   } else if (zdlx === CONSTS.ZDLX_TFZD) {
     let yffMonthNum = Math.ceil((yffdays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
-    let hffMonthNum = Math.ceil((hffDays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
+    let hffMonthNum = Math.ceil((hffdays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
     // if (monthNum < 0) monthNum = 0;
     const glfMonthNum = isYff(house.glfyff) ? yffMonthNum : hffMonthNum;
     housefy.glf = utils.getInteger(house.glf) * glfMonthNum;

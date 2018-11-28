@@ -25,7 +25,7 @@ const fyxxMetas = {
   wlf: { label: '网络费', name: 'wlf', type: "digit" },
   ljf: { label: '卫生费', name: 'ljf', type: "digit" },
   glf: { label: '管理费', name: 'glf', type: "digit" },
-  qtf: { label: '其它费', name: 'qtf', type: "digit" },
+  qtf: { label: '其它费', name: 'qtf'},
   syjzf: { label: '上月结转费', name: 'syjzf', type: "digit" },
   bz: { label: '备注', name: 'bz' },
 }

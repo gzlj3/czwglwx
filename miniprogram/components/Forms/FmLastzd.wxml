@@ -19,6 +19,10 @@
     var zdfy = tsinfo;  
     return zdfy;
   }
+  module.exports.showQtfy = function(item,fyname){
+    if(!item[fyname]) return '';
+    return '('+(item[fyname]<0?'退':'补')+Math.abs(item[fyname])+'个月)';
+  }
 </wxs>
 <template name="FmLastzd">
   <view class="page">
@@ -64,21 +68,23 @@
                     <view class="weui-form-preview__label">网络费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.wlf}}元
-                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                        <view class="redColor">{{m.showQtfy(item,'wlfMonthNum')}}</view>
+                        <!-- <view class="redColor" wx:if="{{item.wlfMonthNum}}">(补{{item.wlfMonthNum}}个月)</view> -->
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.ljfyff && item.ljf}}">
                     <view class="weui-form-preview__label">卫生费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.ljf}}元
-                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                        <view class="redColor">{{m.showQtfy(item,'ljfMonthNum')}}</view>
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.glfyff && item.glf}}">
                     <view class="weui-form-preview__label">管理费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.glf}}元
-                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                        <view class="redColor">{{m.showQtfy(item,'glfMonthNum')}}</view>
+                        <!-- <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view> -->
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.zdlx===CONSTS.ZDLX_HTZD && item.qtf}}">
@@ -109,21 +115,24 @@
                     <view class="weui-form-preview__label">网络费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.wlf}}元
-                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                        <!-- <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view> -->
+                        <view class="redColor">{{m.showQtfy(item,'wlfMonthNum')}}</view>
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{!item.ljfyff && item.ljf}}">
                     <view class="weui-form-preview__label">卫生费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.ljf}}元
-                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                        <view class="redColor">{{m.showQtfy(item,'ljfMonthNum')}}</view>
+                        <!-- <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view> -->
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{!item.glfyff && item.glf}}">
                     <view class="weui-form-preview__label">管理费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.glf}}元
-                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                        <view class="redColor">{{m.showQtfy(item,'glfMonthNum')}}</view>
+                        <!-- <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view> -->
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.syjzf}}">
