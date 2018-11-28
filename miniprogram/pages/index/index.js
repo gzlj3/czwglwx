@@ -8,7 +8,7 @@ const config = require('../../config.js');
 const app = getApp()
 
 const menuList = [
-  { 
+  {
     id: 'form',  
     name: '我的房源列表',
     open: false,

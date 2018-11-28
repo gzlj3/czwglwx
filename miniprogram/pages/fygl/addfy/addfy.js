@@ -65,6 +65,7 @@ Page({
 
   formSubmit: function(e){
     console.log('form提交数据：', e.detail.value)
+    // return;
     // console.log('formid：', e.detail.formId);
     const {buttonAction} = this.data;
     // 校验必录项
@@ -103,7 +104,7 @@ Page({
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData)=>{
-        console.log('savefy return:',resultData);
+        // console.log('savefy return:',resultData);
         getApp().setFyListDirty(true);
         if(!utils.isEmpty(formObject.zhxm)){
           const s = JSON.stringify({ houseid: resultData._id });
@@ -176,6 +177,13 @@ Page({
     }
   },
 
+  onCheckboxChange: function(e){
+    const name = e.target.id;
+    let { currentObject} = this.data;
+    currentObject[name] = e.detail.value;
+    this.setData({currentObject});
+  },
+
   onInputBlur: function(e) {
     const name = e.target.id;
     let { currentObject,fmMetas } = this.data;
@@ -202,10 +210,10 @@ Page({
       const htrqz = currentObject.htrqz;
       if (utils.isEmpty(htrqz)) {
         // 根据合同日期起自动生成下次收租日期，加1年
-        currentObject.htrqz = htrqq.clone().add(1, 'years').format('YYYY-MM-DD');
+        currentObject.htrqz = htrqq.clone().add(1, 'years').subtract(1,'days').format('YYYY-MM-DD');
       }
       refreshFmMetas(fmMetas, currentObject);
-    }else{
+    } else if (fmMetas[name]){
       fmMetas[name].isEmpty = utils.isEmpty(currentObject[name]);
     }
     this.setData({

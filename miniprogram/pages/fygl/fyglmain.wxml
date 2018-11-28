@@ -29,6 +29,7 @@
     <!-- </view> --> 
     <view class="page__bd">
       <button  size="default" bindtap="onAddfy" wx:if="{{isFd}}">新建房源</button>
+      <view class="weui-cells__title" wx:if="{{isZk && allFyList.length===0}}">未查到您的房源数据，请与房东联系，确认签约时手机号是否输入正确！</view>
 
       <view wx:for="{{allFyList}}" wx:key="nickName" wx:for-item="fyItem"> 
         <view class="weui-cells__title">{{fyItem.nickName?fyItem.nickName:'我'}}的{{fyItem.sourceList.length}}间房源(月租:{{fyItem.czjehj}}元,水费:{{fyItem.sfhj}}元,电费:{{fyItem.dfhj}}元,帐单:{{fyItem.fyhj}}元)</view>

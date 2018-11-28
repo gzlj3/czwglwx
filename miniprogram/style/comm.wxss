@@ -1,3 +1,6 @@
+.displayInline {
+  display:inline-block;
+}
 
 .redColor {
   display:inline-block;

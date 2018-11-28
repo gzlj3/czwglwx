@@ -142,6 +142,11 @@ exports.saveFy = async (house,collid) => {
     isAddDoc = false;
   }
   let { _id: saveHouseid, dhhm, avatarUrl } = house;
+  //如果网络费为空，则清空wlfys,wlfnum
+  if(utils.isEmpty(house.wlf)){
+    house.wlfys = "";
+    house.wlfnum = "";
+  }
   //清除house的avatarUrl,重新关联
   avatarUrl = '';
   house.avatarUrl = "";
@@ -349,14 +354,20 @@ const getFyts = (fyts,fy,lineChar) => {
 }
 
 const getDfts = (housefy) => {
-  if(housefy.dfhj)
-    return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds});\r\n`;
+  if(housefy.dfhj){
+    let dgtdsts='';
+    if (!utils.isEmpty(housefy.dgtds)) dgtdsts = `,公摊:${housefy.dgtds}`;
+    return `电费:${housefy.dfhj}元(上月:${housefy.dscds},本月:${housefy.dbcds}${dgtdsts}));\r\n`;
+  }
   // return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds},实用:${housefy.dsyds},公摊:${housefy.dgtds});\r\n`;
   return '';
 }
 const getSfts = (housefy) => {
-  if (housefy.sfhj)
-    return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds});\r\n`;
+  if (housefy.sfhj){
+    let sgtdsts = '';
+    if (!utils.isEmpty(housefy.sgtds)) sgtdsts = `,公摊:${housefy.sgtds}`;
+    return `水费:${housefy.sfhj}元(上月:${housefy.sscds},本月:${housefy.sbcds}${sgtdsts});\r\n`;
+  }
   // return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds},实用:${housefy.ssyds},公摊:${housefy.sgtds});\r\n`;
   return '';
 }
@@ -399,7 +410,7 @@ exports.processQrsz = async (params,curUser) => {
     // 刷新帐单
     // console.log("qrsz zdlx:", housefy.zdlx);
     lastFyhj = house.fyhj;
-    makeHousefy(house, housefy, null);
+    makeHousefy(house, housefy, null,null,flag);
   }else if ("sjdx" === flag) {
     const message = getZdMessage(housefy);
     return message;
@@ -453,24 +464,24 @@ function jzHouse(house, housefy, flag) {
 }
 
 
-function jsFwfy(house){
-  if (!house.sbcds || !house.dbcds)
-    throw utils.newException("未抄水电表");
+// function jsFwfy(house){
+//   if (!house.sbcds || !house.dbcds)
+//     throw utils.newException("未抄水电表");
 
-  // 计算电费
-  const df = jsdf(house);
-  if (df < 0)
-    throw utils.newException("电费计算小于0");
-  // 计算水费
-  const sf = jssf(house);
-  if (sf < 0)
-    throw utils.newException("水费计算小于0");
-  // 计算合计费
-  const fwfy = df + sf + jsqtfhj(house);
-  if (fwfy <= 0)
-    throw utils.newException("无帐单费用");
-  return fwfy;
-}
+//   // 计算电费
+//   const df = jsdf(house);
+//   if (df < 0)
+//     throw utils.newException("电费计算小于0");
+//   // 计算水费
+//   const sf = jssf(house);
+//   if (sf < 0)
+//     throw utils.newException("水费计算小于0");
+//   // 计算合计费
+//   const fwfy = df + sf + jsqtfhj(house);
+//   if (fwfy <= 0)
+//     throw utils.newException("无帐单费用");
+//   return fwfy;
+// }
 
 function jsdf(house) {
   const dsyds = utils.getInteger(house.dbcds)
@@ -498,7 +509,7 @@ function jsqtfhj(house) {
   return utils.roundNumber(qtfy, 1);
 }
 
-function makeHousefy(house, housefy, zdlx,tfrq){
+function makeHousefy(house, housefy, zdlx,tfrq,flag){
   // 计算收租范围
   let szrq = moment(house.szrq);
   if (!szrq.isValid()) throw utils.newException("收租日期不合法！");
@@ -517,7 +528,6 @@ function makeHousefy(house, housefy, zdlx,tfrq){
   // console.log('housefy tsinfo:', housefy.daysinfo, housefy.monthNum);
   housefy.daysinfo = "";
   housefy.monthNum = "";
-  // console.log('housefy tsinfo after assign:', housefy.daysinfo, housefy.monthNum);
   if (CONSTS.ZDLX_TFZD === zdlx) {
     const { sfsz } = house;
     if(!tfrq) 
@@ -542,6 +552,7 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     const days = yffrq2.diff(yffrq1, 'days');
     console.log('yffrq2 - yffrq1:',days);
     let yzj,daysinfo=null;
+
     if (days == 30 || days == 31){
       yzj = house.czje;
       daysinfo = '补1个月租金';
@@ -554,6 +565,7 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     }
     housefy.daysinfo = daysinfo;
     housefy.czje = yzj; // 按天计算已住月租金
+
     // 电费数据
     housefy.dbcds = house.dbcds;
     housefy.dscds = house.dscds;
@@ -585,16 +597,18 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     }
     rq2 = yffrq2;
     const qtfDays = rq2.diff(rq1, 'days');
-    console.log('js qtfdays:', rq2,rq1,qtfDays);
-    let monthNum = Math.ceil((qtfDays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
-    console.log('monthNum:',monthNum);
-    if(monthNum<0) monthNum = 0;
-    housefy.glf = utils.getInteger(house.glf) * monthNum;
-    housefy.wlf = utils.getInteger(house.wlf) * monthNum;
-    housefy.ljf = utils.getInteger(house.ljf) * monthNum;
-    if(monthNum>1){
-      housefy.monthNum = monthNum+"";
-    }
+    // console.log('js qtfdays:', rq2,rq1,qtfDays);
+    assignFwqtf(house, housefy, zdlx, flag, days,qtfDays);
+   
+    // let monthNum = Math.ceil((qtfDays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
+    // console.log('monthNum:',monthNum);
+    // if(monthNum<0) monthNum = 0;
+    // housefy.glf = utils.getInteger(house.glf) * monthNum;
+    // housefy.wlf = utils.getInteger(house.wlf) * monthNum;
+    // housefy.ljf = utils.getInteger(house.ljf) * monthNum;
+    // if(monthNum>1){
+    //   housefy.monthNum = monthNum+"";
+    // }
 
     // 房屋合计费
     housefy.fyhj = utils.roundNumber(utils.getFloat(housefy.dfhj)
@@ -631,12 +645,16 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     housefy.czje = yzj; // 月租金
     housefy.yj = house.yj; // 押金
     housefy.qtf=house.qtf;
+
+    assignFwqtf(house,housefy,zdlx,flag);
+
     housefy.dbcds=house.dscds;
     housefy.Sbcds=house.Sscds;
     // 房屋合计费
-    housefy.fyhj = utils.getInteger(housefy.czje)
-      + utils.getInteger(housefy.yj)
-      + utils.getFloat(housefy.qtf);
+    // housefy.fyhj = utils.getInteger(housefy.czje)
+    //   + utils.getInteger(housefy.yj)
+    //   + utils.getFloat(housefy.qtf);
+    housefy.fyhj = utils.roundNumber(utils.getInteger(housefy.yj) + jsqtfhj(housefy), 1);
   } else {
     if (utils.isEmpty(house.dbcds) || utils.isEmpty(house.sbcds))
       throw utils.newException("未抄水电表!");
@@ -668,15 +686,15 @@ function makeHousefy(house, housefy, zdlx,tfrq){
     housefy.sdj=house.sdj;
     housefy.sfhj = jssf(house);
     // 房屋其它费用
-    housefy.glf=house.glf;
-    housefy.wlf=house.wlf;
-    housefy.ljf=house.ljf;
+    // housefy.glf=house.glf;
+    // housefy.wlf=house.wlf;
+    // housefy.ljf=house.ljf;
     housefy.syjzf=house.syjzf;
     housefy.qtf=house.qtf;
-
+    assignFwqtf(house,housefy,zdlx,flag);
     // 房屋合计费
     housefy.fyhj = utils.roundNumber(utils.getFloat(housefy.dfhj)
-      + utils.getFloat(housefy.sfhj) + jsqtfhj(house),1);
+      + utils.getFloat(housefy.sfhj) + jsqtfhj(housefy),1);
   }
 
   // 日期范围
@@ -711,11 +729,64 @@ function makeHousefy(house, housefy, zdlx,tfrq){
   house.dfhj = housefy.dfhj;
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
-  console.log('makehousefy:',house.sfhj,house.dfhj);
   // console.log('housefy tsinfo end:', housefy.daysinfo, housefy.monthNum);
   return housefy;
 }
 
+function assignFwqtf(house,housefy,zdlx,flag,yffdays,hffdays){
+  housefy.ljfyff = isYff(house.ljfyff);
+  housefy.glfyff = isYff(house.glfyff);
+  housefy.wlfyff = isYff(house.wlfyff);
+  if (zdlx === CONSTS.ZDLX_HTZD){
+    housefy.ljf = isYff(house.ljfyff)? house.ljf : "";  
+    housefy.glf = isYff(house.glfyff) ? house.glf : ""; 
+    housefy.wlf = isYff(house.wlfyff) ? house.wlf : ""; 
+    if(!utils.isEmpty(housefy.wlf)){
+      house.wlfnum = utils.getInteger(house.wlfys) - 1;
+      if(house.wlfnum<0) house.wlfnum = 0;
+    }
+  } else if (zdlx === CONSTS.ZDLX_YJZD){
+    housefy.ljf = house.ljf;
+    housefy.glf = house.glf;
+    if (flag !== 'sxzd') {
+      //刷新帐单不刷网络费
+      if (utils.getInteger(house.wlfnum)<=0) {
+        housefy.wlf = house.wlf;
+        house.wlfnum = utils.getInteger(house.wlfys) - 1;
+      }else{
+        housefy.wlf = "";
+        house.wlfnum = utils.getInteger(house.wlfnum) - 1;
+        if (house.wlfnum < 0) house.wlfnum = 0;
+      }
+    }
+  } else if (zdlx === CONSTS.ZDLX_TFZD) {
+    let yffMonthNum = Math.ceil((yffdays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
+    let hffMonthNum = Math.ceil((hffDays - 3) / 30);  //按月为单位计算其它费用（留3天的退房时间),超过3天，则按1月计
+    // if (monthNum < 0) monthNum = 0;
+    const glfMonthNum = isYff(house.glfyff) ? yffMonthNum : hffMonthNum;
+    housefy.glf = utils.getInteger(house.glf) * glfMonthNum;
+    if (glfMonthNum !== 0) {
+      housefy.glfMonthNum = glfMonthNum + "";
+    }
+    const ljfMonthNum = isYff(house.ljfyff) ? yffMonthNum : hffMonthNum;
+    housefy.ljf = utils.getInteger(house.ljf) * ljfMonthNum;
+    if (ljfMonthNum !== 0) {
+      housefy.ljfMonthNum = ljfMonthNum + "";
+    }
+    if(utils.getInteger(house.wlfys)<2){
+      //网络只处理网络费月数小于2的情况
+      const wlfMonthNum = isYff(house.wlfyff) ? yffMonthNum : hffMonthNum;
+      housefy.wlf = utils.getInteger(house.wlf) * wlfMonthNum;
+      if (wlfMonthNum !== 0) {
+        housefy.wlfMonthNum = wlfMonthNum + "";
+      }
+    }
+  }
+}
+
+function isYff(yff){
+  return yff && yff.length>0;
+}
 /**
  * 更新表的记录，返回更新成功的记录数
  */

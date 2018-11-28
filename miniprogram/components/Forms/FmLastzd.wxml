@@ -60,6 +60,33 @@
                         <view class="redColor" wx:if="{{item.yj<0}}">(退)</view>
                     </view>
                 </view>
+                <view class="weui-form-preview__item" wx:if="{{item.wlfyff && item.wlf}}">
+                    <view class="weui-form-preview__label">网络费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.wlf}}元
+                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.ljfyff && item.ljf}}">
+                    <view class="weui-form-preview__label">卫生费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.ljf}}元
+                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.glfyff && item.glf}}">
+                    <view class="weui-form-preview__label">管理费</view>                    
+                    <view class="weui-form-preview__value">                 
+                        {{item.glf}}元
+                        <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
+                    </view>
+                </view>
+                <view class="weui-form-preview__item" wx:if="{{item.zdlx===CONSTS.ZDLX_HTZD && item.qtf}}">
+                    <view class="weui-form-preview__label">其它费</view>
+                    <view class="weui-form-preview__value">                 
+                        {{item.qtf}}元
+                    </view>
+                </view>
                 <view class="weui-form-preview__item">
                     <view class="weui-form-preview__label"><view class='sjfw'>后付费范围</view></view>                    
                     <view class="weui-form-preview__value">                 
@@ -78,21 +105,21 @@
                         合计:{{item.sfhj}}元(上次:{{item.sscds}},本次:{{item.sbcds}},实用:{{item.ssyds}},公摊:{{item.sgtds?item.sgtds:0}},单价:{{item.sdj}}元)
                     </view>
                 </view>
-                <view class="weui-form-preview__item" wx:if="{{item.wlf}}">
+                <view class="weui-form-preview__item" wx:if="{{!item.wlfyff && item.wlf}}">
                     <view class="weui-form-preview__label">网络费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.wlf}}元
                         <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
                     </view>
                 </view>
-                <view class="weui-form-preview__item" wx:if="{{item.ljf}}">
+                <view class="weui-form-preview__item" wx:if="{{!item.ljfyff && item.ljf}}">
                     <view class="weui-form-preview__label">卫生费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.ljf}}元
                         <view class="redColor" wx:if="{{item.monthNum}}">(补{{item.monthNum}}个月)</view>
                     </view>
                 </view>
-                <view class="weui-form-preview__item" wx:if="{{item.glf}}">
+                <view class="weui-form-preview__item" wx:if="{{!item.glfyff && item.glf}}">
                     <view class="weui-form-preview__label">管理费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.glf}}元
@@ -105,7 +132,7 @@
                         {{item.syjzf}}元
                     </view>
                 </view> 
-                <view class="weui-form-preview__item" wx:if="{{item.qtf}}">
+                <view class="weui-form-preview__item" wx:if="{{item.zdlx!==CONSTS.ZDLX_HTZD && item.qtf}}">
                     <view class="weui-form-preview__label">其它费</view>                    
                     <view class="weui-form-preview__value">                 
                         {{item.qtf}}元

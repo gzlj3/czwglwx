@@ -48,7 +48,7 @@ Page({
     const response = fyglService.postData(CONSTS.BUTTON_USERGRANT, formObject); 
     fyglService.handleAfterRemote(response, '用户授权',
       (resultData) => {
-        console.log(resultData);
+        // console.log(resultData);
         // this.setData({ sendingYzm: true });
         // this.timer();
       }

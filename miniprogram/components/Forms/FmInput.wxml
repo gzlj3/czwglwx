@@ -2,7 +2,7 @@
 <template name="FmInput">
             <view class="weui-cell weui-cell_input">
                 <view class="weui-cell__hd">
-                    <view class="weui-label addwidth {{require?((isEmpty===undefine || isEmpty)?'redColor':''):''}}">{{label}}</view>
+                    <view class="weui-label {{name==='wlf' || name==='glf' || name==='ljf'?'subwidth':'addwidth'}} {{require?((isEmpty===undefine || isEmpty)?'redColor':''):''}}">{{label}}</view>
                 </view>
                 <view class="weui-cell__bd">
                     <picker mode="{{type}}" id="{{name}}" name="{{name}}" value="{{currentObject[name]}}" bindchange="onInputBlur" wx:if="{{type==='date'}}">
@@ -10,7 +10,23 @@
                     </picker>
                     <input id="{{name}}" name="{{name}}" type="{{type}}" value="{{currentObject[name]}}" bindblur="onInputBlur" class="weui-input" placeholder="请输入{{label}}" wx:else/>
                 </view>
+
+                <view class="weui-cell__ft weui-vcode-btn" wx:if="{{name==='wlf'||name==='glf'||name==='ljf'}}">
+                    <checkbox-group id="{{name+'yff'}}" name="{{name+'yff'}}" class="displayInline" bindchange="onCheckboxChange"><label><checkbox value="1" checked="{{currentObject[name+'yff'].length>0}}"/>预付费</label></checkbox-group>
+                    <block wx:if="{{name==='wlf'}}">
+                      <input id="{{wlfys}}" class="displayInline" style="width:30px;margin-right:10px" id="wlfys" name="wlfys" type="number"  placeholder="月数" value="{{currentObject.wlfys}}" bindblur="onInputBlur"/>月
+                    </block>
+                </view>
+                <!-- <view class="weui-cell__ft weui-vcode-btn" wx:if="{{name==='ljf'|| name==='glf'}}">
+                  <checkbox-group name="{{name}}yff" class="displayInline">
+                    <label><checkbox value="1"/>预付费</label>
+                  </checkbox-group>
+                </view> -->
+                <!-- <view class="weui-cell__ft weui-vcode-btn" wx:if="{{name==='glf'}}">
+                  <label><checkbox id="glfyff" name="glfyff" value="1"/>预付费</label>
+                </view> -->
             </view>
             <view class="weui-cells__tips" wx:if="{{name==='szrq'}}">现已租房屋输入下次收租日期,一般应大于当前日期</view>
             <view class="weui-cells__tips" wx:if="{{name==='dscds' || name==='sscds'}}">现已租房屋输入上个月的读数</view>
+            <view class="weui-cells__tips" style="text-align:right" wx:if="{{name==='wlf' && currentObject.wlfnum}}">剩余:{{currentObject.wlfnum}}月</view>
 </template>
