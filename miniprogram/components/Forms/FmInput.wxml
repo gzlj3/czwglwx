@@ -24,9 +24,10 @@
                 </view> -->
                 <!-- <view class="weui-cell__ft weui-vcode-btn" wx:if="{{name==='glf'}}">
                   <label><checkbox id="glfyff" name="glfyff" value="1"/>预付费</label>
-                </view> -->
+                </view> --> 
             </view>
-            <view class="weui-cells__tips" wx:if="{{name==='szrq'}}">现已租房屋输入下次收租日期,一般应大于当前日期</view>
+            <view class="weui-cells__tips" wx:if="{{name==='htrqq'}}">现已租房屋可输入上个月的收租日期</view>
+            <view class="weui-cells__tips" wx:if="{{name==='szrq'}}">现已租房屋可输入下个月的收租日期</view>
             <view class="weui-cells__tips" wx:if="{{name==='dscds' || name==='sscds'}}">现已租房屋输入上个月的读数</view>
             <view class="weui-cells__tips" style="text-align:right" wx:if="{{name==='wlf' && currentObject.wlfnum}}">剩余:{{currentObject.wlfnum}}月</view>
 </template>

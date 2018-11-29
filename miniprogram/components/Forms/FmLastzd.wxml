@@ -102,13 +102,13 @@
                 <view class="weui-form-preview__item" wx:if="{{item.dfhj}}" >
                     <view class="weui-form-preview__label">电费</view>                    
                     <view class="weui-form-preview__value">                 
-                        合计:{{item.dfhj}}元(上次:{{item.dscds}},本次:{{item.dbcds}},实用:{{item.dsyds}},公摊:{{item.dgtds?item.dgtds:0}},单价:{{item.ddj}}元)
+                        合计:{{item.dfhj}}元(上月:{{item.dscds}},本月:{{item.dbcds}},实用:{{item.dsyds}},公摊:{{item.dgtds?item.dgtds:0}},单价:{{item.ddj}}元)
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{item.sfhj}}" >
                     <view class="weui-form-preview__label">水费</view>                    
                     <view class="weui-form-preview__value">                 
-                        合计:{{item.sfhj}}元(上次:{{item.sscds}},本次:{{item.sbcds}},实用:{{item.ssyds}},公摊:{{item.sgtds?item.sgtds:0}},单价:{{item.sdj}}元)
+                        合计:{{item.sfhj}}元(上月:{{item.sscds}},本月:{{item.sbcds}},实用:{{item.ssyds}},公摊:{{item.sgtds?item.sgtds:0}},单价:{{item.sdj}}元)
                     </view>
                 </view>
                 <view class="weui-form-preview__item" wx:if="{{!item.wlfyff && item.wlf}}">

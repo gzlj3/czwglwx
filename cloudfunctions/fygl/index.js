@@ -25,7 +25,6 @@ exports.main = async (event, context) => {
   try {
     //检查权限，成功则返回用户的基本数据
     const curUser = await userServices.checkAuthority(action, method,userInfo);
-    //{userid,userType,yzhid,sjhm,collid}
 
     console.log('操作用户：', curUser);
     let result;
@@ -52,16 +51,16 @@ exports.main = async (event, context) => {
       case CONSTS.BUTTON_ADDFY:
         // console.log('addfy');
           data.yzhid = curUser.yzhid;
-          data.lrr=curUser.userid;
+          data.lrr=curUser.openId;
           data.lrsj=utils.getCurrentTimestamp();
-          data.zhxgr=curUser.userid;
+          data.zhxgr=curUser.openId;
           data.zhxgsj=data.lrsj;
           result = await services.saveFy(data,curUser.collid);
           return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_EDITFY:
         console.log("editfy");
-        data.zhxgr=curUser.userid;
+        data.zhxgr=curUser.openId;
         data.zhxgsj=utils.getCurrentTimestamp();       
         const collid = restData && restData.length > 0 ? restData[0] : curUser.collid;
         console.log('editfy',collid);

@@ -35,7 +35,7 @@ exports.queryFyList = async (curUser) => {
       if (!granted[i]) continue;
       const { collid, nickName, yzhid, rights } = granted[i];
       // result = await db.collection(getTableName(tablename, collid)).where(whereObj).get();
-      result = await db.collection(commService.getTableName('house', collid)).orderBy('sfsz','asc').orderBy('fwmc', 'asc').where({
+      result = await db.collection(commService.getTableName('house', collid)).orderBy('fwmc', 'asc').where({
         yzhid
       }).get();
       //计算费用合计数
@@ -84,7 +84,7 @@ async function querySdbList (curUser,data) {
   }else{
     const szrqCond = moment().startOf('day').add(4, 'days').format('YYYY-MM-DD');
     console.log('szrqcond:'+szrqCond);
-    result = await db.collection(commService.getTableName('house',collid)).where({
+    result = await db.collection(commService.getTableName('house', collid)).orderBy('fwmc', 'asc').where({
       yzhid,
       sfsz: _.in([CONSTS.SFSZ_YJQ, CONSTS.SFSZ_YJZ]),
       szrq: _.lte(szrqCond),
@@ -198,9 +198,9 @@ exports.exitFy = async (data,curUser) => {
     //帐单状态为已结清或已结转 ，则生成新的退房帐单
   }
   newHousefy = makeHousefy(house, housefy, CONSTS.ZDLX_TFZD,tfrq);
-  house.zhxgr = curUser.userid;
+  house.zhxgr = curUser.openId;
   house.zhxgsj = utils.getCurrentTimestamp();
-  newHousefy.zhxgr = curUser.userid;
+  newHousefy.zhxgr = curUser.openId;
   newHousefy.zhxgsj = house.zhxgsj;
 
   if (sfsz === CONSTS.SFSZ_WJQ) {
@@ -312,7 +312,7 @@ exports.updateZdList = async (zdList,autoSendMessage,curUser) => {
         throw utils.newException("更新房源信息失败！");      
       if (autoSendMessage){
         //生成帐单完成，发送短信提醒
-        await sendZdMessage(house,newHousefy,collid,curUser.userid);
+        await sendZdMessage(house,newHousefy,collid,curUser.openId);
       }
     }catch(e){
       errMsg += house.fwmc+','+e.message;
@@ -322,9 +322,8 @@ exports.updateZdList = async (zdList,autoSendMessage,curUser) => {
   return null;
 }
 
-const sendZdMessage= async (house,housefy,collid,userid)=>{
+const sendZdMessage= async (house,housefy,collid,openId)=>{
   const {dhhm,fwmc,zhxm,fyhj,zdlx} = house;
-  // const {collid,userid} = curUser;
   let message = getZdMessage(housefy);
   message += '【极简出租】';
   //发送短信
@@ -336,7 +335,7 @@ const sendZdMessage= async (house,housefy,collid,userid)=>{
     }
   });
   //发送短信成功，更新用户表当前帐户发送次数
-  await db.collection('userb').where({openId:userid}).update({
+  await db.collection('userb').where({openId}).update({
     data: {
       messageNum: _.inc(1)
     }
@@ -415,15 +414,15 @@ exports.processQrsz = async (params,curUser) => {
     const message = getZdMessage(housefy);
     return message;
   } else if ("sendsjdx" === flag) {
-    await sendZdMessage(house,housefy,collid,curUser.userid);
+    await sendZdMessage(house,housefy,collid,curUser.openId);
     return queryLastzdList({ houseid, collid});
   } else {
     jzHouse(house, housefy, flag);
   }
   
-  house.zhxgr=curUser.userid;
+  house.zhxgr=curUser.openId;
   house.zhxgsj = utils.getCurrentTimestamp();
-  housefy.zhxgr=curUser.userid;
+  housefy.zhxgr=curUser.openId;
   housefy.zhxgsj = house.zhxgsj;
   const housefyNum = await commService.updateDoc(commService.getTableName('housefy',collid),housefy);
   if(housefyNum===0)

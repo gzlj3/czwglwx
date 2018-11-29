@@ -67,6 +67,10 @@ Page({
   },
   
   onLoad: function (options) {  
+    // let arr = ['111','222'];
+    // console.log(arr.splice(arr.indexOf('222'),1));
+    // console.log(arr);
+
     // console.log('index onload',options)
     this.setData({ onLoadState: 'onLoading' });
     this.queryUser(); 

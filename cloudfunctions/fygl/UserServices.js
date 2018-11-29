@@ -19,13 +19,15 @@ exports.checkAuthority = async(action,method,userInfo) => {
   }
   // throw utils.codeException(100);
   const db = cloud.database();
-  const result = await db.collection('userb').
-        field({ userType: true, yzhid: true,sjhm:true,collid:true,granted:true,nickName:true }).where({
-    openId
-  }).get();
-  if(!result || result.data.length<=0)
+  const result = await commService.querySingleDoc('userb', { openId })
+  // db.collection('userb').
+  //       field({ userType: true, yzhid: true,sjhm:true,collid:true,granted:true,nickName:true,grantedSjhm:true }).where({
+  //   openId
+  // }).get();
+  if(!result)
     throw utils.codeException(100);
-  let curUser = { userid: openId, ...result.data[0] };
+  // let curUser = { userid: openId, ...result.data[0] };
+  let curUser = result;
   if(utils.isEmpty(curUser.collid)) curUser.collid='';
   const { userType, yzhid, sjhm, collid} = curUser;
   if (utils.isEmpty(userType) || utils.isEmpty(yzhid) || utils.isEmpty(sjhm) || utils.isEmpty(openId))
@@ -94,8 +96,8 @@ const setSessionData = async (openId,data) => {
   const result = await db.collection('session').where({
     openId
   }).update({data});
-  console.log('setsessiondata');  
-  console.log(result);
+  // console.log('setsessiondata');  
+  // console.log(result);
   const updatedNum = result.stats.updated;
   if(updatedNum<1) throw utils.newException('会话数据写入错误!'); 
   return updatedNum;
@@ -106,8 +108,8 @@ const getSessionData = async (openId) => {
   const result = await db.collection('session').where({
     openId
   }).get();
-  console.log('query session');
-  console.log(result);
+  // console.log('query session');
+  // console.log(result);
   if (result && result.data.length > 0) {
     return result.data[0];
   }else{
@@ -136,7 +138,7 @@ const getCachedSjyzm = async (openId)=>{
 const queryUser = async (userInfo) => {
   const {openId} = userInfo;
   const db = cloud.database();
-  const result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true}).where({
+  const result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true,grantedSjhm:true}).where({
     openId
   }).get();
   return result.data;
@@ -156,6 +158,8 @@ exports.grantUser = async (data, curUser) => {
   const oldGranted = userb.granted
   let newGranted = [];
   let found = false;
+  let newGrantedSjhm = [];
+  let grantedState = '';
   if (oldGranted){
     oldGranted.map(value=>{
       if(!value) return;
@@ -164,24 +168,46 @@ exports.grantUser = async (data, curUser) => {
       if (sourceYzhid === yzhid){
         if (rights.length > 0){
           //之前已经有授权，且本次有授权，则修改授权
-          console.log('found.......');
           found = true;
           newGranted.push(getNewGrant(curUser,rights));
+          grantedState = 'modify';
         }
       }else{
         newGranted.push(value);
       }
     })
   }
-  if (!found && rights.length>0){
-    //新授权
-    newGranted.push(getNewGrant(curUser, rights));
+  if (!found){
+    if(rights.length>0){
+      //新授权
+      newGranted.push(getNewGrant(curUser, rights));
+      grantedState = 'add';
+    }else{
+      //删除授权
+      grantedState = 'delete';
+    }
   }
+
   userb.granted = newGranted;
   // console.log('granted userb:',userb);
-  const updatedNum = await commService.updateDoc('userb', userb);
-  if(updatedNum===0)
+  userb.zhxgr = curUser.openId;
+  userb.zhxgsj = utils.getCurrentTimestamp;
+  let updatedNum = await commService.updateDoc('userb', userb);
+  if(updatedNum===0){
     throw utils.newException('本次授权无修改！');  
+  }else{
+    //修改本次授权的手机号
+    let {grantedSjhm} = curUser;
+    if(!grantedSjhm) grantedSjhm = [];
+    if(grantedState==='delete'){
+      grantedSjhm.splice(grantedSjhm.indexOf(sjhm), 1)
+    } else if (grantedState === 'add') {
+      grantedSjhm.push(sjhm);
+    }
+    curUser.grantedSjhm = grantedSjhm;
+    curUser.zhxgsj = utils.getCurrentTimestamp();
+    updatedNum = await commService.updateDoc('userb', curUser);
+  }
   return updatedNum;
 }
 
