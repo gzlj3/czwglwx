@@ -138,10 +138,19 @@ const getCachedSjyzm = async (openId)=>{
 const queryUser = async (userInfo) => {
   const {openId} = userInfo;
   const db = cloud.database();
-  const result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true,grantedSjhm:true}).where({
+  let result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true,granted:true,grantedSjhm:true}).where({
     openId
   }).get();
-  return result.data;
+  if(result && result.data.length>0){
+    result = result.data[0];
+    // if(result.granted){
+    //   result.rights = [...result.granted.rights];
+    //   delete result.granted;
+    // }
+    // console.log('queryuser:', result);
+    return result;
+  }
+  return null;
 }
 exports.queryUser = queryUser;
 

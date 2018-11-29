@@ -2,19 +2,22 @@ const utils = require('../../utils/utils.js');
 const fyglService = require('../../services/fyglServices.js');
 const commService = require('../../services/commServices.js');
 const CONSTS = require('../../utils/constants.js');
+const app = getApp()
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    rights:{}
+    rights:{},
+    user: app.globalData.user
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    this.setData({ user: app.globalData.user });
     commService.checkAuthority(CONSTS.BUTTON_USERGRANT);
   },
 

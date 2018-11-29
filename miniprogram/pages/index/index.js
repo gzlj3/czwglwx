@@ -37,7 +37,7 @@ const zkMenuList = [
   {
     id: 'widget',
     name: '查看我的帐单',
-    open: false,
+    open: false, 
     page: 'seeLastzd'
   },
 ]
@@ -47,7 +47,7 @@ Page({
     user: app.globalData.user,
     avatarUrl: './user-unlogin.png',
     userInfo: {},
-    granted: false,  //是否获得用户公共信息的授权    
+    wxgranted: false,  //是否获得用户公共信息的授权    
     registered: false, // 用户是否已经注册
     userType:'0', // 用户身份,0:未注册，1：房东，2：租客
     logged: false,
@@ -84,18 +84,14 @@ Page({
   },
 
   getWxGrantedData: function(){
-    if (!this.data.user.granted) {
+    if (!this.data.user.wxgranted) {
       //获取用户信息
       wx.getSetting({
         success: res => {
-          // console.log('getSetting success.');
-          // console.log(res);
           if (res.authSetting['scope.userInfo']) {
             // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
             wx.getUserInfo({
               success: res => {
-                // console.log('get granted userinfo');
-                // console.log(res.userInfo);
                 this.setUserData(res.userInfo);
               }
             })
@@ -193,7 +189,7 @@ Page({
     console.log(e.detail.value);
     const {sjhm,sjyzm} = e.detail.value;
     if (!utils.checkSjhm(sjhm) || utils.isEmpty(sjyzm) || sjyzm.length!==6) {
-      wx.showToast({
+      wx.showToast({ 
         title: '请先输入手机号和验证码',
         icon: 'none',
       });
@@ -203,22 +199,23 @@ Page({
                                           {frontUserInfo:this.data.user,
                                           sjData:e.detail.value});
     fyglService.handleAfterRemote(response, '用户注册',
-      (resultData) => {
+      (resultData) => { 
         // console.log('======register user result:');
         // console.log(resultData);
-        this.setUserData(resultData && resultData.length > 0 ? resultData[0] : null);
+        // this.setUserData(resultData && resultData.length > 0 ? resultData[0] : null);
+        this.setUserData(resultData);
       }
     );
-  },
+  }, 
  
   queryUser: function(){
     const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
-        // console.log('======query user result:');
-        // console.log(resultData);
+        // console.log('queryuser:',resultData);
         this.setData({onLoadState:'onLoadSuccess'});
-        this.setUserData(resultData && resultData.length > 0 ? resultData[0]:null);
+        // this.setUserData(resultData && resultData.length > 0 ? resultData[0]:null);
+        this.setUserData(resultData);
         this.getWxGrantedData();
       },
       err => {
@@ -231,13 +228,13 @@ Page({
   setUserData: function(userData){
     if (userData) {
       // let { userType, nickName, avatarUrl } = userData;
-      app.setGlobalData({ user: { granted: true, userType: CONSTS.USERTYPE_NONE,...userData}});
+      app.setGlobalData({ user: { wxgranted: true, userType: CONSTS.USERTYPE_NONE,...userData}});
       this.setData({ user: app.globalData.user});
       // console.log(this.data.user);
     } else {
       const userType = CONSTS.USERTYPE_NONE;
-      const nickName = '',avatarUrl = '',granted=false;
-      app.setGlobalData({ user: { granted, userType, nickName, avatarUrl } });
+      const nickName = '',avatarUrl = '',wxgranted=false;
+      app.setGlobalData({ user: { wxgranted, userType, nickName, avatarUrl } });
       this.setData({ user: app.globalData.user });
     }
   },  

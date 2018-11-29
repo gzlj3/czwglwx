@@ -5,6 +5,18 @@
       <view class="page__desc">将我的房源授予他人查看和管理，慎重操作。</view>
     </view>
     <view class="page__bd">
+      <view class="weui-cells__title">已授权手机号</view>
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell" wx:for="{{user.grantedSjhm}}" wx:key="item">
+          <view class="weui-cell__hd">
+            {{item}}
+          </view>
+          <view class="weui-cell__bd" style="margin-left:30px">
+            <button size='mini' type="primary">取消授权</button>
+          </view>
+        </view>
+      </view>
+      <view class="weui-cells__title">新授权手机号</view>
       <view class="weui-cells weui-cells_after-title">
         <view class="weui-cell weui-cell_input">
           <view class="weui-cell__hd">
@@ -42,9 +54,6 @@
               <view class="weui-cell__bd">管理我的帐单</view>
             </label>
           </checkbox-group>
-          <!-- <view class='weui-cell'>
-            <button size='mini' type='primary' form-type="submit">保存</button>
-          </view> -->
         </view>
       </view>
     </view>
