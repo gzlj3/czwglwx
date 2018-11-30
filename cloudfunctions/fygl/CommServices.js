@@ -95,7 +95,7 @@ exports.isFdZk = (userType) => {
 //查询所有房东collid
 async function queryAllCollids() {
   const db = cloud.database();
-  const result = await db.collection('userb').field({ collid: true, nickName: true }).where({ userType: '1' }).get();
+  const result = await db.collection('userb').field({ collid: true, yzhid:true,nickName: true }).where({ userType: '1' }).get();
   // const result = await db.collection('userb').field({ collid: true, nickName: true }).get();
   if (result && result.data.length > 0)
     return result.data;
@@ -109,13 +109,18 @@ exports.updateAllDoc = async (tablename, whereObj, updateObj) => {
   const collids = await queryAllCollids();
   if (!collids) return;
   let updatedNum = 0;
+  let updatedCollids = [];
   for (let i = 0; i < collids.length; i++) {
     let collid = collids[i].collid;
-    if (utils.isEmpty(collid)) collid = '';
-    else collid = '_' + collid;
+    // if (utils.isEmpty(collid)) collid = '';
+    // else collid = '_' + collid;
+    if (updatedCollids.includes(collid)) continue;
+    else{
+      updatedCollids.push(collid);
+    }
     try {
-      const result = await db.collection(tablename + collid).where(whereObj).update({ data: updateObj });
-      // console.log('updateAllDoc:', result, tablename + collid,whereObj,updateObj);
+      const result = await db.collection(getTableName(tablename, collid)).where(whereObj).update({ data: updateObj });
+      // console.log('updateAllDoc:', result, getTableName(tablename, collid),whereObj,updateObj);
       updatedNum += result.stats.updated;
     } catch (e) {
       //更新批表如果出错，暂不抛出异常
@@ -133,11 +138,12 @@ exports.queryAllDoc = async (tablename, whereObj) => {
   console.log('collids:', collids);
   let resultList = [];
   for (let i = 0; i < collids.length; i++) {
-    const { collid, nickName } = collids[i];
+    const { collid, nickName,yzhid } = collids[i];
     // if(utils.isEmpty(collid)) collid='';
     // else collid = '_'+collid;
     try {
-      result = await db.collection(getTableName(tablename, collid)).where(whereObj).get();
+      const newWhereObj = {yzhid,...whereObj};
+      result = await db.collection(getTableName(tablename, collid)).where(newWhereObj).get();
       if (result && result.data.length > 0) {
         resultList.push({ collid, nickName, sourceList: result.data });
       }

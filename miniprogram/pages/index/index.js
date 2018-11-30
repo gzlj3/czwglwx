@@ -2,7 +2,6 @@
 import moment from '../../utils/moment.min.js';
 const CONSTS = require('../../utils/constants.js');
 const utils = require('../../utils/utils.js');
-// const userService = require('../../services/userServices.js');
 const fyglService = require('../../services/fyglServices.js');
 const config = require('../../config.js');
 const app = getApp()
@@ -38,68 +37,98 @@ const zkMenuList = [
     id: 'widget',
     name: '查看我的帐单',
     open: false, 
-    page: 'seeLastzd'
+    page: '../fygl/fyglmain'
   },
 ]
 
 Page({
   data: {
-    user: app.globalData.user,
-    avatarUrl: './user-unlogin.png',
-    userInfo: {},
-    wxgranted: false,  //是否获得用户公共信息的授权    
-    registered: false, // 用户是否已经注册
-    userType:'0', // 用户身份,0:未注册，1：房东，2：租客
-    logged: false,
-    takeSession: false,
-    requestResult: '',
+    user: null,
+    // avatarUrl: './user-unlogin.png',
+    // userInfo: {},
+    // wxgranted: false,  //是否获得用户公共信息的授权    
+    // registered: false, // 用户是否已经注册
+    // userType:'0', // 用户身份,0:未注册，1：房东，2：租客
+    // logged: false,
+    // takeSession: false,
+    // requestResult: '',
     list:menuList,
     zkMenuList,
     sjhm:'',
     sendingYzm:false,
     second:config.conf.yzmYxq,
     CONSTS,
-    onLoadState:null,
+    // onLoadState:null,
     radioItems: [ 
       { name: '我是房东，想管理我的房源', value: '1', checked: true  },
       { name: '我是租客，想查询我的帐单', value: '2'}
     ], 
+    waitingCloud:true,
+    requestUserType:'',  //用户请求入口身份（房东或租客）
   },
   
-  onLoad: function (options) {  
-    // let arr = ['111','222'];
-    // console.log(arr.splice(arr.indexOf('222'),1));
-    // console.log(arr);
-
-    // console.log('index onload',options)
-    this.setData({ onLoadState: 'onLoading' });
-    this.queryUser(); 
-  },
-  onShow: function () {
-    // console.log('index onshow')
-    const {onLoadState} = this.data; 
-    if (onLoadState !=='onLoading' &&  onLoadState!=='onLoadSuccess'){
-      this.onLoad(); 
+  onLoad: function (options) {
+    // const arr=['aaa','bbb'];
+    // console.log('test:',arr.includes(''));
+    console.log('index onload:',options);
+    const requestUserType = options.requestUserType ? options.requestUserType:'';
+    if(!utils.isEmpty(requestUserType)){
+      if (requestUserType === CONSTS.USERTYPE_ZK){
+        this.data.radioItems[0].checked = false;
+        this.data.radioItems[1].checked = true;
+        this.setData({ requestUserType, radioItems: this.data.radioItems});
+      }
     }
+    this.waitingCloudNormal();
+  },  
+
+  waitingCloudNormal: function () {
+    let waitingCloudNum = 0;
+    this.setData({waitingCloud:true});
+    let promise = new Promise((resolve, reject) => {
+      let setTimer = setInterval(
+        () => { 
+          waitingCloudNum++; 
+          if (app.globalData.cloudNormal){
+            this.setData({
+              user: app.globalData.user              
+            });
+            resolve(setTimer);
+          } 
+          if (waitingCloudNum>20){
+            //等待10秒
+            resolve(setTimer);
+          } 
+        },500)
+    });
+    promise.then((setTimer) => {
+      clearInterval(setTimer)
+      this.setData({ waitingCloud: false });
+    });
   },
 
-  getWxGrantedData: function(){
-    if (!this.data.user.wxgranted) {
-      //获取用户信息
-      wx.getSetting({
-        success: res => {
-          if (res.authSetting['scope.userInfo']) {
-            // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
-            wx.getUserInfo({
-              success: res => {
-                this.setUserData(res.userInfo);
-              }
-            })
-          }
-        }
-      })
-    }    
+  refreshUser:function(){
+    app.queryUser();
+    this.waitingCloudNormal();
   },
+
+  // getWxGrantedData: function(){
+  //   if (!this.data.user.wxgranted) {
+  //     //获取用户信息
+  //     wx.getSetting({
+  //       success: res => {
+  //         if (res.authSetting['scope.userInfo']) {
+  //           // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
+  //           wx.getUserInfo({
+  //             success: res => {
+  //               this.setUserData(res.userInfo);
+  //             }
+  //           })
+  //         }
+  //       }
+  //     })
+  //   }    
+  // },
 
   radioChange: function (e) {
     // console.log('radio发生change事件，携带value值为：', e.detail.value);
@@ -114,32 +143,30 @@ Page({
  
 
   onGetUserInfo: function(e) {
-    console.log('getuserinfo');
-    console.log(e);
     this.setUserData(e.detail.userInfo);
   },
 
 
-  onGetOpenid: function() {
-    // 调用云函数
-    wx.cloud.callFunction({
-      name: 'login',
-      data: {},
-      success: res => {
-        console.log('[云函数] [login] user openid: ', res.result.openid)
-        app.globalData.openid = res.result.openid
-        wx.navigateTo({
-          url: '../userConsole/userConsole',
-        })
-      },
-      fail: err => {
-        console.error('[云函数] [login] 调用失败', err)
-        wx.navigateTo({
-          url: '../deployFunctions/deployFunctions',
-        })
-      }
-    })
-  }, 
+  // onGetOpenid: function() {
+  //   // 调用云函数
+  //   wx.cloud.callFunction({
+  //     name: 'login',
+  //     data: {},
+  //     success: res => {
+  //       console.log('[云函数] [login] user openid: ', res.result.openid)
+  //       app.globalData.openid = res.result.openid
+  //       wx.navigateTo({
+  //         url: '../userConsole/userConsole',
+  //       })
+  //     },
+  //     fail: err => {
+  //       console.error('[云函数] [login] 调用失败', err)
+  //       wx.navigateTo({
+  //         url: '../deployFunctions/deployFunctions',
+  //       })
+  //     }
+  //   })
+  // }, 
 
   onInputSjhm: function(e){
     this.setData({sjhm:e.detail.value});
@@ -200,59 +227,58 @@ Page({
                                           sjData:e.detail.value});
     fyglService.handleAfterRemote(response, '用户注册',
       (resultData) => { 
-        // console.log('======register user result:');
-        // console.log(resultData);
-        // this.setUserData(resultData && resultData.length > 0 ? resultData[0] : null);
         this.setUserData(resultData);
       }
     );
   }, 
  
-  queryUser: function(){
-    const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
-    fyglService.handleAfterRemote(response, null,
-      (resultData) => { 
-        // console.log('queryuser:',resultData);
-        this.setData({onLoadState:'onLoadSuccess'});
-        // this.setUserData(resultData && resultData.length > 0 ? resultData[0]:null);
-        this.setUserData(resultData);
-        this.getWxGrantedData();
-      },
-      err => {
-        this.setData({ onLoadState: 'onLoadFail' });
-      }
-    );
-  }, 
+  // queryUser: function(){
+  //   const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
+  //   fyglService.handleAfterRemote(response, null,
+  //     (resultData) => { 
+  //       // console.log('queryuser:',resultData);
+  //       this.setData({onLoadState:'onLoadSuccess'});
+  //       // this.setUserData(resultData && resultData.length > 0 ? resultData[0]:null);
+  //       this.setUserData(resultData);
+  //       this.getWxGrantedData();
+  //     },
+  //     err => {
+  //       this.setData({ onLoadState: 'onLoadFail' });
+  //     }
+  //   );
+  // }, 
 
   //设置用户数据，入口对象userInfo:{userType,nickName,avatarUrl,...}或为空
   setUserData: function(userData){
-    if (userData) {
-      // let { userType, nickName, avatarUrl } = userData;
-      app.setGlobalData({ user: { wxgranted: true, userType: CONSTS.USERTYPE_NONE,...userData}});
-      this.setData({ user: app.globalData.user});
-      // console.log(this.data.user);
-    } else {
-      const userType = CONSTS.USERTYPE_NONE;
-      const nickName = '',avatarUrl = '',wxgranted=false;
-      app.setGlobalData({ user: { wxgranted, userType, nickName, avatarUrl } });
-      this.setData({ user: app.globalData.user });
-    }
+    app.setUserData(userData);
+    this.setData({ user: app.globalData.user });
+    // if (userData) {
+    //   // let { userType, nickName, avatarUrl } = userData;
+    //   app.setGlobalData({ user: { wxgranted: true, userType: CONSTS.USERTYPE_NONE,...userData}});
+    //   this.setData({ user: app.globalData.user});
+    //   // console.log(this.data.user);
+    // } else {
+    //   const userType = CONSTS.USERTYPE_NONE;
+    //   const nickName = '',avatarUrl = '',wxgranted=false;
+    //   app.setGlobalData({ user: { wxgranted, userType, nickName, avatarUrl } });
+    //   this.setData({ user: app.globalData.user });
+    // }
   },  
 
-  seeLastzd: function(){
-    wx.navigateTo({
-      url: '../fygl/fyglmain',
-    })
+  // seeLastzd: function(){
+  //   wx.navigateTo({
+  //     url: '../fygl/fyglmain',
+  //   })
 
-  },
+  // },
 
   kindToggle: function (e) {
     const page = e.currentTarget.id;
 
-    if (page === 'seeLastzd'){
-      this.seeLastzd();
-      return;
-    }
+    // if (page === 'seeLastzd'){
+    //   this.seeLastzd();
+    //   return;
+    // }
 
     wx.navigateTo({
       url: page,
@@ -271,53 +297,53 @@ Page({
   },
 
   // 上传图片
-  doUpload: function () {
-    // 选择图片
-    wx.chooseImage({
-      count: 1,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
-      success: function (res) {
+  // doUpload: function () {
+  //   // 选择图片
+  //   wx.chooseImage({
+  //     count: 1,
+  //     sizeType: ['compressed'],
+  //     sourceType: ['album', 'camera'],
+  //     success: function (res) {
 
-        wx.showLoading({
-          title: '上传中',
-        })
+  //       wx.showLoading({
+  //         title: '上传中',
+  //       })
 
-        const filePath = res.tempFilePaths[0]
+  //       const filePath = res.tempFilePaths[0]
         
-        // 上传图片
-        const cloudPath = 'my-image' + filePath.match(/\.[^.]+?$/)[0]
-        wx.cloud.uploadFile({
-          cloudPath,
-          filePath,
-          success: res => {
-            console.log('[上传文件] 成功：', res)
+  //       // 上传图片
+  //       const cloudPath = 'my-image' + filePath.match(/\.[^.]+?$/)[0]
+  //       wx.cloud.uploadFile({
+  //         cloudPath,
+  //         filePath,
+  //         success: res => {
+  //           console.log('[上传文件] 成功：', res)
 
-            app.globalData.fileID = res.fileID
-            app.globalData.cloudPath = cloudPath
-            app.globalData.imagePath = filePath
+  //           app.globalData.fileID = res.fileID
+  //           app.globalData.cloudPath = cloudPath
+  //           app.globalData.imagePath = filePath
             
-            wx.navigateTo({
-              url: '../storageConsole/storageConsole'
-            })
-          },
-          fail: e => {
-            console.error('[上传文件] 失败：', e)
-            wx.showToast({
-              icon: 'none',
-              title: '上传失败',
-            })
-          },
-          complete: () => {
-            wx.hideLoading()
-          }
-        })
+  //           wx.navigateTo({
+  //             url: '../storageConsole/storageConsole'
+  //           })
+  //         },
+  //         fail: e => {
+  //           console.error('[上传文件] 失败：', e)
+  //           wx.showToast({
+  //             icon: 'none',
+  //             title: '上传失败',
+  //           })
+  //         },
+  //         complete: () => {
+  //           wx.hideLoading()
+  //         }
+  //       })
 
-      },
-      fail: e => {
-        console.error(e)
-      }
-    })
-  },
+  //     },
+  //     fail: e => {
+  //       console.error(e)
+  //     }
+  //   })
+  // },
 
 })

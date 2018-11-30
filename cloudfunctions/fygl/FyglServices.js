@@ -5,8 +5,7 @@ const CONSTS = require('constants.js');
 const config = require('config.js')
 const commService = require('CommServices.js')
 cloud.init({
-  env: config.conf.env,   //'jjczwgl-bc6ef9'
-  // env: 'jjczwgl-test-2e296e'
+  env: config.conf.env, 
 })
 const db = cloud.database();
 const _ = db.command;
@@ -24,37 +23,50 @@ exports.queryFyList = async (curUser) => {
   if(commService.isZk(userType)){
     result = await commService.queryAllDoc('house',{dhhm:sjhm});
   }else{
-    // result = await db.collection(commService.getTableName('house',collid)).orderBy('fwmc', 'asc').where({
-    //   yzhid
-    // }).get();
-    // result = result.data;
     if(!granted) granted = [];
     granted.unshift({collid:curUser.collid,nickName:null,yzhid:curUser.yzhid});
     let resultList = [];
     for (let i = 0; i < granted.length; i++) {
       if (!granted[i]) continue;
       const { collid, nickName, yzhid, rights } = granted[i];
-      // result = await db.collection(getTableName(tablename, collid)).where(whereObj).get();
       result = await db.collection(commService.getTableName('house', collid)).orderBy('fwmc', 'asc').where({
         yzhid
-      }).get();
+      }).get(); 
       //计算费用合计数
-      let czjehj=0,sfhj=0,dfhj=0,fyhj=0;
-      result.data.map(value=>{
-        czjehj += utils.getInteger(value.czje);
-        sfhj += utils.getFloat(value.sfhj);
-        dfhj += utils.getFloat(value.dfhj);
-        fyhj += utils.getFloat(value.fyhj);
-      });
-      fyhj = utils.roundNumber(fyhj,1);
-      dfhj = utils.roundNumber(dfhj,1);
-      sfhj = utils.roundNumber(sfhj,1);
+      // let czjehj=0,sfhj=0,dfhj=0,fyhj=0;
+      // result.data.map(value=>{
+      //   czjehj += utils.getInteger(value.czje);
+      //   sfhj += utils.getFloat(value.sfhj);
+      //   dfhj += utils.getFloat(value.dfhj);
+      //   fyhj += utils.getFloat(value.fyhj);
+      // });
+      // fyhj = utils.roundNumber(fyhj,1);
+      // dfhj = utils.roundNumber(dfhj,1);
+      // sfhj = utils.roundNumber(sfhj,1);
       if (result && result.data.length > 0) {
-        resultList.push({ collid, nickName,rights,czjehj,sfhj,dfhj,fyhj,sourceList: result.data });
+        resultList.push({ collid, nickName,yzhid,rights,sourceList: result.data });
       }
     }
     result = resultList;
   }
+  //计算费用合计数
+  result.map(onefd=>{
+    let czjehj = 0, sfhj = 0, dfhj = 0, fyhj = 0;
+    onefd.sourceList.map(value => {
+      czjehj += utils.getInteger(value.czje);
+      sfhj += utils.getFloat(value.sfhj);
+      dfhj += utils.getFloat(value.dfhj);
+      fyhj += utils.getFloat(value.fyhj);
+    });
+    fyhj = utils.roundNumber(fyhj, 1);
+    dfhj = utils.roundNumber(dfhj, 1);
+    sfhj = utils.roundNumber(sfhj, 1);
+    onefd.czjehj = czjehj;
+    onefd.sfhj = sfhj;
+    onefd.dfhj = dfhj;
+    onefd.fyhj = fyhj;
+  });
+
   return result;
 }
 

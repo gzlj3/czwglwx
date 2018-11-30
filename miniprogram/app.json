@@ -1,11 +1,11 @@
 {
-  "pages": [
-    "pages/index/index",
+  "pages": [ 
+    "pages/user/userGrant",
     "pages/fygl/fyglmain",
+    "pages/index/index",
     "pages/fygl/addfy/addfy",
     "pages/fygl/editlist/editlist",
-    "pages/fygl/msg/msg_success",
-    "pages/user/userGrant"
+    "pages/fygl/msg/msg_success"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",

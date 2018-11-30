@@ -55,4 +55,5 @@ exports.getSfszInfo = sfsz => {
 exports.EXCEPTION = {
   100: '用户未注册',
   101: '用户数据异常',
+  102: '无权操作'
 }

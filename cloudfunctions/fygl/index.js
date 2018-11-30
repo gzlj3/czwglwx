@@ -4,7 +4,7 @@ const CONSTS = require('constants.js');
 const services = require('FyglServices.js');
 const userServices = require('UserServices.js');
 const utils = require('utils.js');
-
+ 
 
 // 云函数入口函数
 /* event 参数对象：

@@ -1,4 +1,5 @@
 const CONSTS = require('../utils/constants.js');
+const utils = require('../utils/utils.js');
 export function handleAfterRemote(response, tsinfo, successCallback,failCallback) {
   if (!response) return;
   // const { buttonAction } = this.data;
@@ -22,9 +23,9 @@ export function handleAfterRemote(response, tsinfo, successCallback,failCallback
         icon: 'none',
         duration: 5000,
       });
-      if (errCode === 100 || errCode === 101) {
+      if (errCode === 100 || errCode === 101 || errCode===102) {
         //用户未注册或用户数据异常，回到主页面
-        wx.redirectTo({
+        wx.reLaunch({
           url: '/pages/index/index',
         })
       }
@@ -58,7 +59,7 @@ export function checkAuthority(action){
   }
 }
 
-const checkRights = (action)=>{
+const checkRights = (action,right,yzhid,showts)=>{
   if (!isZk() && !isFd()) {
     //用户未注册或用户数据异常，回到主页面
     return false;
@@ -68,5 +69,28 @@ const checkRights = (action)=>{
       return false;
     }
   }
+  if (isFd() && !utils.isEmpty(right) && !utils.isEmpty(yzhid)) {
+    const user = getApp().globalData.user;
+    const {granted} = user;
+    if(user.yzhid === yzhid){
+       //自己的房源
+       return true;
+    }
+    let haveRight = false;
+    // console.log('checkright:',granted,right,yzhid);
+    if(granted && granted.length>0){
+      for(let i=0;i<granted.length;i++){
+        const value = granted[i];
+        const {yzhid:grantYzhid,rights} = value;
+        if (grantYzhid===yzhid && rights.includes(right)){
+          haveRight = true;
+          break;
+        }
+      };
+    }
+    if (showts && !haveRight ) utils.showToast('你无权操作此功能！');
+    return haveRight;
+  } 
   return true;
 }
+export {checkRights}

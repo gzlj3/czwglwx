@@ -1,6 +1,6 @@
 const utils = require('../../utils/utils.js');
 const fyglService = require('../../services/fyglServices.js');
-const commService = require('../../services/commServices.js');
+// const commService = require('../../services/commServices.js');
 const CONSTS = require('../../utils/constants.js');
 const app = getApp()
 Page({
@@ -17,8 +17,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.setData({ user: app.globalData.user });
-    commService.checkAuthority(CONSTS.BUTTON_USERGRANT);
+    console.log('usergrant onload');
+    fyglService.checkAuthority(CONSTS.BUTTON_USERGRANT);
+    this.setData({ user: app.globalData.user }); 
   },
 
   grantCheckboxChange: function (e) {
@@ -29,6 +30,13 @@ Page({
       rights[value] = true;
     })
     this.setData({rights});
+  },
+  cancelGrant: function(e){
+    const { item: sjhm } = e.currentTarget.dataset;
+    const formObject = {sjhm};
+    e.detail.value = formObject;
+    e.cancelGrant = true;
+    this.formSubmit(e);
   },
 
   formSubmit: function (e) {
@@ -43,7 +51,13 @@ Page({
       return;
     };
     const self = this;
-    utils.showModal('房源授权', `你确定将我的房源授权给${sjhm}操作吗？`, () => { self.handleSubmit(e); });      
+    let tsinfo;
+    if (e.cancelGrant){
+      tsinfo = `确定取消${sjhm}的权限吗?`;
+    }else{
+      tsinfo = `你确定将我的房源授权给${sjhm}操作吗？`;
+    }
+    utils.showModal('权限管理',tsinfo, () => { self.handleSubmit(e); });      
   },
 
   handleSubmit: function (e) {
@@ -51,6 +65,8 @@ Page({
     const response = fyglService.postData(CONSTS.BUTTON_USERGRANT, formObject); 
     fyglService.handleAfterRemote(response, '用户授权',
       (resultData) => {
+        app.setUserData(resultData);
+        this.setData({ user: app.globalData.user });
         // console.log(resultData);
         // this.setData({ sendingYzm: true });
         // this.timer();

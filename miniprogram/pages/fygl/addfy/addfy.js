@@ -3,6 +3,7 @@ import * as CONSTS from '../../../utils/constants.js';
 import * as utils from '../../../utils/utils.js';
 import * as fyglService from '../../../services/fyglServices.js'; 
 import moment from '../../../utils/moment.min.js';
+const commService = require('../../../services/commServices.js');
 
 const fyxxMetas = { 
   fwmc: { label: '房屋名称', name: 'fwmc', require: true },
@@ -140,6 +141,8 @@ Page({
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
     } 
+    // commService.checkAuthority(buttonAction);
+
     this.setData({
       buttonAction, 
       collid,

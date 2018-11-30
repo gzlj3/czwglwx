@@ -163,6 +163,9 @@ Page({
       buttonAction = Number.parseInt(buttonAction);
     }
     console.log('editlist:',buttonAction,params);
+    let zdright = true;
+    if (params && params.zdright!==null) zdright = params.zdright;
+
     const response = fyglService.queryData(buttonAction, params);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
@@ -177,6 +180,7 @@ Page({
           isFd: app.globalData.user.userType === CONSTS.USERTYPE_FD,
           isZk: app.globalData.user.userType === CONSTS.USERTYPE_ZK,
           isFdZk: app.globalData.user.userType === CONSTS.USERTYPE_FDZK,
+          zdright,
           params,
         }); 
         this.refreshState();

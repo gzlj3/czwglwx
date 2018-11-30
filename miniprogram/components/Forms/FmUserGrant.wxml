@@ -12,7 +12,7 @@
             {{item}}
           </view>
           <view class="weui-cell__bd" style="margin-left:30px">
-            <button size='mini' type="primary">取消授权</button>
+            <button size='mini' type="primary" data-item="{{item}}" ontap="cancelGrant">取消授权</button>
           </view>
         </view>
       </view>
@@ -44,7 +44,7 @@
                   <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rights['102']}}"></icon>
               </view>
               <view class="weui-cell__bd">修改我的房源</view>
-            </label>
+            </label>  
             <label class="weui-cell weui-check__label">
               <checkbox class="weui-check" value="103"/>
               <view class="weui-cell__hd weui-check__hd_in-checkbox">

@@ -138,7 +138,7 @@ const getCachedSjyzm = async (openId)=>{
 const queryUser = async (userInfo) => {
   const {openId} = userInfo;
   const db = cloud.database();
-  let result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true,granted:true,grantedSjhm:true}).where({
+  let result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true,yzhid:true,granted:true,grantedSjhm:true}).where({
     openId
   }).get();
   if(result && result.data.length>0){
@@ -175,7 +175,7 @@ exports.grantUser = async (data, curUser) => {
       const {yzhid} = value;
       console.log('1:',yzhid,sourceYzhid);
       if (sourceYzhid === yzhid){
-        if (rights.length > 0){
+        if (rights && rights.length > 0){
           //之前已经有授权，且本次有授权，则修改授权
           found = true;
           newGranted.push(getNewGrant(curUser,rights));
@@ -187,7 +187,7 @@ exports.grantUser = async (data, curUser) => {
     })
   }
   if (!found){
-    if(rights.length>0){
+    if (rights && rights.length>0){
       //新授权
       newGranted.push(getNewGrant(curUser, rights));
       grantedState = 'add';
@@ -196,7 +196,6 @@ exports.grantUser = async (data, curUser) => {
       grantedState = 'delete';
     }
   }
-
   userb.granted = newGranted;
   // console.log('granted userb:',userb);
   userb.zhxgr = curUser.openId;
@@ -217,7 +216,7 @@ exports.grantUser = async (data, curUser) => {
     curUser.zhxgsj = utils.getCurrentTimestamp();
     updatedNum = await commService.updateDoc('userb', curUser);
   }
-  return updatedNum;
+  return await queryUser({ openId:curUser.openId });
 }
 
 const getNewGrant = (curUser,rights)=>{

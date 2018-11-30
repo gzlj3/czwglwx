@@ -2,7 +2,7 @@ import * as utils from '../utils/utils.js';
 import moment from '../utils/moment.min.js';
 const CONSTS = require('../utils/constants.js');
 
-export { handleAfterRemote } from 'commServices.js';
+export { handleAfterRemote, checkAuthority, checkRights } from 'commServices.js';
 
 export function queryData(action,params) {
   utils.showLoading();

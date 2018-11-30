@@ -147,8 +147,11 @@ Page({
   },
 
   onEditfy(e){
-    // console.log(e);
-    const { item, fyitem} = e.currentTarget.dataset;
+    // console.log('oneditfy:',e);
+    const { item, fyitem,yzhid} = e.currentTarget.dataset;
+    if(!fyglService.checkRights(this.data.buttonAction,'102',yzhid,true)){
+      return;
+    }
     const s = JSON.stringify({house:item, collid: fyitem });
     // console.log(s);
     // console.log('addfy/addfy?buttonAction=' + CONSTS.BUTTON_EDITFY + '&item=' + s);
@@ -159,9 +162,11 @@ Page({
 
   onLastzd(e){
     const { item } = e.currentTarget.dataset;
-    const { fyitem } = e.currentTarget.dataset;
-    console.log('fyitem:',fyitem);
-    const s = JSON.stringify({houseid:item,collid:fyitem});
+    const { fyitem, yzhid } = e.currentTarget.dataset;
+    const zdright = fyglService.checkRights(this.data.buttonAction, '103', yzhid);
+
+    // console.log('fyitem:',fyitem);
+    const s = JSON.stringify({ houseid: item, collid: fyitem, zdright});
     // console.log(s);
     console.log('editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s);
     wx.navigateTo({
@@ -173,6 +178,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    // this.setData({ user: getApp().globalData.user });
+    // fyglService.checkAuthority(1);
+ 
     const response = fyglService.queryFyglList(); 
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 

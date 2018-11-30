@@ -7,14 +7,20 @@
       <view class="page__desc">极简出租为房东提供简洁高效的房屋出租管理，为租客提供方便快捷的帐单查询。</view> 
   </view>
   <view class="page__bd page__bd_spacing">
-      <view class="grant-container grant-container-wxgrant" wx:if="{{!user.wxgranted}}">
+      <view class="grant-container grant-container-wxgrant" wx:if="{{!waitingCloud && !user}}">
+        <view class='grant-item'>服务器处理异常</view>
+        <view class='grant-item'>
+          <button size='mini' type='primary' ontap='refreshUser'>重新刷新</button>
+        </view>
+      </view>
+      <view class="grant-container grant-container-wxgrant" wx:if="{{user && !user.wxgranted}}">
         <view class='grant-item'>需要获得您微信公开信息的授权</view>
         <view class='grant-item'>
           <button size='mini' type='primary' open-type="getUserInfo" 
       bindgetuserinfo="onGetUserInfo">微信授权</button>
         </view>
       </view>
-      <view class="grant-container" wx:if="{{user.wxgranted && user.userType===CONSTS.USERTYPE_NONE}}"> 
+      <view class="grant-container" wx:if="{{user && user.wxgranted && user.userType===CONSTS.USERTYPE_NONE}}"> 
       <!-- <view class="grant-container" >  -->
           <view class='grant-item'>需要注册确定你的身份</view>
           <view class='grant-item'>
