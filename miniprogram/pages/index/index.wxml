@@ -85,6 +85,8 @@
               </view>
           </block>
       </view>
+  <view ontap='doUpload'>上传照片</view>
+  <view ontap='doDelete'>删除照片</view>
   </view>
  <!-- <form bind:submit="testSubmit" report-submit="true" report-submit="true">
       <button formType="submit">发送模板消息</button>

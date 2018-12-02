@@ -14,7 +14,7 @@
                 <view class="weui-cell__ft weui-vcode-btn" wx:if="{{name==='wlf'||name==='glf'||name==='ljf'}}">
                     <checkbox-group id="{{name+'yff'}}" name="{{name+'yff'}}" class="displayInline" bindchange="onCheckboxChange"><label><checkbox value="1" checked="{{currentObject[name+'yff'].length>0}}"/>预付费</label></checkbox-group>
                     <block wx:if="{{name==='wlf'}}">
-                      <input id="{{wlfys}}" class="displayInline" style="width:30px;margin-right:10px" id="wlfys" name="wlfys" type="number"  placeholder="月数" value="{{currentObject.wlfys}}" bindblur="onInputBlur"/>月
+                      <input id="{{wlfys}}" class="displayInline" style="width:30px;margin-right:10px;border:1px solid rgba(0, 0, 0, 0.1);position:relative;left:5px;top:5px;height:20px" id="wlfys" name="wlfys" type="number"  placeholder="月数" value="{{currentObject.wlfys}}" bindblur="onInputBlur"/>月
                     </block>
                 </view>
                 <!-- <view class="weui-cell__ft weui-vcode-btn" wx:if="{{name==='ljf'|| name==='glf'}}">

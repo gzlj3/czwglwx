@@ -6,7 +6,7 @@ const fyglService = require('../../services/fyglServices.js');
 const config = require('../../config.js');
 const app = getApp()
 
-const menuList = [
+const menuList = [ 
   {
     id: 'form',  
     name: '我的房源列表',
@@ -39,7 +39,7 @@ const zkMenuList = [
     open: false, 
     page: '../fygl/fyglmain'
   },
-]
+] 
 
 Page({
   data: {
@@ -71,6 +71,7 @@ Page({
     // const arr=['aaa','bbb'];
     // console.log('test:',arr.includes(''));
     console.log('index onload:',options);
+
     const requestUserType = options.requestUserType ? options.requestUserType:'';
     if(!utils.isEmpty(requestUserType)){
       if (requestUserType === CONSTS.USERTYPE_ZK){
@@ -80,6 +81,8 @@ Page({
       }
     }
     this.waitingCloudNormal();
+
+
   },  
 
   waitingCloudNormal: function () {
@@ -111,6 +114,7 @@ Page({
     app.queryUser();
     this.waitingCloudNormal();
   },
+
 
   // getWxGrantedData: function(){
   //   if (!this.data.user.wxgranted) {
@@ -295,55 +299,70 @@ Page({
     //   list: list
     // });
   },
+  doDelete: function () {
+    wx.cloud.deleteFile({
+      fileList: ['cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/test/my-image.jpg'],
+      success: res => {
+        // handle success
+        console.log(res)
+      },
+      fail: err => {
+        // handle error
+        console.log(err)
+      }
+    })    
+  },
 
   // 上传图片
-  // doUpload: function () {
-  //   // 选择图片
-  //   wx.chooseImage({
-  //     count: 1,
-  //     sizeType: ['compressed'],
-  //     sourceType: ['album', 'camera'],
-  //     success: function (res) {
+  doUpload: function () {
+    // 选择图片
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        // console.log(res);
+        // return;
+        wx.showLoading({
+          title: '上传中',
+        })
 
-  //       wx.showLoading({
-  //         title: '上传中',
-  //       })
+        const filePath = res.tempFilePaths[0]
+        // 上传图片
+        const cloudPath = 'test/my-image1' + filePath.match(/\.[^.]+?$/)[0]
+        console.log('chooseImage cloudPath:', filePath,cloudPath);
+// return; 
 
-  //       const filePath = res.tempFilePaths[0]
-        
-  //       // 上传图片
-  //       const cloudPath = 'my-image' + filePath.match(/\.[^.]+?$/)[0]
-  //       wx.cloud.uploadFile({
-  //         cloudPath,
-  //         filePath,
-  //         success: res => {
-  //           console.log('[上传文件] 成功：', res)
+        wx.cloud.uploadFile({
+          cloudPath,
+          filePath,
+          success: res => {
+            console.log('[上传文件] 成功：', res)
 
-  //           app.globalData.fileID = res.fileID
-  //           app.globalData.cloudPath = cloudPath
-  //           app.globalData.imagePath = filePath
+            app.globalData.fileID = res.fileID
+            app.globalData.cloudPath = cloudPath
+            app.globalData.imagePath = filePath
             
-  //           wx.navigateTo({
-  //             url: '../storageConsole/storageConsole'
-  //           })
-  //         },
-  //         fail: e => {
-  //           console.error('[上传文件] 失败：', e)
-  //           wx.showToast({
-  //             icon: 'none',
-  //             title: '上传失败',
-  //           })
-  //         },
-  //         complete: () => {
-  //           wx.hideLoading()
-  //         }
-  //       })
+            wx.navigateTo({
+              url: '../storageConsole/storageConsole'
+            })
+          },
+          fail: e => {
+            console.error('[上传文件] 失败：', e)
+            wx.showToast({
+              icon: 'none',
+              title: '上传失败',
+            })
+          },
+          complete: () => {
+            wx.hideLoading()
+          }
+        })
 
-  //     },
-  //     fail: e => {
-  //       console.error(e)
-  //     }
-  //   })
-  // },
-
+      },
+      fail: e => {
+        console.error(e)
+      }
+    })
+  },
 })

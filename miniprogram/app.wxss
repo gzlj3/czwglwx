@@ -16,7 +16,7 @@ page{
     padding: 10px;
 }
 .page__bd {
-    padding-bottom: 40px;
+    padding-bottom: 30px;
 }
 .page__bd_spacing {
     padding-left: 15px;

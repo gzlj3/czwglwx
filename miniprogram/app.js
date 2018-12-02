@@ -1,7 +1,7 @@
 //const fyglService = require('./services/fyglServices.js');
 const config = require('config.js')
 const CONSTS = require('./utils/constants.js');
-// const utils = require('../../utils/utils.js');
+const utils = require('./utils/utils.js');
 const fyglService = require('./services/fyglServices.js');
 
 App({
@@ -21,8 +21,14 @@ App({
       fyListDirty:false,  //房源列表是否有更新
       user: { wxgranted: true, userType:'', nickName:'', avatarUrl:'',collid:'',granted:[],grantedSjhm:[], }  //用户登录基本信息
     }
+  },
 
-    this.queryUser();
+  onShow: function(e) {
+    console.log('app onshow');
+    const user = this.globalData.user;
+    if (!user || utils.isEmpty(user.userType) || user.userType===CONSTS.USERTYPE_NONE){
+      this.queryUser();
+    }
   },
 
   setGlobalData: function(newData){
@@ -40,7 +46,7 @@ App({
     const response = fyglService.queryData(CONSTS.BUTTON_QUERYUSER);
     fyglService.handleAfterRemote(response, null,
       (resultData) => {
-        console.log('onLaunch queryuser success!');
+        console.log('queryuser success!');
         this.setUserData(resultData);
         this.getWxGrantedData();
         if(this.globalData.user.wxgranted){

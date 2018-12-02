@@ -163,10 +163,9 @@ Page({
   onLastzd(e){
     const { item } = e.currentTarget.dataset;
     const { fyitem, yzhid } = e.currentTarget.dataset;
-    const zdright = fyglService.checkRights(this.data.buttonAction, '103', yzhid);
 
     // console.log('fyitem:',fyitem);
-    const s = JSON.stringify({ houseid: item, collid: fyitem, zdright});
+    const s = JSON.stringify({ houseid: item, collid: fyitem,yzhid});
     // console.log(s);
     console.log('editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s);
     wx.navigateTo({

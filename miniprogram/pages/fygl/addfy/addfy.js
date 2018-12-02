@@ -39,6 +39,10 @@ const initialState = {
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
   pageTitle:'',
   pageDesc:'',
+  tabs: ["基本信息", "更多信息","证件照"],
+  activeIndex: 2,
+  sliderOffset: 0,
+  sliderLeft: 0
 }
 
 const refreshFmMetas = (fmMetas,currentObject) => {
@@ -50,6 +54,7 @@ const refreshFmMetas = (fmMetas,currentObject) => {
   // console.log('currentobject:',currentObject);
   // console.log('fmMetas:',fmMetas);
 }
+const sliderWidth = 96; // 需要设置slider的宽度，用于计算中间位置
 
 Page({
 
@@ -112,10 +117,10 @@ Page({
           let pageDesc;
           if(buttonAction===CONSTS.BUTTON_EDITFY){
             pageDesc = '数据修改完成后，如帐单数据有变动，可进入帐单详情页查看并刷新帐单。';
-          }else{
+          }else{ 
             pageDesc = '房源新建完成后，可进入帐单详细页查看签约帐单。';
           }
-          utils.redirectToSuccessPage(pageDesc, '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id,collid:this.data.collid });
+          utils.redirectToSuccessPage(pageDesc, '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id, collid: this.data.collid, yzhid: formObject.yzhid });
         }else{
           wx.navigateBack();
         }
@@ -141,7 +146,18 @@ Page({
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
     } 
-    // commService.checkAuthority(buttonAction);
+    //调试程序用。。。。
+    buttonAction = CONSTS.BUTTON_ADDFY;
+
+    var that = this;
+    wx.getSystemInfo({
+      success: function (res) {
+        that.setData({
+          sliderLeft: (res.windowWidth / that.data.tabs.length - sliderWidth) / 2,
+          sliderOffset: res.windowWidth / that.data.tabs.length * that.data.activeIndex
+        });
+      }
+    });
 
     this.setData({
       buttonAction, 
@@ -180,11 +196,107 @@ Page({
     }
   },
 
+  tabClick: function (e) {
+    this.setData({
+      sliderOffset: e.currentTarget.offsetLeft,
+      activeIndex: e.currentTarget.id
+    });
+  },
+
   onCheckboxChange: function(e){
     const name = e.target.id;
     let { currentObject} = this.data;
     currentObject[name] = e.detail.value;
     this.setData({currentObject});
+  },
+
+  onAddMorezh:function(e){
+    let { currentObject } = this.data;
+    if(!currentObject.moreZh) currentObject.moreZh = []; 
+    currentObject.moreZh.push({});
+    this.setData({
+      currentObject
+    })
+  },
+  
+  onAddMorePhoto: function (e) {
+    let { currentObject } = this.data;
+    currentObject.fwmc = '101';
+    if(utils.isEmpty(currentObject.fwmc)){
+      utils.showToast('需要输入房屋名称后才能上传照片！');
+      return;
+    }
+
+    this.doUpload(getApp().globalData.user.yzhid, currentObject.fwmc);
+
+  },
+
+  onDeletePhoto: function(e){
+
+  }, 
+  
+  // 上传图片
+  doUpload: function (yzhid,fwmc) {
+    // 选择图片
+    let self = this;
+    wx.chooseImage({
+      count: 1,
+      // sizeType: ['compressed'],
+      // sourceType: ['album', 'camera'],
+      success: function (res) {
+        wx.showLoading({
+          title: '上传中',
+        })
+
+        const filePath = res.tempFilePaths[0]
+        // 上传图片
+        const fileType = filePath.match(/\.[^.]+?$/)[0];
+        const cloudPath = yzhid + '_'+fwmc+'_'+utils.uuid(5)+fileType;
+        console.log('chooseImage Path:', filePath, cloudPath);
+        // return; 
+
+        wx.cloud.uploadFile({
+          cloudPath,
+          filePath,
+          success: res => {
+            // console.log('[上传文件] 成功111：', res)
+            // console.log(this.data.currentObject);
+            let { currentObject } = self.data;
+            if (!currentObject.photos) currentObject.photos = [];
+            currentObject.photos.push(res.fileID);
+            self.setData({currentObject});
+          },
+          fail: e => {
+            console.error('[上传文件] 失败：', e)
+            wx.showToast({
+              icon: 'none',
+              title: '上传失败',
+            })
+          },
+          complete: () => {
+            wx.hideLoading()
+          }
+        })
+      },
+      fail: e => {
+        console.error(e)
+      }
+    })
+  },
+
+
+
+  onMorezhBlur: function (e) {
+    console.log(e);
+    // console.log(e.currentTarget);
+    const idarr = e.currentTarget.id.split('.');
+    const index = Number.parseInt(idarr[0]);
+    const name = idarr[1];
+    let {currentObject} = this.data;
+    currentObject.moreZh[index][name] = e.detail.value;
+    this.setData({
+      currentObject
+    })
   },
 
   onInputBlur: function(e) {

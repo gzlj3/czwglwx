@@ -12,6 +12,7 @@ const _ = db.command;
 
 //检查权限，成功返回用户基本数据(userType,yzhid)
 exports.checkAuthority = async(action,method,userInfo) => {
+
   const { openId } = userInfo;
   if ([CONSTS.BUTTON_QUERYUSER, CONSTS.BUTTON_REGISTERUSER,CONSTS.BUTTON_SENDSJYZM].indexOf(action)>=0){
     //用户注册等基本操作不检查权限

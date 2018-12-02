@@ -11,16 +11,100 @@
         <input id="_id" name="_id" class="displaynone" value="{{currentObject._id}}"/>
         <input id="housefyid" name="housefyid" class="displaynone" value="{{currentObject.housefyid}}"/>
         <input id="yzhid" name="yzhid" class="displaynone" value="{{currentObject.yzhid}}"/>
-        <view class="weui-cells weui-cells_after-title">
-            <template is="FmInput" data="{{...fmMetas.fwmc,currentObject}}"/>
-        </view> 
-        <view class="weui-cells__title">签约信息</view>
-        <view class="weui-cells weui-cells_after-title">
-            <template is="FmInput" wx:key="{{item}}" wx:for="{{['zhxm','sfzh','dhhm','czje','yj','htrqq','htrqz','szrq','dscds','sscds','ddj','sdj','dgtds','sgtds']}}" data="{{...fmMetas[item],currentObject}}"/>
-        </view>
-        <view class="weui-cells__title">其它费用</view>
-        <view class="weui-cells weui-cells_after-title">
-            <template is="FmInput" wx:key="{{item}}" wx:for="{{['wlf','ljf','glf','qtf','syjzf','bz']}}" data="{{...fmMetas[item],currentObject}}"/>
+
+        <view class="weui-tab">
+            <view class="weui-navbar">
+                <block wx:for="{{tabs}}" wx:for-index="tab_index" wx:for-item="tab_item" wx:key="*this">
+                    <view id="{{tab_index}}" class="weui-navbar__item {{activeIndex == tab_index ? 'weui-bar__item_on' : ''}}" bindtap="tabClick">
+                        <view class="weui-navbar__title">{{tab_item}}</view>
+                    </view>
+                </block>
+                <view class="weui-navbar__slider" style="left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+            </view>
+            <view class="weui-tab__panel">
+                <view class="weui-tab__content" hidden="{{activeIndex != 0}}">
+                    <!--房源基本信息-->
+                    <view class="weui-cells weui-cells_after-title">
+                        <template is="FmInput" data="{{...fmMetas.fwmc,currentObject}}"/>
+                    </view> 
+                    <view class="weui-cells__title">签约信息</view>
+                    <view class="weui-cells weui-cells_after-title">
+                        <template is="FmInput" wx:key="{{item}}" wx:for="{{['zhxm','sfzh','dhhm','czje','yj','htrqq','htrqz','szrq','dscds','sscds','ddj','sdj','dgtds','sgtds']}}" data="{{...fmMetas[item],currentObject}}"/>
+                    </view>
+                    <view class="weui-cells__title">其它费用</view>
+                    <view class="weui-cells weui-cells_after-title">
+                        <template is="FmInput" wx:key="{{item}}" wx:for="{{['wlf','ljf','glf','qtf','syjzf','bz']}}" data="{{...fmMetas[item],currentObject}}"/>
+                    </view>
+                </view>
+                <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
+                  <button data-item="{{item}}" ontap="onAddMorezh">添加更多租户</button>
+                  <block wx:for="{{currentObject.moreZh}}" wx:for-index="morezh_index" wx:for-item="morezh_item" wx:key="*this">
+                    <view class="weui-cells__title">租户{{morezh_index+1}}
+                      <view style='display:inline-block;width:85%;color:red;text-align:right'>删除</view>
+                    </view>
+                    <view class="weui-cells weui-cells_after-title">
+                      <view class="weui-cell weui-cell_input">
+                          <view class="weui-cell__hd">
+                              <view class="weui-label">租户姓名</view>
+                          </view>
+                          <view class="weui-cell__bd">
+                              <input id="{{morezh_index}}.zhxm" value="{{morezh_item.zhxm}}" bindblur="onMorezhBlur" class="weui-input" placeholder="请输入租户姓名"/>
+                          </view>
+                      </view>
+                      <view class="weui-cell weui-cell_input">
+                          <view class="weui-cell__hd">
+                              <view class="weui-label">身份证号</view>
+                          </view>
+                          <view class="weui-cell__bd">
+                              <input id="{{morezh_index}}.sfzh" value="{{morezh_item.sfzh}}" bindblur="onMorezhBlur" class="weui-input" placeholder="请输入身份证号"/>
+                          </view>
+                      </view>
+                      <view class="weui-cell weui-cell_input">
+                          <view class="weui-cell__hd">
+                              <view class="weui-label">手机号码</view>
+                          </view>
+                          <view class="weui-cell__bd">
+                              <input id="{{morezh_index}}.dhhm" value="{{morezh_item.dhhm}}" bindblur="onMorezhBlur" class="weui-input" placeholder="请输入手机号码"/>
+                          </view>
+                      </view>
+                    </view>                
+                  </block>
+                    <view class="weui-cells__title">房屋配套</view>
+                    <view class="weui-cells weui-cells_after-title">
+                      <view class="weui-cell weui-cell_input" wx:for="{{[{label1:'空调',name1:'kt',label2:'热水器',name2:'rsq'},{label1:'洗衣机',name1:'xyj',label2:'油烟机',name2:'yyj'},{label1:'沙发',name1:'sf',label2:'茶几',name2:'cj'},{label1:'床',name1:'c',label2:'衣柜',name2:'yg'},{label1:'书桌',name1:'sz',label2:'凳子',name2:'dz'}]}}"  wx:for-index="fwpt_index" wx:for-item="fwpt_item" wx:key="{{fwpt_index}}">
+                          <view class="weui-cell__hd">
+                              <view class="weui-label" style='width:70px'>{{fwpt_item.label1}}</view>
+                          </view>
+                          <view class="weui-cell__bd">
+                              <input id="rsq" name="rsq" style='width:30px' value="{{currentObject[fwpt_item.name1]}}" bindblur="onInputBlur" class="weui-input" placeholder="无"/>
+                          </view>
+                          <view class="weui-cell__hd">
+                              <view class="weui-label" style='width:70px'>{{fwpt_item.label2}}</view>
+                          </view>
+                          <view class="weui-cell__bd">
+                              <input id="kt" name="kt"  style='width:30px' value="{{currentObject[fwpt_item.name2]}}" bindblur="onInputBlur" class="weui-input" placeholder="无"/>
+                          </view>
+                      </view>
+                    </view>
+                    <view class="weui-cells weui-cells_after-title">
+                      <view class="weui-cell weui-cell_input">
+                          <view class="weui-cell__bd">
+                              <textarea class="weui-textarea" placeholder="其它配套" style="height: 3.3em" />
+                              <!-- <view class="weui-textarea-counter">0/200</view> -->
+                          </view>
+                      </view>
+                    </view>
+                </view>
+                <view class="weui-tab__content" hidden="{{activeIndex != 2}}">
+                  <button data-item="{{item}}" ontap="onAddMorePhoto">添加照片</button>
+                  <view class="list">
+                    <view class="list-item" wx:for="{{currentObject.photos}}" wx:for-index="photos_index" wx:for-item="photos_item" wx:key="{{photos_index}}">
+                      <image class="image1" src="{{photos_item}}" mode="aspectFit"></image>
+                      <view style='display:inline-block;width:50px;color:red;text-align:right' data-item="{{photos_index}}" ontap="onDeletePhoto">删除</view>
+                    </view>
+                   </view>
+                </view>
+            </view>
         </view>
     </view>
   </view>

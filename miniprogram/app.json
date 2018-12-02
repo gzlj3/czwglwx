@@ -1,10 +1,11 @@
 {
-  "pages": [ 
-    "pages/user/userGrant",
-    "pages/fygl/fyglmain",
-    "pages/index/index",
+  "pages": [
     "pages/fygl/addfy/addfy",
+    "pages/index/index",
+    "pages/user/userGrant",
     "pages/fygl/editlist/editlist",
+    "pages/fygl/fyglmain",
+    "pages/storageConsole/storageConsole",
     "pages/fygl/msg/msg_success"
   ],
   "window_old": {

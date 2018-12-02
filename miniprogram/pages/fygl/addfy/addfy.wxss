@@ -1,4 +1,6 @@
 /* miniprogram/pages/fygl/addfy/addfy.wxss */
+@import "../../../style/guide.wxss";
+
 .placeholder{
     margin: 5px;
     padding: 0 10px;

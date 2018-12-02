@@ -164,7 +164,9 @@ Page({
     }
     console.log('editlist:',buttonAction,params);
     let zdright = true;
-    if (params && params.zdright!==null) zdright = params.zdright;
+    if (params && buttonAction===CONSTS.BUTTON_LASTZD){
+      zdright = fyglService.checkRights(buttonAction, '103', params.yzhid);
+    }
 
     const response = fyglService.queryData(buttonAction, params);
     fyglService.handleAfterRemote(response, null,
@@ -257,7 +259,7 @@ Page({
  },
   
   onInputBlur: function(e) {
-    console.log(e);
+    // console.log(e);
     // console.log(e.currentTarget);
     const idarr = e.currentTarget.id.split('.');
     const index =  Number.parseInt(idarr[0]);
