@@ -6,7 +6,7 @@ import moment from '../../../utils/moment.min.js';
 const commService = require('../../../services/commServices.js');
 const config = require('../../../config.js');
 
-const fyxxMetas = { 
+const fyxxMetas = {
   fwmc: { label: '房屋名称', name: 'fwmc', require: true },
   zhxm: { label: '租户姓名', name: 'zhxm'},
   sfzh: { label: '身份证号', name: 'sfzh', type:'idcard' },

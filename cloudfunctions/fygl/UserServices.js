@@ -139,7 +139,7 @@ const getCachedSjyzm = async (openId)=>{
 const queryUser = async (userInfo) => {
   const {openId} = userInfo;
   const db = cloud.database();
-  let result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true,yzhid:true,granted:true,grantedSjhm:true}).where({
+  let result = await db.collection('userb').field({ userType: true, nickName:true,avatarUrl:true,collid:true,yzhid:true,granted:true,grantedSjhm:true,config:true}).where({
     openId
   }).get();
   if(result && result.data.length>0){

@@ -247,9 +247,13 @@ exports.exitFy = async (data,curUser) => {
     throw utils.newException("房源数据更新失败！");
 }
 
-exports.deleteFy = async (house,curUser) => {
+exports.deleteFy = async (house,curUser) => { 
   const {collid} = curUser;
-  const { houseid } = house;
+  const { houseid} = house;
+  const deleteHouse = await commService.queryPrimaryDoc(commService.getTableName('house', collid), houseid);
+  if(!deleteHouse)
+    throw utils.newException('房源ID:' + houseid);
+
   const num = await commService.removeDoc(commService.getTableName('house',collid),houseid);
   if(num<1)
     throw utils.newException('房源ID:'+houseid);
@@ -261,8 +265,10 @@ exports.deleteFy = async (house,curUser) => {
     } 
   }
   //删除房屋图片
-  cloud.deleteFile({fileList: house.photos});
-
+  if (deleteHouse.photos && deleteHouse.photos.length>0){
+    // console.log('deletefile:', deleteHouse.photos);
+    await cloud.deleteFile({ fileList: deleteHouse.photos});
+  }
 }
 
 async function tfFy(data,curUser){
@@ -282,6 +288,10 @@ async function tfFy(data,curUser){
     for (let i = 0; i < housefyList.length; i++) {
       await commService.removeDoc(commService.getTableName('housefy',collid), housefyList[i]._id);
     }
+  }
+  //删除房屋图片
+  if (house.photos && house.photos.length > 0) {
+    await cloud.deleteFile({ fileList: house.photos });
   }
 }
 exports.tfFy = tfFy;
