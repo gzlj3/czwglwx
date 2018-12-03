@@ -8,7 +8,8 @@
                     <picker mode="{{type}}" id="{{name}}" name="{{name}}" value="{{currentObject[name]}}" bindchange="onInputBlur" wx:if="{{type==='date'}}">
                         <view class="weui-input">{{currentObject[name]}}</view>
                     </picker>
-                    <input id="{{name}}" name="{{name}}" type="{{type}}" value="{{currentObject[name]}}" bindblur="onInputBlur" class="weui-input" placeholder="请输入{{label}}" wx:else/>
+                    <input id="{{name}}" name="{{name}}" type="{{type}}" value="{{currentObject[name]}}" bindblur="onInputBlur" class="weui-input" placeholder="请输入{{label}}" disabled="{{name==='fwmc' && currentObject.photos.length>0?true:false}}" wx:else/>
+                    
                 </view>
 
                 <view class="weui-cell__ft weui-vcode-btn" wx:if="{{name==='wlf'||name==='glf'||name==='ljf'}}">

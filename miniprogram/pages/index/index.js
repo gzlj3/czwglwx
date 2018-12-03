@@ -58,7 +58,6 @@ Page({
     sendingYzm:false,
     second:config.conf.yzmYxq,
     CONSTS,
-    // onLoadState:null,
     radioItems: [ 
       { name: '我是房东，想管理我的房源', value: '1', checked: true  },
       { name: '我是租客，想查询我的帐单', value: '2'}
@@ -70,7 +69,8 @@ Page({
   onLoad: function (options) {
     // const arr=['aaa','bbb'];
     // console.log('test:',arr.includes(''));
-    console.log('index onload:',options);
+    // let s = '1234567890'; 
+    console.log(/1234567890/.test('1234567890'));
 
     const requestUserType = options.requestUserType ? options.requestUserType:'';
     if(!utils.isEmpty(requestUserType)){
@@ -314,55 +314,55 @@ Page({
   },
 
   // 上传图片
-  doUpload: function () {
-    // 选择图片
-    wx.chooseImage({
-      count: 1,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
-      success: function (res) {
-        // console.log(res);
-        // return;
-        wx.showLoading({
-          title: '上传中',
-        })
+//   doUpload: function () {
+//     // 选择图片
+//     wx.chooseImage({
+//       count: 1,
+//       sizeType: ['compressed'],
+//       sourceType: ['album', 'camera'],
+//       success: function (res) {
+//         // console.log(res);
+//         // return;
+//         wx.showLoading({
+//           title: '上传中',
+//         })
 
-        const filePath = res.tempFilePaths[0]
-        // 上传图片
-        const cloudPath = 'test/my-image1' + filePath.match(/\.[^.]+?$/)[0]
-        console.log('chooseImage cloudPath:', filePath,cloudPath);
-// return; 
+//         const filePath = res.tempFilePaths[0]
+//         // 上传图片
+//         const cloudPath = 'test/my-image1' + filePath.match(/\.[^.]+?$/)[0]
+//         console.log('chooseImage cloudPath:', filePath,cloudPath);
+// // return; 
 
-        wx.cloud.uploadFile({
-          cloudPath,
-          filePath,
-          success: res => {
-            console.log('[上传文件] 成功：', res)
+//         wx.cloud.uploadFile({
+//           cloudPath,
+//           filePath,
+//           success: res => {
+//             console.log('[上传文件] 成功：', res)
 
-            app.globalData.fileID = res.fileID
-            app.globalData.cloudPath = cloudPath
-            app.globalData.imagePath = filePath
+//             app.globalData.fileID = res.fileID
+//             app.globalData.cloudPath = cloudPath
+//             app.globalData.imagePath = filePath
             
-            wx.navigateTo({
-              url: '../storageConsole/storageConsole'
-            })
-          },
-          fail: e => {
-            console.error('[上传文件] 失败：', e)
-            wx.showToast({
-              icon: 'none',
-              title: '上传失败',
-            })
-          },
-          complete: () => {
-            wx.hideLoading()
-          }
-        })
+//             wx.navigateTo({
+//               url: '../storageConsole/storageConsole'
+//             })
+//           },
+//           fail: e => {
+//             console.error('[上传文件] 失败：', e)
+//             wx.showToast({
+//               icon: 'none',
+//               title: '上传失败',
+//             })
+//           },
+//           complete: () => {
+//             wx.hideLoading()
+//           }
+//         })
 
-      },
-      fail: e => {
-        console.error(e)
-      }
-    })
-  },
+//       },
+//       fail: e => {
+//         console.error(e)
+//       }
+//     })
+//   },
 })

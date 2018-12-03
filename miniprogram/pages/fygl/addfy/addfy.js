@@ -4,6 +4,7 @@ import * as utils from '../../../utils/utils.js';
 import * as fyglService from '../../../services/fyglServices.js'; 
 import moment from '../../../utils/moment.min.js';
 const commService = require('../../../services/commServices.js');
+const config = require('../../../config.js');
 
 const fyxxMetas = { 
   fwmc: { label: '房屋名称', name: 'fwmc', require: true },
@@ -39,8 +40,8 @@ const initialState = {
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
   pageTitle:'',
   pageDesc:'',
-  tabs: ["基本信息", "更多信息","证件照"],
-  activeIndex: 2,
+  tabs: ["基本信息", "更多信息","图片"],
+  activeIndex: 0,
   sliderOffset: 0,
   sliderLeft: 0
 }
@@ -70,7 +71,6 @@ Page({
   },
 
   formSubmit: function(e){
-    console.log('form提交数据：', e.detail.value)
     // return;
     // console.log('formid：', e.detail.formId);
     const {buttonAction} = this.data;
@@ -103,7 +103,23 @@ Page({
       })
       return;
     }
+    const { currentObject } = this.data; 
+    //检查更多租户输入信息的完整性
+    if(currentObject.moreZh){
+      for (let zhIndex=0;zhIndex<currentObject.moreZh.length;zhIndex++){
+        const value = currentObject.moreZh[zhIndex];
+        if (utils.isEmpty(value.zhxm) || (!utils.isEmpty(value.dhhm) && !utils.checkSjhm(value.dhhm))){
+          utils.showToast(`更多信息中，第${zhIndex+1}个租户的姓名为空或手机号码输入有误！`);
+          return;
+        }
+      };
+    }
 
+    //处理更多信息
+    formObject.moreZh = currentObject.moreZh;
+    formObject.fwpt = currentObject.fwpt;
+    formObject.photos = currentObject.photos;
+    console.log('提交存储数据：',formObject);
 
     // const response = fyglService.saveFy(buttonAction, formObject);
     const response = fyglService.postData(buttonAction, formObject,this.data.collid);
@@ -140,6 +156,9 @@ Page({
     }else{
       currentObject = {};
       collid = getApp().globalData.user.collid;
+    }
+    if(!currentObject.fwpt){
+      currentObject.fwpt = {};
     }
 
     let buttonAction = options.buttonAction;
@@ -221,19 +240,64 @@ Page({
   
   onAddMorePhoto: function (e) {
     let { currentObject } = this.data;
-    currentObject.fwmc = '101';
     if(utils.isEmpty(currentObject.fwmc)){
       utils.showToast('需要输入房屋名称后才能上传照片！');
       return;
     }
-
+    if (currentObject.photos && currentObject.photos.length>=config.uploadFileMaxCount){
+      utils.showToast('超过每个房间最大上传照片数：'+config.uploadFileMaxCount);
+      return;
+    }
     this.doUpload(getApp().globalData.user.yzhid, currentObject.fwmc);
+  },
 
+  onPreviewPhotos: function (e) {
+    const { item:current} = e.currentTarget.dataset;
+    const {photos} = this.data.currentObject;
+    wx.previewImage({
+      current,
+      urls:photos,
+    })
+  }, 
+
+
+  onDeleteMorezh: function (e) {
+    utils.showModal('删除租户', '你确定删除当前租户吗？', () => this.startDeleteMorezh(e));
+  }, 
+
+  startDeleteMorezh:function(e){
+    const { item: index } = e.currentTarget.dataset;
+    let { currentObject } = this.data;
+    currentObject.moreZh.splice(index, 1);
+    this.setData({ currentObject });
   },
 
   onDeletePhoto: function(e){
-
+    utils.showModal('删除图片','你确定删除当前图片吗？',()=>this.startDeletePhoto(e));
   }, 
+
+  startDeletePhoto: function (e) {
+    const { item: index } = e.currentTarget.dataset;
+    let { currentObject } = this.data;
+    const fileid = currentObject.photos[index];
+    let self = this;
+    utils.showLoading('删除中');
+    wx.cloud.deleteFile({
+      fileList: [fileid],
+      success: res => {
+        let { currentObject } = self.data;
+        currentObject.photos.splice(index, 1);
+        self.setData({ currentObject });
+      },
+      fail: err => {
+        utils.showToast('删除图片失败！' + err);
+      },
+      complete: res => {
+        wx.hideLoading();
+      }
+    })
+  },
+
   
   // 上传图片
   doUpload: function (yzhid,fwmc) {
@@ -241,9 +305,16 @@ Page({
     let self = this;
     wx.chooseImage({
       count: 1,
-      // sizeType: ['compressed'],
-      // sourceType: ['album', 'camera'],
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
       success: function (res) {
+        //检查文件大小
+        const fileSize = res.tempFiles[0].size;
+        if (fileSize > config.uploadFileMaxSize){
+          utils.showToast('上传文件大小不能超过：' + (config.uploadFileMaxSize/1024)+'k');
+          return;
+        }
+
         wx.showLoading({
           title: '上传中',
         })
@@ -251,7 +322,7 @@ Page({
         const filePath = res.tempFilePaths[0]
         // 上传图片
         const fileType = filePath.match(/\.[^.]+?$/)[0];
-        const cloudPath = yzhid + '_'+fwmc+'_'+utils.uuid(5)+fileType;
+        const cloudPath = yzhid + '/'+fwmc+'/'+utils.uuid(5)+fileType;
         console.log('chooseImage Path:', filePath, cloudPath);
         // return; 
 
@@ -284,16 +355,20 @@ Page({
     })
   },
 
-
-
   onMorezhBlur: function (e) {
-    console.log(e);
-    // console.log(e.currentTarget);
     const idarr = e.currentTarget.id.split('.');
     const index = Number.parseInt(idarr[0]);
     const name = idarr[1];
     let {currentObject} = this.data;
     currentObject.moreZh[index][name] = e.detail.value;
+    this.setData({
+      currentObject
+    })
+  },
+  onFwptBlur: function (e) {
+    const name = e.currentTarget.id;
+    let { currentObject } = this.data;
+    currentObject.fwpt[name] = e.detail.value;
     this.setData({
       currentObject
     })
@@ -393,3 +468,4 @@ Page({
 
   }
 })
+

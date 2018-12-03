@@ -7,6 +7,7 @@ cloud.init({
   env: config.conf.env,
 })
 const db = cloud.database();
+const _ = db.command;
 /**
  * 更新表的记录，返回更新成功的记录数
  */
@@ -96,7 +97,7 @@ exports.isFdZk = (userType) => {
 async function queryAllCollids() {
   const db = cloud.database();
   const result = await db.collection('userb').field({ collid: true, yzhid:true,nickName: true }).where({ userType: '1' }).get();
-  // const result = await db.collection('userb').field({ collid: true, nickName: true }).get();
+  // const result = await db.collection('userb').field({ collid: true, yzhid: true, nickName: true }).get();
   if (result && result.data.length > 0)
     return result.data;
   return null;
@@ -139,10 +140,9 @@ exports.queryAllDoc = async (tablename, whereObj) => {
   let resultList = [];
   for (let i = 0; i < collids.length; i++) {
     const { collid, nickName,yzhid } = collids[i];
-    // if(utils.isEmpty(collid)) collid='';
-    // else collid = '_'+collid;
     try {
       const newWhereObj = {yzhid,...whereObj};
+      // console.log('query cond:', getTableName(tablename, collid),newWhereObj);
       result = await db.collection(getTableName(tablename, collid)).where(newWhereObj).get();
       if (result && result.data.length > 0) {
         resultList.push({ collid, nickName, sourceList: result.data });

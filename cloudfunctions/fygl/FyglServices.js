@@ -21,7 +21,8 @@ exports.queryFyList = async (curUser) => {
   let { granted} = curUser;
   let result;
   if(commService.isZk(userType)){
-    result = await commService.queryAllDoc('house',{dhhm:sjhm});
+    const sjhmCond = ','+sjhm+',';
+    result = await commService.queryAllDoc('house', { querySjhm: db.RegExp({ regexp: sjhmCond})});
   }else{
     if(!granted) granted = [];
     granted.unshift({collid:curUser.collid,nickName:null,yzhid:curUser.yzhid});
@@ -29,7 +30,7 @@ exports.queryFyList = async (curUser) => {
     for (let i = 0; i < granted.length; i++) {
       if (!granted[i]) continue;
       const { collid, nickName, yzhid, rights } = granted[i];
-      result = await db.collection(commService.getTableName('house', collid)).orderBy('fwmc', 'asc').where({
+      result = await db.collection(commService.getTableName('house', collid)).orderBy('sfsz','asc').orderBy('fwmc', 'asc').where({
         yzhid
       }).get(); 
       //计算费用合计数
@@ -154,6 +155,19 @@ exports.saveFy = async (house,collid) => {
     isAddDoc = false;
   }
   let { _id: saveHouseid, dhhm, avatarUrl } = house;
+  //处理所有租户查询手机号码
+  let querySjhm = ',';
+  if(!utils.isEmpty(house.dhhm)){
+    querySjhm+=house.dhhm+',';
+  }
+  if(house.moreZh){
+    house.moreZh.map(value=>{
+      if(!utils.isEmpty(value.dhhm) && querySjhm.indexOf(','+value.dhhm+',')<0) 
+        querySjhm+=value.dhhm+',';      
+    })
+  }
+  house.querySjhm = querySjhm;
+
   //如果网络费为空，则清空wlfys,wlfnum
   if(utils.isEmpty(house.wlf)){
     house.wlfys = "";
@@ -246,6 +260,9 @@ exports.deleteFy = async (house,curUser) => {
       await commService.removeDoc(commService.getTableName('housefy',collid), housefyList[i]._id);
     } 
   }
+  //删除房屋图片
+  cloud.deleteFile({fileList: house.photos});
+
 }
 
 async function tfFy(data,curUser){

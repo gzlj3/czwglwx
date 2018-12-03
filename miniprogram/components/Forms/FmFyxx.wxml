@@ -38,9 +38,9 @@
                 </view>
                 <view class="weui-tab__content" hidden="{{activeIndex != 1}}">
                   <button data-item="{{item}}" ontap="onAddMorezh">添加更多租户</button>
-                  <block wx:for="{{currentObject.moreZh}}" wx:for-index="morezh_index" wx:for-item="morezh_item" wx:key="*this">
+                  <block wx:for="{{currentObject.moreZh}}" wx:for-index="morezh_index" wx:for-item="morezh_item" wx:key="{{morezh_index}}">
                     <view class="weui-cells__title">租户{{morezh_index+1}}
-                      <view style='display:inline-block;width:85%;color:red;text-align:right'>删除</view>
+                      <view style='display:inline-block;width:85%;color:red;text-align:right' data-item="{{morezh_index}}" ontap="onDeleteMorezh">删除</view>
                     </view>
                     <view class="weui-cells weui-cells_after-title">
                       <view class="weui-cell weui-cell_input">
@@ -76,30 +76,30 @@
                               <view class="weui-label" style='width:70px'>{{fwpt_item.label1}}</view>
                           </view>
                           <view class="weui-cell__bd">
-                              <input id="rsq" name="rsq" style='width:30px' value="{{currentObject[fwpt_item.name1]}}" bindblur="onInputBlur" class="weui-input" placeholder="无"/>
+                              <input id="{{fwpt_item.name1}}" style='width:30px' value="{{currentObject.fwpt[fwpt_item.name1]}}" bindblur="onFwptBlur" class="weui-input" placeholder="无"/>
                           </view>
                           <view class="weui-cell__hd">
                               <view class="weui-label" style='width:70px'>{{fwpt_item.label2}}</view>
                           </view>
                           <view class="weui-cell__bd">
-                              <input id="kt" name="kt"  style='width:30px' value="{{currentObject[fwpt_item.name2]}}" bindblur="onInputBlur" class="weui-input" placeholder="无"/>
+                              <input id="{{fwpt_item.name2}}" style='width:30px' value="{{currentObject.fwpt[fwpt_item.name2]}}" bindblur="onFwptBlur" class="weui-input" placeholder="无"/>
                           </view>
                       </view>
                     </view>
                     <view class="weui-cells weui-cells_after-title">
                       <view class="weui-cell weui-cell_input">
                           <view class="weui-cell__bd">
-                              <textarea class="weui-textarea" placeholder="其它配套" style="height: 3.3em" />
+                              <textarea id="qtpt" class="weui-textarea" value="{{currentObject.fwpt['qtpt']}}" bindblur="onFwptBlur"  placeholder="其它配套" maxlength='100' style="height: 3.3em" />
                               <!-- <view class="weui-textarea-counter">0/200</view> -->
                           </view>
                       </view>
                     </view>
                 </view>
-                <view class="weui-tab__content" hidden="{{activeIndex != 2}}">
-                  <button data-item="{{item}}" ontap="onAddMorePhoto">添加照片</button>
+                <view class="weui-tab__content" wx:if="{{activeIndex == 2}}">
+                  <button ontap="onAddMorePhoto">添加图片</button>
                   <view class="list">
                     <view class="list-item" wx:for="{{currentObject.photos}}" wx:for-index="photos_index" wx:for-item="photos_item" wx:key="{{photos_index}}">
-                      <image class="image1" src="{{photos_item}}" mode="aspectFit"></image>
+                      <image class="image1" src="{{photos_item}}" mode="aspectFit" lazy-load="true" data-item="{{photos_item}}" ontap="onPreviewPhotos"></image> 
                       <view style='display:inline-block;width:50px;color:red;text-align:right' data-item="{{photos_index}}" ontap="onDeletePhoto">删除</view>
                     </view>
                    </view>
