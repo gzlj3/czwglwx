@@ -31,6 +31,12 @@ const menuList = [
     open: false,
     page: '../user/userGrant'
   },
+  {
+    id: 'feedback',
+    name: '系统配置',
+    open: false,
+    page: '../sysmanager/sysconfig/sysconfig'
+  },
 ];
 const zkMenuList = [
   {
@@ -70,7 +76,11 @@ Page({
     // const arr=['aaa','bbb'];
     // console.log('test:',arr.includes(''));
     // let s = '1234567890'; 
-    console.log(/1234567890/.test('1234567890'));
+    // console.log(/1234567890/.test('1234567890'));
+    // let s = 'a\r\nb\r\nc';
+    // console.log(s.length);
+    // s =  s.replace(/\r\n/g,'\n');
+    // console.log(s.length);
 
     const requestUserType = options.requestUserType ? options.requestUserType:'';
     if(!utils.isEmpty(requestUserType)){

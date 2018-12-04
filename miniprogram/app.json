@@ -6,7 +6,8 @@
     "pages/fygl/editlist/editlist",
     "pages/fygl/fyglmain",
     "pages/storageConsole/storageConsole",
-    "pages/fygl/msg/msg_success"
+    "pages/fygl/msg/msg_success",
+    "pages/sysmanager/sysconfig/sysconfig"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",

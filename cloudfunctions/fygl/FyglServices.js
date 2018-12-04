@@ -10,6 +10,11 @@ cloud.init({
 const db = cloud.database();
 const _ = db.command;
 
+let USER;
+exports.setUser = (curUser)=>{
+  USER = curUser;
+};
+
 // cloud.init({
 //   env: 'jjczwgl-bc6ef9'
 //   // env: 'jjczwgl-test-2e296e'
@@ -110,7 +115,7 @@ async function querySdbList (curUser,data) {
 exports.querySdbList = querySdbList;
 
 async function queryZdList(curUser,data) {
-  console.log('===queryzdlist:',data);
+  // console.log('===queryzdlist:',data);
   const fyList = await querySdbList(curUser,data);
   const resultList = fyList;
   let zdList = new Array(resultList.length);
@@ -364,6 +369,8 @@ exports.updateZdList = async (zdList,autoSendMessage,curUser) => {
 const sendZdMessage= async (house,housefy,collid,openId)=>{
   const {dhhm,fwmc,zhxm,fyhj,zdlx} = house;
   let message = getZdMessage(housefy);
+  message = message.replace(/\r\n/g,'\n');
+  if(message.endsWith('\n')) message = message.substring(0,message.length - 1);  
   message += '【极简出租】';
   //发送短信
   await utils.sendPhoneMessage(dhhm,message);
@@ -395,9 +402,8 @@ const getDfts = (housefy) => {
   if(housefy.dfhj){
     let dgtdsts='';
     if (!utils.isEmpty(housefy.dgtds)) dgtdsts = `,公摊:${housefy.dgtds}`;
-    return `电费:${housefy.dfhj}元(上月:${housefy.dscds},本月:${housefy.dbcds}${dgtdsts}));\r\n`;
+    return `电费:${housefy.dfhj}元(上月:${housefy.dscds},本月:${housefy.dbcds}${dgtdsts});\r\n`;
   }
-  // return `电费:${housefy.dfhj}元(上次:${housefy.dscds},本次:${housefy.dbcds},实用:${housefy.dsyds},公摊:${housefy.dgtds});\r\n`;
   return '';
 }
 const getSfts = (housefy) => {
@@ -406,7 +412,6 @@ const getSfts = (housefy) => {
     if (!utils.isEmpty(housefy.sgtds)) sgtdsts = `,公摊:${housefy.sgtds}`;
     return `水费:${housefy.sfhj}元(上月:${housefy.sscds},本月:${housefy.sbcds}${sgtdsts});\r\n`;
   }
-  // return `水费:${housefy.sfhj}元(上次:${housefy.sscds},本次:${housefy.sbcds},实用:${housefy.ssyds},公摊:${housefy.sgtds});\r\n`;
   return '';
 }
 
@@ -416,11 +421,11 @@ const getZdMessage = (housefy) => {
   let zdlxinfo;
   if (housefy.zdlx == '0') zdlxinfo = '(签约帐单),';
   else if (housefy.zdlx == '2') zdlxinfo = '(退房帐单),';
-  else zdlxinfo = rq1.substring(0, 4) + '年' + rq1.substring(5, 7) + '月';
+  else zdlxinfo = housefy.zdmonth ? housefy.zdmonth:rq1.substring(0, 4) + '年' + rq1.substring(5, 7) + '月';
   const ts1 = housefy.fyhj<0?'退':'缴';
   const ts2 = housefy.czje<0?'(退)':'';
 
-  const s = `${housefy.fwmc}房租户,${housefy.zhxm},您好,${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。\r\n`+
+  const s = `${housefy.fwmc}房,${housefy.zhxm},您好:\r\n${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。\r\n`+
             `${getFyts('月租费', housefy.czje, ';\r\n')}`+
             `${getFyts('押金', housefy.yj,';\r\n')}`+getDfts(housefy)+getSfts(housefy)+
             `${getFyts('网络费', housefy.wlf)}${getFyts('卫生费', housefy.ljf)}${getFyts('管理费', housefy.glf)}`+
@@ -443,18 +448,27 @@ exports.processQrsz = async (params,curUser) => {
 
   if ("sxzd" === flag && housefyid !== house.housefyid)
     throw utils.newException("帐单数据与主房屋不匹配，刷新帐单失败！");
+  if ("htzd" === flag && housefyid !== house.housefyid)
+    throw utils.newException("只能回退当期帐单！");
   let lastFyhj;
   if ("sxzd" === flag) {
     // 刷新帐单
-    // console.log("qrsz zdlx:", housefy.zdlx);
     lastFyhj = house.fyhj;
     makeHousefy(house, housefy, null,null,flag);
   }else if ("sjdx" === flag) {
     const message = getZdMessage(housefy);
     return message;
   } else if ("sendsjdx" === flag) {
-    await sendZdMessage(house,housefy,collid,curUser.openId);
+    await sendZdMessage(house, housefy, collid, curUser.openId);
     return queryLastzdList({ houseid, collid});
+  } else if ("htzd" === flag) {
+    await htHouse(house, housefy, collid);
+    return queryLastzdList({ houseid, collid });
+  } else if ("sczd" === flag) {
+    if(house.sfsz===CONSTS.SFSZ_WJQ)
+      throw utils.newException("帐单未结清，不能删除！");
+    await commService.removeDoc(commService.getTableName('housefy', collid), housefy._id);
+    return queryLastzdList({ houseid, collid });
   } else {
     jzHouse(house, housefy, flag);
   }
@@ -476,6 +490,46 @@ exports.processQrsz = async (params,curUser) => {
   }
 
   return queryLastzdList({ houseid, collid});
+}
+
+const htHouse = async (house, housefy, collid) => {
+  const housefyList = await queryLastzdList({houseid:house._id,collid});
+  if(housefyList.length<2) 
+    throw utils.newException('已经是最后一个帐单，不能再回退了！');
+  const lastHousefy = housefyList[1];
+
+  house.sfsz = lastHousefy.sfsz;
+  house.zdlx = lastHousefy.zdlx;
+  house.rq1 = lastHousefy.rq1;
+  house.rq2 = lastHousefy.rq2;
+  house.yffrq1 = lastHousefy.yffrq1;
+  house.yffrq2 = lastHousefy.yffrq2;
+  house.sfhj = lastHousefy.sfhj;
+  house.dfhj = lastHousefy.dfhj;
+  house.fyhj = lastHousefy.fyhj;
+  //回退水电数据
+  house.dscds = lastHousefy.dscds;
+  house.dbcds = lastHousefy.dbcds;
+  house.sscds = lastHousefy.sscds;
+  house.sbcds = lastHousefy.sbcds;
+
+  //回退其它费用
+  if (lastHousefy.zdlx!==CONSTS.ZDLX_HTZD){
+    house.wlf = lastHousefy.wlf;
+    house.glf = lastHousefy.glf;
+    house.ljf = lastHousefy.ljf;
+  }
+  house.qtf = housefy.qtf;
+  house.syjzf = housefy.syjzf;
+
+  house.housefyid = lastHousefy._id;
+
+  //更新房屋数据
+  const updatedNum = await commService.updateDoc(commService.getTableName('house',collid),house);
+  if(updatedNum===0)
+    throw utils.newException('更新房屋数据出错！');
+  //删除当前帐单
+  await commService.removeDoc(commService.getTableName('housefy', collid),housefy._id);
 }
 
 function jzHouse(house, housefy, flag) {
@@ -686,8 +740,10 @@ function makeHousefy(house, housefy, zdlx,tfrq,flag){
 
     assignFwqtf(house,housefy,zdlx,flag);
 
-    housefy.dbcds=house.dscds;
-    housefy.Sbcds=house.Sscds;
+    housefy.dbcds = house.dbcds;
+    housefy.dscds = house.dscds;
+    housefy.sbcds = house.sbcds;
+    housefy.sscds = house.sscds;
     // 房屋合计费
     // housefy.fyhj = utils.getInteger(housefy.czje)
     //   + utils.getInteger(housefy.yj)
@@ -767,7 +823,25 @@ function makeHousefy(house, housefy, zdlx,tfrq,flag){
   house.dfhj = housefy.dfhj;
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
-  // console.log('housefy tsinfo end:', housefy.daysinfo, housefy.monthNum);
+  //根据当前配置，生成帐单显示月份提示（用后付费或预付费显示）
+  let zdlxinfo;
+  if (house.zdlx == CONSTS.ZDLX_HTZD) zdlxinfo = '签约';
+  else if (house.zdlx == CONSTS.ZDLX_TFZD) zdlxinfo = '退房';
+  else{
+    let zdrq;
+    // const { userConfig} = USER;
+    // console.log('userconfig:',userConfig);
+    if (USER && USER.config && USER.config.zdmonth === '1') {
+      zdrq = house.yffrq1;
+    }else{
+      zdrq = house.rq1;
+    }
+    zdlxinfo = zdrq.substring(0, 4) + '年' + zdrq.substring(5, 7) + '月';
+  }
+  house.zdmonth = zdlxinfo;
+  housefy.zdmonth = zdlxinfo;
+  ///////////////////////////////////
+
   return housefy;
 }
 

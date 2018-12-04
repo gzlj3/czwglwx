@@ -96,6 +96,12 @@ Page({
     } else if ("sxzd" === flag) {
       title = "刷新帐单";
       content = "确定刷新当前帐单吗？"
+    } else if ("htzd" === flag) {
+      title = "回退帐单";
+      content = "将帐单回退到上一期帐单状态，请注意留存好水电数据，确定回退帐单吗？"
+    } else if ("sczd" === flag) {
+      title = "删除帐单";
+      content = "确定删除当前帐单吗？"
     }else{
       return;
     }

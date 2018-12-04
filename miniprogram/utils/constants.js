@@ -34,6 +34,9 @@ exports.USERTYPE_FD = '1'; // 用户类型：房东
 exports.USERTYPE_ZK = '2'; // 用户类型：租客
 exports.USERTYPE_FDZK = '3'; // 用户类型：房东租客双重身份
 
+//系统管理
+exports.BUTTON_SYSCONFIG = 200; // 系统配置
+
 // //租客操作
 // exports.BUTTON_ZK_SEELASTZD = 200;  //租客查看帐单
 
@@ -54,6 +57,5 @@ exports.getSfszInfo = sfsz => {
 // 异常信息
 exports.EXCEPTION = {
   100: '用户未注册',
-  101: '用户数据异常',
-  102: '无权操作'
+  101: '用户无权操作'
 }

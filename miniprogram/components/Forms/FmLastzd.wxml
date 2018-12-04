@@ -12,10 +12,11 @@
   module.exports.getZdfy = function(item){
     var rq1 = item.rq1;
     if(!rq1 || rq1.length<10) return '';
-    var ym = rq1.substring(0,4)+'年'+rq1.substring(5,7)+'月';
+    var ym = item.zdmonth?item.zdmonth:rq1.substring(0,4)+'年'+rq1.substring(5,7)+'月';
     if(item.zdlx=='0') tsinfo = '签约帐单';
     else if(item.zdlx=='2') tsinfo = '退房帐单';
     else tsinfo = ym+'帐单';
+
     var zdfy = tsinfo;  
     return zdfy;
   }
@@ -26,6 +27,9 @@
 </wxs>
 <template name="FmLastzd">
   <view class="page">
+    <view class="page__hd" wx:if="{{sourceList.length===0}}">
+        <view class="page__desc">无帐单数据!</view>
+    </view>
     <view class="page__hd" wx:if="{{sourceList.length>0}}">
         <view class="page__title">{{sourceList[0].fwmc}} {{sourceList[0].zhxm}}</view>
         <view class="page__desc">最近6个月帐单列表</view>
@@ -149,11 +153,16 @@
                 </view>
             </view>
             
-            <view class="weui-form-preview__ft" wx:if="{{item.sfsz==='0' && (isFd) && zdright}}">
+            <view class="weui-form-preview__ft" wx:if="{{item.sfsz==='0' && (isFd) && zdright && showDetailZd[index]}}">
                 <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="jzzd" data-item="{{item._id}}" bindtap="onQrsz">结转下月</view>
-                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="sxzd" data-item="{{item._id}}" bindtap="onQrsz">刷新帐单</view>
+                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="sxzd" data-item="{{item._id}}" bindtap="onQrsz">刷新</view>
+                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="htzd" data-item="{{item._id}}" bindtap="onQrsz" wx:if="{{sourceList.length>1}}">回退</view>
                 <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" id="sjdx" data-item="{{item._id}}" bindtap="onQrszCz">发短信{{item.messageNum?'['+item.messageNum+']':''}}</view>
                 <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" id="qrsz" data-item="{{item._id}}" bindtap="onQrsz">确认收费</view>
+            </view>
+            <view class="weui-form-preview__ft" wx:if="{{item.sfsz!=='0' && (isFd) && zdright && showDetailZd[index]}}">
+                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="htzd" data-item="{{item._id}}" bindtap="onQrsz" wx:if="{{sourceList.length>1}}">回退帐单</view>
+                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="sczd" data-item="{{item._id}}" bindtap="onQrsz" wx:if="{{sourceList.length<=1}}">删除账单</view>
             </view>
         </view>
     </view>

@@ -1,0 +1,19 @@
+<!--入口为user.config对象 -->
+<template name="FmSysConfig">
+  <view class="page">
+    <view class="page__hd">
+      <view class="page__title">系统配置</view>
+      <view class="page__desc">属于你的个性化配置。</view>
+    </view>
+    <view class="page__bd">
+      <!-- <view class="weui-cells__title">新授权手机号</view> -->
+      <view class="weui-cells weui-cells_after-title">
+        <view class="weui-cell weui-cell_input">
+           <checkbox-group id="zdmonth" name="zdmonth" bindchange="onCheckboxChange">
+              <label><checkbox value="zdmonth" checked="{{config.zdmonth==='1'}}"/>帐单显示月为预付费起始月（默认为后付费起始月）</label>
+           </checkbox-group>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>

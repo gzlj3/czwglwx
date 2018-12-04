@@ -24,8 +24,8 @@ exports.main = async (event, context) => {
   try {
     //检查权限，成功则返回用户的基本数据
     const curUser = await userServices.checkAuthority(action, method,userInfo);
-
     console.log('操作用户：', curUser);
+    services.setUser(curUser);
     let result;
     switch(action){
       case CONSTS.BUTTON_ZK_SEELASTZD:
@@ -39,6 +39,9 @@ exports.main = async (event, context) => {
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_USERGRANT  :
         result = await userServices.grantUser(data, curUser);
+        return results.getSuccessResults(result);
+      case CONSTS.BUTTON_SYSCONFIG  :
+        result = await userServices.sysconfig(data, curUser);
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_SENDSJYZM:
         result = await userServices.sendSjyzm(data,userInfo);

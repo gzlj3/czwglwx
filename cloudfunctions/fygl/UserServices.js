@@ -41,7 +41,7 @@ exports.checkAuthority = async(action,method,userInfo) => {
   // }
 
   if(commService.isZk(userType)){
-    if ([CONSTS.BUTTON_CB, CONSTS.BUTTON_MAKEZD, CONSTS.BUTTON_ADDFY, CONSTS.EDITFY, CONSTS.DELETEFY, CONSTS.BUTTON_EXITFY, CONSTS.BUTTON_USERGRANT].indexOf(action) >= 0) {
+    if ([CONSTS.BUTTON_CB, CONSTS.BUTTON_MAKEZD, CONSTS.BUTTON_ADDFY, CONSTS.EDITFY, CONSTS.DELETEFY, CONSTS.BUTTON_EXITFY, CONSTS.BUTTON_USERGRANT, CONSTS.BUTTON_SYSCONFIG].indexOf(action) >= 0) {
       throw utils.codeException(101);
     }
     if ([CONSTS.BUTTON_LASTZD].indexOf(action) >= 0 && method === 'POST') {
@@ -272,4 +272,10 @@ exports.registerUser = async (data,userInfo) => {
   }
   
   return await queryUser({ openId});
+}
+
+exports.sysconfig = async (data, curUser) => {
+  curUser.config = { ...curUser.config,...data};
+  updatedNum = await commService.updateDoc('userb', curUser);
+  return await queryUser({ openId: curUser.openId });
 }
