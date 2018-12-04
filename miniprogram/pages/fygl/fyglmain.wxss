@@ -27,4 +27,5 @@
   padding-right: 15px;
   color:black;
   font-size: 14px;
+  display:inline-block;
 }

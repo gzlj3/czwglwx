@@ -48,7 +48,7 @@
                               <view class="weui-label">租户姓名</view>
                           </view>
                           <view class="weui-cell__bd">
-                              <input id="{{morezh_index}}.zhxm" value="{{morezh_item.zhxm}}" bindblur="onMorezhBlur" class="weui-input" placeholder="请输入租户姓名"/>
+                              <input id="{{morezh_index}}.zhxm" value="{{morezh_item.zhxm}}" bindinput="onMorezhBlur" class="weui-input" placeholder="请输入租户姓名"/>
                           </view>
                       </view>
                       <view class="weui-cell weui-cell_input">
@@ -56,7 +56,7 @@
                               <view class="weui-label">身份证号</view>
                           </view>
                           <view class="weui-cell__bd">
-                              <input id="{{morezh_index}}.sfzh" value="{{morezh_item.sfzh}}" bindblur="onMorezhBlur" class="weui-input" placeholder="请输入身份证号"/>
+                              <input id="{{morezh_index}}.sfzh" value="{{morezh_item.sfzh}}" bindinput="onMorezhBlur" class="weui-input" placeholder="请输入身份证号"/>
                           </view>
                       </view>
                       <view class="weui-cell weui-cell_input">
@@ -64,7 +64,7 @@
                               <view class="weui-label">手机号码</view>
                           </view>
                           <view class="weui-cell__bd">
-                              <input id="{{morezh_index}}.dhhm" value="{{morezh_item.dhhm}}" bindblur="onMorezhBlur" class="weui-input" placeholder="请输入手机号码"/>
+                              <input id="{{morezh_index}}.dhhm" value="{{morezh_item.dhhm}}" bindinput="onMorezhBlur" class="weui-input" placeholder="请输入手机号码"/>
                           </view>
                       </view>
                     </view>                
@@ -76,20 +76,20 @@
                               <view class="weui-label" style='width:70px'>{{fwpt_item.label1}}</view>
                           </view>
                           <view class="weui-cell__bd">
-                              <input id="{{fwpt_item.name1}}" style='width:30px' value="{{currentObject.fwpt[fwpt_item.name1]}}" bindblur="onFwptBlur" class="weui-input" placeholder="无"/>
+                              <input id="{{fwpt_item.name1}}" style='width:50px' value="{{currentObject.fwpt[fwpt_item.name1]}}" bindinput="onFwptBlur" class="weui-input" placeholder="无"/>
                           </view>
                           <view class="weui-cell__hd">
                               <view class="weui-label" style='width:70px'>{{fwpt_item.label2}}</view>
                           </view>
                           <view class="weui-cell__bd">
-                              <input id="{{fwpt_item.name2}}" style='width:30px' value="{{currentObject.fwpt[fwpt_item.name2]}}" bindblur="onFwptBlur" class="weui-input" placeholder="无"/>
+                              <input id="{{fwpt_item.name2}}" style='width:50px' value="{{currentObject.fwpt[fwpt_item.name2]}}" bindinput="onFwptBlur" class="weui-input" placeholder="无"/>
                           </view>
                       </view>
                     </view>
                     <view class="weui-cells weui-cells_after-title">
                       <view class="weui-cell weui-cell_input">
                           <view class="weui-cell__bd">
-                              <textarea id="qtpt" class="weui-textarea" value="{{currentObject.fwpt['qtpt']}}" bindblur="onFwptBlur"  placeholder="其它配套" maxlength='100' style="height: 3.3em" />
+                              <textarea id="qtpt" class="weui-textarea" value="{{currentObject.fwpt['qtpt']}}" bindinput="onFwptBlur"  placeholder="其它配套" maxlength='100' style="height: 3.3em" />
                               <!-- <view class="weui-textarea-counter">0/200</view> -->
                           </view>
                       </view>

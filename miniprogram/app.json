@@ -1,10 +1,10 @@
 {
   "pages": [
+    "pages/fygl/fyglmain",
     "pages/index/index",
     "pages/fygl/addfy/addfy",
     "pages/user/userGrant",
     "pages/fygl/editlist/editlist",
-    "pages/fygl/fyglmain",
     "pages/storageConsole/storageConsole",
     "pages/fygl/msg/msg_success",
     "pages/sysmanager/sysconfig/sysconfig"

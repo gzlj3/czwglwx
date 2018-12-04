@@ -20,8 +20,8 @@ const fyxxMetas = {
   sscds: { label: '水上次读数', name: 'sscds', type: "number" },
   ddj: { label: '电费单价', name: 'ddj', type: "digit" },
   sdj: { label: '水费单价', name: 'sdj', type: "digit" },
-  dgtds: { label: '电公摊', name: 'dgtds', type: "digit" },
-  sgtds: { label: '水公摊', name: 'sgtds', type: "digit" },
+  dgtds: { label: '电公摊度数', name: 'dgtds', type: "digit" },
+  sgtds: { label: '水公摊度数', name: 'sgtds', type: "digit" },
   // dbcds: { label: '电本次读数', name: 'dbcds', type: "number" },
   // sbcds: { label: '水本次读数', name: 'sbcds', type: "number" },
   wlf: { label: '网络费', name: 'wlf', type: "digit" },
@@ -248,7 +248,13 @@ Page({
       utils.showToast('超过每个房间最大上传照片数：'+config.uploadFileMaxCount);
       return;
     }
-    this.doUpload(getApp().globalData.user.yzhid, currentObject.fwmc);
+
+    if(!currentObject.photos || currentObject.photos.length===0){
+      utils.showModal('添加图片', `添加图片后，将不能再修改房屋名称，请确认房屋名称(${currentObject.fwmc})已经输入正确？`, 
+      () => this.doUpload(getApp().globalData.user.yzhid, currentObject.fwmc));
+    }else{
+      this.doUpload(getApp().globalData.user.yzhid, currentObject.fwmc);
+    }
   },
 
   onPreviewPhotos: function (e) {
