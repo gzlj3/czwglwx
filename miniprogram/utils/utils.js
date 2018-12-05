@@ -18,6 +18,21 @@ exports.getFloat = (value) => {
   }
 }
 
+//对number四舍五入，保留指定位置，并返回数值型
+exports.roundNumber = (number, precision) => {
+  try {
+    const result = Number.parseFloat(number.toFixed(precision));
+    if (isNaN(result)) return 0;
+    return result;
+  } catch (e) {
+    return 0;
+  }
+}
+
+exports.getString = (value) => {
+  return value?value:"";
+}
+
 const isEmpty = (value) => {
   return !value;
   // return !(value && value.length>0);
@@ -83,6 +98,11 @@ exports.redirectToSuccessPage = (pageDesc, buttonText,returnUrl,returnAction,ret
   wx.redirectTo({
     url: '/pages/fygl/msg/msg_success?pageDesc=' + pageDesc + '&button2=' + JSON.stringify(button2Obj)
   });
+}
+
+//取当前时间毫秒值
+exports.currentTimeMillis = () => {
+  return (new Date()).getTime();
 }
 
 function uuid(len, radix) {

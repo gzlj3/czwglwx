@@ -179,7 +179,11 @@ Page({
   onLoad: function (options) {
     // this.setData({ user: getApp().globalData.user });
     // fyglService.checkAuthority(1);
- 
+    // let arr = new Array(3);
+    // arr[0] = {};
+    // arr[1] = {};
+    // console.log('compare:',arr[0]===arr[1]);
+
     const response = fyglService.queryFyglList(); 
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
@@ -192,17 +196,82 @@ Page({
   refreshFyList: function(resultData) {
     //计算房源进度条显示数据
     // console.log(resultData);
+    let queryCond = new Array(resultData.length);
+    let i=0;
     resultData.map(value=>{
+      queryCond[i++] = {};
+      value.filterList = value.sourceList;
       fyglService.refreshProgessState(value.sourceList);
     });
+    this.refreshHjs(resultData);
 
     this.setData({
       // fyList: resultData,
       allFyList: resultData,
+      queryCond,
       isFd: getApp().globalData.user.userType === CONSTS.USERTYPE_FD,
       isZk: getApp().globalData.user.userType === CONSTS.USERTYPE_ZK,
-    }); 
+    });
+  },
 
+  refreshHjs: function (allFyList) {
+    allFyList.map(onefd => {
+      let czjehj = 0, sfhj = 0, dfhj = 0, fyhj = 0;
+      let wjqhj = 0,yjqhj=0;
+      onefd.filterList.map(value => {
+        czjehj += utils.getInteger(value.czje);
+        sfhj += utils.getFloat(value.sfhj);
+        dfhj += utils.getFloat(value.dfhj);
+        fyhj += utils.getFloat(value.fyhj);
+        const sfsz = value.sfsz;
+        if(sfsz===CONSTS.SFSZ_WJQ) wjqhj++;
+        else if (sfsz === CONSTS.SFSZ_YJQ || sfsz===CONSTS.SFSZ_YJZ) yjqhj++;
+      });
+      fyhj = utils.roundNumber(fyhj, 1);
+      dfhj = utils.roundNumber(dfhj, 1);
+      sfhj = utils.roundNumber(sfhj, 1);
+      onefd.czjehj = czjehj;
+      onefd.sfhj = sfhj;
+      onefd.dfhj = dfhj;
+      onefd.fyhj = fyhj;
+      onefd.wjqhj = wjqhj;
+      onefd.yjqhj = yjqhj;
+    });
+  },
+
+  onQueryData: function(e){
+    const obj = e.detail.value;
+    const index = Number.parseInt(e.currentTarget.id);
+    let {queryCond}  = this.data;
+    if (obj instanceof Array) {
+      queryCond[index].sfszArr = obj;
+      queryCond[index].wjqChecked = obj.includes(CONSTS.SFSZ_WJQ);
+      queryCond[index].yjqChecked = obj.includes(CONSTS.SFSZ_YJQ);
+    }else{
+      queryCond[index].search = obj;
+    }
+    console.log('querycond:',queryCond);
+    // this.setData({queryCond});
+
+    let {allFyList} = this.data;
+    let fyItem = allFyList[index];
+    const currQueryCond = queryCond[index];
+    let filterList = [];
+    fyItem.sourceList.map(value=>{
+      let sfsz = value.sfsz;
+      if (sfsz === CONSTS.SFSZ_YJZ) sfsz = CONSTS.SFSZ_YJQ;
+      if (currQueryCond.sfszArr && currQueryCond.sfszArr.length > 0 && !currQueryCond.sfszArr.includes(sfsz)){
+        return;
+      }
+      if(!utils.isEmpty(currQueryCond.search)){
+        const searchStr = value.fwmc + ',' + utils.getString(value.zhxm) + ',' + utils.getString(value.dhhm);//+','+utils.getString(value.sfzh)+','+utils.getString(value.dhhm);
+        if (searchStr.indexOf(currQueryCond.search)<0) return;
+      }
+      filterList.push(value);
+    });
+    fyItem.filterList = filterList;
+    this.refreshHjs(allFyList);
+    this.setData({ queryCond, allFyList});
   },
 
   onTfInputBlur: function(e) {

@@ -56,22 +56,22 @@ exports.queryFyList = async (curUser) => {
     result = resultList;
   }
   //计算费用合计数
-  result.map(onefd=>{
-    let czjehj = 0, sfhj = 0, dfhj = 0, fyhj = 0;
-    onefd.sourceList.map(value => {
-      czjehj += utils.getInteger(value.czje);
-      sfhj += utils.getFloat(value.sfhj);
-      dfhj += utils.getFloat(value.dfhj);
-      fyhj += utils.getFloat(value.fyhj);
-    });
-    fyhj = utils.roundNumber(fyhj, 1);
-    dfhj = utils.roundNumber(dfhj, 1);
-    sfhj = utils.roundNumber(sfhj, 1);
-    onefd.czjehj = czjehj;
-    onefd.sfhj = sfhj;
-    onefd.dfhj = dfhj;
-    onefd.fyhj = fyhj;
-  });
+  // result.map(onefd=>{
+  //   let czjehj = 0, sfhj = 0, dfhj = 0, fyhj = 0;
+  //   onefd.sourceList.map(value => {
+  //     czjehj += utils.getInteger(value.czje);
+  //     sfhj += utils.getFloat(value.sfhj);
+  //     dfhj += utils.getFloat(value.dfhj);
+  //     fyhj += utils.getFloat(value.fyhj);
+  //   });
+  //   fyhj = utils.roundNumber(fyhj, 1);
+  //   dfhj = utils.roundNumber(dfhj, 1);
+  //   sfhj = utils.roundNumber(sfhj, 1);
+  //   onefd.czjehj = czjehj;
+  //   onefd.sfhj = sfhj;
+  //   onefd.dfhj = dfhj;
+  //   onefd.fyhj = fyhj;
+  // });
 
   return result;
 }

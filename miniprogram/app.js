@@ -19,7 +19,8 @@ App({
     this.globalData = {
       cloudNormal:false,
       fyListDirty:false,  //房源列表是否有更新
-      user: { wxgranted: true, userType:'', nickName:'', avatarUrl:'',collid:'',granted:[],grantedSjhm:[], }  //用户登录基本信息
+      user: { wxgranted: true, userType:'', nickName:'', avatarUrl:'',collid:'',granted:[],grantedSjhm:[], },  //用户登录基本信息
+      lastRefreshTime:0,  //上次刷新时间
     }
   },
 
@@ -28,6 +29,12 @@ App({
     const user = this.globalData.user;
     if (!user || utils.isEmpty(user.userType) || user.userType===CONSTS.USERTYPE_NONE){
       this.queryUser();
+    }else{
+      const { lastRefreshTime } = this.globalData;
+      if (utils.currentTimeMillis() - lastRefreshTime >= config.refreshUserInterval){
+        console.log('refresh user');
+        this.queryUser();
+      }
     }
   },
 
@@ -52,6 +59,7 @@ App({
         if(this.globalData.user.wxgranted){
           this.setGlobalData({ cloudNormal: true });
         }
+        this.setGlobalData({ lastRefreshTime: utils.currentTimeMillis()});
       },
       err => {
         this.setGlobalData({ cloudNormal: false });

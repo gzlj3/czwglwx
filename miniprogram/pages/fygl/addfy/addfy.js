@@ -165,8 +165,6 @@ Page({
     if(buttonAction){
       buttonAction = Number.parseInt(buttonAction);
     } 
-    //调试程序用。。。。
-    buttonAction = CONSTS.BUTTON_ADDFY;
 
     var that = this;
     wx.getSystemInfo({

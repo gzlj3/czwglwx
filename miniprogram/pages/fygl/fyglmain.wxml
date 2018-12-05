@@ -30,16 +30,17 @@
     <view class="page__bd">
       <button  size="default" bindtap="onAddfy" wx:if="{{isFd}}">新建房源</button>
       <view class="weui-cells__title" wx:if="{{isZk && allFyList.length===0}}">未查到您的房源数据，请与房东联系，确认签约时手机号是否输入正确！</view>
-      <view wx:for="{{allFyList}}" wx:key="nickName" wx:for-item="fyItem"> 
-        <view class="weui-cells__title">{{fyItem.nickName?fyItem.nickName:'我'}}的{{fyItem.sourceList.length}}间房源(帐单:{{fyItem.fyhj}}元,月租:{{fyItem.czjehj}}元,水费:{{fyItem.sfhj}}元,电费:{{fyItem.dfhj}}元)</view>
+      <view wx:for="{{allFyList}}" wx:key="yzhid" wx:for-item="fyItem" wx:for-index="fyItem_index"> 
+        <view class="weui-cells__title">{{fyItem.nickName?fyItem.nickName:'我'}}的{{fyItem.filterList.length}}间房源(帐单:{{fyItem.fyhj}}元,月租:{{fyItem.czjehj}}元,水费:{{fyItem.sfhj}}元,电费:{{fyItem.dfhj}}元)</view>
         <view class="weui-cells__title1">
-          <checkbox-group bindchange="onCheckboxChange">
-              <label><checkbox value="0"/>未结清</label>
-              <label><checkbox value="1"/>已结清</label>
-              <input style="position:relative;top:5px;margin-left:10px;display:inline-block;width:120px;background-color:white;border:1rpx solid #d5d5d6" bindinput=""/>
+          <checkbox-group id="{{fyItem_index}}" bindchange="onQueryData">
+              <label><checkbox value="0" checked="{{queryCond[fyItem_index].wjqChecked}}"/>未结清[{{fyItem.wjqhj}}]</label>
+              <label style="margin-left:10px;"><checkbox value="1" checked="{{queryCond[fyItem_index].yjqChecked}}"/>已结清[{{fyItem.yjqhj}}]</label>
+              <!-- <view style="position:relative;margin-left:10px;display:inline-block;">查询</view> -->
+              <input id="{{fyItem_index}}" style="position:relative;top:5px;margin-left:10px;display:inline-block;width:100px;background-color:white;border:1rpx solid #d5d5d6;font-size:16px" placeholder="查询条件" value="{{queryCond[fyItem_index].search}}" bindinput="onQueryData"/>
            </checkbox-group>
         </view>
-        <view class="weui-panel weui-panel_access" wx:key="_id" wx:for="{{fyItem.sourceList}}">
+        <view class="weui-panel weui-panel_access" wx:key="_id" wx:for="{{fyItem.filterList}}">
             <view class="weui-panel__bd">
                 <view data-item="{{item}}" class="weui-media-box weui-media-box_appmsg" >
                     <view class="weui-media-box__hd weui-media-box__hd_in-appmsg" data-item="{{item}}" data-fyitem="{{fyItem.collid}}"  data-yzhid="{{fyItem.yzhid}}" bindtap="{{isFd?'onEditfy':''}}"> 
