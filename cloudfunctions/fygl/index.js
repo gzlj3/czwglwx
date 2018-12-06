@@ -15,17 +15,18 @@ exports.main = async (event, context) => {
   const { action, method, data,restData,userInfo} = event;
   if(!action) return results.getErrorResults('未指定操作！');
   console.log("action:"+action+"   method:"+method);
-  // if(action === 300){
-  //   // console.log(data);
-  //   const result = await utils.sendTemplateMessage(data);
-  //   return results.getSuccessResults(result);
-  // }
 
   try {
     //检查权限，成功则返回用户的基本数据
     const curUser = await userServices.checkAuthority(action, method,userInfo);
     // console.log('操作用户：', curUser);
     services.setUser(curUser);
+    if (action === 300) {
+      //测试发送模板消息
+      // console.log(data);
+      const result = await utils.sendTemplateMessage(data,curUser);
+      return results.getSuccessResults(result);
+    }
     let result;
     switch(action){
       case CONSTS.BUTTON_ZK_SEELASTZD:

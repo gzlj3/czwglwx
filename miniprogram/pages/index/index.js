@@ -73,6 +73,7 @@ Page({
   },
   
   onLoad: function (options) {
+    
     // const arr=['aaa','bbb'];
     // console.log('test:',arr.includes(''));
     // let s = '1234567890'; 
@@ -81,6 +82,7 @@ Page({
     // console.log(s.length);
     // s =  s.replace(/\r\n/g,'\n');
     // console.log(s.length);
+    console.log(utils.currentTimeMillis());
 
     const requestUserType = options.requestUserType ? options.requestUserType:'';
     if(!utils.isEmpty(requestUserType)){
@@ -323,56 +325,14 @@ Page({
     })    
   },
 
-  // 上传图片
-//   doUpload: function () {
-//     // 选择图片
-//     wx.chooseImage({
-//       count: 1,
-//       sizeType: ['compressed'],
-//       sourceType: ['album', 'camera'],
-//       success: function (res) {
-//         // console.log(res);
-//         // return;
-//         wx.showLoading({
-//           title: '上传中',
-//         })
+  testSubmit: function(e){
+    console.log(e);
+    const response = fyglService.postData(300, { form_id:e.detail.formId });
+    fyglService.handleAfterRemote(response, '发送模板消息',
+      (resultData) => {
+        console.log(resultData)
+      }
+    );
+  }
 
-//         const filePath = res.tempFilePaths[0]
-//         // 上传图片
-//         const cloudPath = 'test/my-image1' + filePath.match(/\.[^.]+?$/)[0]
-//         console.log('chooseImage cloudPath:', filePath,cloudPath);
-// // return; 
-
-//         wx.cloud.uploadFile({
-//           cloudPath,
-//           filePath,
-//           success: res => {
-//             console.log('[上传文件] 成功：', res)
-
-//             app.globalData.fileID = res.fileID
-//             app.globalData.cloudPath = cloudPath
-//             app.globalData.imagePath = filePath
-            
-//             wx.navigateTo({
-//               url: '../storageConsole/storageConsole'
-//             })
-//           },
-//           fail: e => {
-//             console.error('[上传文件] 失败：', e)
-//             wx.showToast({
-//               icon: 'none',
-//               title: '上传失败',
-//             })
-//           },
-//           complete: () => {
-//             wx.hideLoading()
-//           }
-//         })
-
-//       },
-//       fail: e => {
-//         console.error(e)
-//       }
-//     })
-//   },
 })

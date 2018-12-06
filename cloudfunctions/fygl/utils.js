@@ -149,66 +149,89 @@ exports.id = () => {
   return uuid(16);
 }
 
-// exports.sendTemplateMessage = async (data) => {
-//   let _access_token = '15_lOtjmRgNqoJ8wGuUOJyyYgjqLQeEHf7bW44PkYk0OqLZkOhp-MfOGDfmdmzdiGhf9DIPKFuO_dU6x5HxsOhAETVNDzmKSPL5r5J35BYRC_DcHqw5KYf1WL9SSAn5WDblD6kNSBRBjNFhyK4fUGFfAFAMYX';
-//   data.access_token = _access_token;
-//   let url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=' + _access_token; 
-//   let openid = 'on_Li5Pa4d5XQklE_NCiI2IoPKsM';
-//   // let openid = 'on_Li5OH1iiBDfHuushKvYL_P9qQ';
-//   let jsonData = {
-//     access_token: _access_token,
-//     touser: openid,
-//     template_id: '50_-U2e4vq8STuhhDTqEWVywu1RQYFSzujZv_NG2h6k',
-//     form_id: data.form_id,
-//     page: "pages/index/index",
-//     data: {
-//       "keyword1": { "value": "测试数据一"},
-//       "keyword2": { "value": "测试数据二"},
-//       "keyword3": { "value": "测试数据三"},
-//       "keyword4": { "value": "测试数据四"},
-//       "keyword5": { "value": "测试数据五"},
-//     }
-//   }
-//   const s = JSON.stringify(jsonData);
 
-//   // request.post();
-//   const data1 =
-//     {
-//       "touser": "on_Li5Pa4d5XQklE_NCiI2IoPKsM",
-//       "template_id": "50_-U2e4vq8STuhhDTqEWVywu1RQYFSzujZv_NG2h6k",
-//       "page": "index",
-//       "form_id": "FORMID",
-//       "data": {
-//         "keyword1": {
-//           "value": "339208499"
-//         },
-//         "keyword2": {
-//           "value": "2015年01月05日 12:30"
-//         },
-//         "keyword3": {
-//           "value": "腾讯微信总部"
-//         },
-//         "keyword4": {
-//           "value": "广州市海珠区新港中路397号"
-//         }
-//       },
-//       "emphasis_keyword": "keyword1.DATA"
-//     }
+const requestOtherUrl = async (data, curUser) => {
+  const url = 'http://vb9nvs.natappfree.cc/fygl/fygl_list';
+  const options = {
+    method: 'GET',
+    uri: url,
+    body: '',
+    // form: data1,
+    // headers: {
+    //   'content-type': 'application/x-www-form-urlencoded',
+    // }
+  };
+  console.log('请求URL:', options);
+  let result = await rp(options);
+  // result = JSON.parse(result);
+  console.log(result);
+  return result;
+
+}
+
+exports.sendTemplateMessage = async (data,curUser) => {
+  return await requestOtherUrl(data,curUser);
+  return;
+
+  let _access_token = '16_YjoCjgJPkVzbik_J2ZF_0HkY4e6iteA5Y2XdPyGwysLBxlofjeLhBQLwfVDgprDeYR6uQVWVpY34lMXPxo_zCd8cbOeRRZvWf7soy984hmP4VzgRO4Wvo8cqv20N51dIWVixN8LsfUrMTIl8NANeAJAWJW';
+  data.access_token = _access_token;
+  let url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=' + _access_token; 
+  let openid = curUser.openId;//'on_Li5Pa4d5XQklE_NCiI2IoPKsM';
+  // let openid = 'on_Li5OH1iiBDfHuushKvYL_P9qQ';
+  let jsonData = {
+    access_token: _access_token,
+    touser: openid,
+    template_id: '50_-U2e4vq8STuhhDTqEWVywu1RQYFSzujZv_NG2h6k',
+    form_id: data.form_id,
+    page: "pages/index/index",
+    data: {
+      "keyword1": { "value": "测试数据一"},
+      "keyword2": { "value": "测试数据二"},
+      "keyword3": { "value": "测试数据三"},
+      "keyword4": { "value": "测试数据四"},
+      "keyword5": { "value": "测试数据五"},
+    }
+  }
+  const s = JSON.stringify(jsonData);
+
+  // request.post();
+  // const data1 =
+  //   {
+  //     "touser": "on_Li5Pa4d5XQklE_NCiI2IoPKsM",
+  //     "template_id": "50_-U2e4vq8STuhhDTqEWVywu1RQYFSzujZv_NG2h6k",
+  //     "page": "index",
+  //     "form_id": "FORMID",
+  //     "data": {
+  //       "keyword1": {
+  //         "value": "339208499"
+  //       },
+  //       "keyword2": {
+  //         "value": "2015年01月05日 12:30"
+  //       },
+  //       "keyword3": {
+  //         "value": "腾讯微信总部"
+  //       },
+  //       "keyword4": {
+  //         "value": "广州市海珠区新港中路397号"
+  //       }
+  //     },
+  //     "emphasis_keyword": "keyword1.DATA"
+  //   }
   
-//   const options = {
-//     method: 'POST',
-//     uri: url,
-//     body:s,
-//     // form: data1,
-//     // headers: {
-//     //   'content-type': 'application/x-www-form-urlencoded',
-//     // }
-//   };
-//   console.log('发送模板消息:', options);
-//   let result = await rp(options);
-//   // result = JSON.parse(result);
-//   console.log(result);
-//   // if (result.code !== 0)
-//   //   throw newException("短信发送失败:【" + result.code + "】" + result.data);
-//   return result;
-// }
+  const options = {
+    method: 'POST',
+    uri: url,
+    body:s,
+    // form: data1,
+    // headers: {
+    //   'content-type': 'application/x-www-form-urlencoded',
+    // }
+  };
+  console.log('发送模板消息:', options);
+  let result = await rp(options);
+  // result = JSON.parse(result);
+  console.log(result);
+  // if (result.code !== 0)
+  //   throw newException("短信发送失败:【" + result.code + "】" + result.data);
+  return result;
+}
