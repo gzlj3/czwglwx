@@ -281,6 +281,7 @@ async function tfFy(data,curUser){
   const { houseid } = data;
   const house = await commService.queryPrimaryDoc(commService.getTableName('house',collid), houseid);
   const housefyList = await commService.queryDocs(commService.getTableName('housefy',collid),{houseid});
+
   if(housefyList){
     for(let i=0;i<housefyList.length;i++){
       await commService.addDoc('housefy_tf', housefyList[i]);
@@ -298,6 +299,16 @@ async function tfFy(data,curUser){
   if (house.photos && house.photos.length > 0) {
     await cloud.deleteFile({ fileList: house.photos });
   }
+
+  //保留现有房屋数据，但将其置为空房
+  const clearFields = ['aratarUrl', 'bz', 'dbcds', 'dfhj', 'dhhm', 'dscds', 'fyhj', 'housefyid', 'htrqq', 'htrqz', 'lrr', 'lrsj','moreZh','photos','qtf','querySjhm','rq1','rq2','sbcds','sfhj','sfsz','sfzh','sscds','syjzf','szrq','yffrq1','yffrq2','zdlx','zdmonth','zhxgr','zhxgsj','zhxm'];
+  let newHouse = house;
+  clearFields.map(value=>{
+    delete newHouse[value];
+  })
+  newHouse._id = utils.id();
+  console.log('tffy:',newHouse);
+  await commService.addDoc(commService.getTableName('house',curUser.collid),newHouse);
 }
 exports.tfFy = tfFy;
 

@@ -73,7 +73,13 @@ Page({
   },
   
   onLoad: function (options) {
-    
+    const clearFields = ['aratarUrl', 'bz', 'dbcds', 'dfhj', 'dhhm', 'dscds', 'fyhj', 'housefyid', 'htrqq', 'htrqz', 'lrr', 'lrsj', 'morezh', 'photos', 'qtf', 'querySjhm', 'rq1', 'rq2', 'sbcds', 'sfhj', 'sfsz', 'sfzh', 'sscds', 'syjzf', 'szrq', 'yffrq1', 'yffrq2', 'zdlx', 'zdmonth', 'zhxgr', 'zhxgsj', 'zhxm'];
+    let newHouse = {zhxm:'aaa',aa:1};
+    clearFields.map(value => {
+      delete newHouse[value];
+    })
+    // newHouse._id = utils.id();
+    console.log('tffy:', newHouse);
     // const arr=['aaa','bbb'];
     // console.log('test:',arr.includes(''));
     // let s = '1234567890'; 
@@ -82,7 +88,7 @@ Page({
     // console.log(s.length);
     // s =  s.replace(/\r\n/g,'\n');
     // console.log(s.length);
-    console.log(utils.currentTimeMillis());
+    //console.log(utils.currentTimeMillis());
 
     const requestUserType = options.requestUserType ? options.requestUserType:'';
     if(!utils.isEmpty(requestUserType)){
