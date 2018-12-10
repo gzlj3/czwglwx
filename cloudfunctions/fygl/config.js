@@ -4,3 +4,4 @@ exports.conf = {
   yzmYxq: 2 * 60,   //验证码有效期，2分钟
 }
 exports.production = production;
+exports.queryPhoneInterval = 10*1000; //手机短信结果查询时间间隔，10秒

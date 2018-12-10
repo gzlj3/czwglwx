@@ -2,6 +2,7 @@ const cloud = require('wx-server-sdk')
 const commService = require('CommServices.js')
 // const rp = require('request-promise')
 const utils = require('utils.js');
+const phone = require('phone.js');
 const CONSTS = require('constants.js');
 const config = require('config.js')
 cloud.init({
@@ -82,7 +83,7 @@ exports.sendSjyzm = async (data,userInfo) => {
   const message="【极简出租】验证码："+yzm+",您正在注册极简出租，验证码2分钟内有效。";
   console.log(message);
   // try{ 
-    await utils.sendPhoneMessage(sjhm,message);  //短信发送失败会抛出异常
+    await phone.sendPhoneMessage(sjhm,message);  //短信发送失败会抛出异常
   // }catch(e){
   //   console.log(e);
   // }

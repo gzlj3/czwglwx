@@ -4,6 +4,7 @@ const CONSTS = require('constants.js');
 const services = require('FyglServices.js');
 const userServices = require('UserServices.js');
 const utils = require('utils.js');  
+const phone = require('phone.js');  
 
 // 云函数入口函数
 /* event 参数对象：
@@ -24,7 +25,8 @@ exports.main = async (event, context) => {
     if (action === 300) {
       //测试发送模板消息
       // console.log(data);
-      const result = await utils.sendTemplateMessage(data,curUser);
+      // const result = await utils.sendTemplateMessage(data,curUser);
+      const result = await phone.queryPhoneMessageStatus("01114453971");      
       return results.getSuccessResults(result);
     }
     let result;

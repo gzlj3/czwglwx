@@ -1,5 +1,6 @@
 const moment = require('moment.min.js');
 const utils = require('utils.js');
+const phone = require('phone.js');
 const cloud = require('wx-server-sdk')
 const CONSTS = require('constants.js');
 const config = require('config.js')
@@ -84,10 +85,28 @@ async function queryLastzdList (params) {
     throw utils.newException('查询数据异常！');
   const db = cloud.database();
   const _ = db.command;
-  const result = await db.collection(commService.getTableName('housefy',collid)).orderBy('zdlx','desc').orderBy('szrq','desc').limit(6).where({
+  let result = await db.collection(commService.getTableName('housefy',collid)).orderBy('zdlx','desc').orderBy('szrq','desc').limit(6).where({
     houseid,
   }).get();
-  return result.data;
+  result = result.data;
+  //处理帐单发送短信状态
+  for(let i=0;i<result.length;i++){
+    let tmpHousefy=result[i];
+    if (!utils.isEmpty(tmpHousefy.messageId) && tmpHousefy.messageId.length>1){
+      const messageId = utils.getInteger(tmpHousefy.messageId);
+      if (utils.currentTimeMillis() - messageId >= config.queryPhoneInterval){
+        const status = await phone.queryPhoneMessageStatus(tmpHousefy.messageId);
+        if(status.code!==0){
+          //短信发送失败
+          tmpHousefy.messageId = 'x';
+        }else{
+          tmpHousefy.messageId = '';
+        }
+        await commService.updateDoc(commService.getTableName('housefy', collid), tmpHousefy);        
+      }
+    }
+  }
+  return result;
 }
 exports.queryLastzdList = queryLastzdList;
 
@@ -384,11 +403,13 @@ const sendZdMessage= async (house,housefy,collid,openId)=>{
   if(message.endsWith('\n')) message = message.substring(0,message.length - 1);  
   message += '【极简出租】';
   //发送短信
-  await utils.sendPhoneMessage(dhhm,message);
+  const messageId = utils.currentTimeMillis()+"";
+  await phone.sendPhoneMessage(dhhm,message,messageId);
   //发送短信成功，更新帐单表发送次数
   await db.collection(commService.getTableName('housefy',collid)).doc(housefy._id).update({
     data: {
-      messageNum: _.inc(1)
+      messageNum: _.inc(1),
+      messageId,
     }
   });
   //发送短信成功，更新用户表当前帐户发送次数
