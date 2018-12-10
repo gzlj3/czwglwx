@@ -31,6 +31,54 @@ Page({
       ...newState,
     });
   },
+  onMoreAction(e) {
+    const { item,index} = e.currentTarget.dataset;
+    console.log("moreAction:",item);
+    let itemList;
+    // if (utils.isEmpty(item.zhxm)) {
+    //   this.actionSheet2(e);
+    // } else {
+      this.actionSheet1(e);
+    // }
+  },
+
+  actionSheet1: function (e) {
+    // const { item, fyitem } = e.currentTarget.dataset;
+    const { item, index:sourceIndex } = e.currentTarget.dataset;
+    const itemList = ['结转下月','刷新帐单', '回退帐单','取消'];
+    const self = this;
+    wx.showActionSheet({
+      itemList,
+      success: function (res) {
+        if (res.cancel) return;
+        const index = res.tapIndex;
+        // console.log(index);
+        switch (index) {
+          case 0:
+            e.currentTarget.id = "jzzd";
+            self.onQrsz(e);
+            break;
+          case 1:
+            e.currentTarget.id = "sxzd";
+            self.onQrsz(e);
+            break;
+          case 2:
+            const {sourceList} = self.data;
+            if (sourceList.length < 2){
+              utils.showToast('最后一条帐单，不能回退！');
+              return;
+            }
+            if (sourceIndex !==0 ) {
+              utils.showToast('只能从第一条帐单开始回退！');
+              return;
+            }
+            e.currentTarget.id = "htzd";
+            self.onQrsz(e);
+            break;
+        }
+      }
+    });
+  },
 
   formSubmit: function(e){
     // console.log('form发生了submit事件，携带数据为：', e.detail.value)
@@ -67,7 +115,7 @@ Page({
   },
 
   onToggleDetailZd: function(e) {
-    console.log(e);
+    // console.log(e);
     const { item: index } = e.currentTarget.dataset;
     let {showDetailZd} = this.data;
     showDetailZd[index] = !showDetailZd[index];

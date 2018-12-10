@@ -153,11 +153,14 @@
                 </view>
             </view>
             <view class="weui-form-preview__ft" wx:if="{{item.sfsz==='0' && (isFd) && zdright && showDetailZd[index]}}">
-                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="jzzd" data-item="{{item._id}}" bindtap="onQrsz">结转下月</view>
-                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="sxzd" data-item="{{item._id}}" bindtap="onQrsz">刷新</view>
-                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="htzd" data-item="{{item._id}}" bindtap="onQrsz" wx:if="{{sourceList.length>1 && index===0}}">回退帐单</view>
+                <!-- <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="jzzd" data-item="{{item._id}}" bindtap="onQrsz">结转下月</view> -->
+                <!-- <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="sxzd" data-item="{{item._id}}" bindtap="onQrsz">刷新</view> -->
+                <!-- <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="htzd" data-item="{{item._id}}" bindtap="onQrsz" wx:if="{{sourceList.length>1 && index===0}}">回退帐单</view> -->
+                <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" id="fzzd" data-item="{{item._id}}" bindtap="onQrszCz">复制帐单</view>
                 <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" id="sjdx" data-item="{{item._id}}" bindtap="onQrszCz">发短信{{item.messageNum?'['+item.messageNum+']':''}}<view style="display:inline-block;color:red">{{item.messageId && item.messageId.length>1?'?':item.messageId}}</view></view>
                 <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" id="qrsz" data-item="{{item._id}}" bindtap="onQrsz">确认收费</view>
+                <view class="weui-form-preview__btn weui-form-preview__btn_default" data-item="{{item._id}}" data-index="{{index}}" bindtap="onMoreAction">更多></view>
+
             </view>
             <view class="weui-form-preview__ft" wx:if="{{item.sfsz!=='0' && (isFd) && zdright && showDetailZd[index]}}">
                 <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="htzd" data-item="{{item._id}}" bindtap="onQrsz" wx:if="{{sourceList.length>1 && index===0}}">回退帐单</view>
