@@ -138,7 +138,7 @@ Page({
     //   content = "将向租户发送帐单信息，确认发送吗？"
     } else if ("sendsjdx" === flag) {
       title = "发短信";
-      content = e.dxcontent + '内容已写入剪贴板。是否确定向租户发送此帐单短信？';
+      content = e.dxcontent + '是否确定向租户发送此帐单短信？';
     }else if("jzzd"===flag){
       title = "结转下月";
       content = "本月租金未缴费，确认将本月帐单结转到下月吗？"
@@ -225,7 +225,8 @@ Page({
       buttonAction = Number.parseInt(buttonAction);
     }
     console.log('editlist:',buttonAction,params);
-    const {grantcode} = params;
+    let {grantcode} = params;
+    if(!grantcode) grantcode='';
     let zdright = true;
     if (utils.isEmpty(grantcode)){
       if (params && buttonAction===CONSTS.BUTTON_LASTZD){
@@ -341,6 +342,14 @@ Page({
     this.data.sourceList[index][name] = e.detail.value;
     this.setData({
       sourceList: this.data.sourceList
+    })
+  },
+
+  onGetUserInfo: function (e) {
+    // app.setUserData(e.detail.userInfo);
+    console.log(e);
+    wx.reLaunch({
+      url: '/pages/index/index',
     })
   },
 

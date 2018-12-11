@@ -6,10 +6,11 @@ const request = require('request');
 //通过榛子云短信平台发送手机短信（http://smsow.zhenzikj.com）
 //其中的appId,appSecret为榛子云平台注册的帐号信息
 exports.sendPhoneMessage = async (sjhm, message,messageId) => {
-  // if(!config.production) {
-  //   //测试环境不真正发短信
-  //   return;
-  // }
+  console.log('sendmessagelength:',message.length);
+  if(!config.production) {
+    //测试环境不真正发短信
+    return;
+  }
   if(!messageId) messageId = utils.currentTimeMillis()+"";
   const options = {
     method: 'POST',

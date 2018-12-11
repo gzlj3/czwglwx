@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/fygl/fyglmain",
     "pages/index/index",
+    "pages/fygl/fyglmain",
     "pages/fygl/addfy/addfy",
     "pages/user/userGrant",
     "pages/fygl/editlist/editlist",

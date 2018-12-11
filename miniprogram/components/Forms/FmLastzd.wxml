@@ -167,10 +167,11 @@
                 <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="sczd" data-item="{{item._id}}" bindtap="onQrsz" wx:if="{{sourceList.length<=1}}">删除账单</view>
             </view>
         </view>
-
-            <view class="weui-form-preview__ft" wx:if="{{!registered}}">
-                <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="htzd" data-item="{{item._id}}" bindtap="onQrsz" wx:if="{{sourceList.length>1 && index===0}}">现在注册</view>
-            </view>
+ 
+        <view class="weui-form-preview__item" wx:if="{{!registered}}">
+          <view style="text-align:center;width:100%">注册后，你能查看更多帐单</view>
+          <button type='primary' open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">现在注册</button>
+        </view>
 
     </view>
   </view>

@@ -62,8 +62,8 @@ Page({
 
   },
   onCopyzd:function(e){
-    const response = fyglService.postData(CONSTS.BUTTON_GRANTCODE, this.data.params);
-    fyglService.handleAfterRemote(response, '发送帐单');    
+    const {message} = this.data.params;
+    wx.setClipboardData({ data: message });
   },
   /**
    * 用户点击按钮分享
@@ -77,16 +77,22 @@ Page({
     const {grantcode} = this.data.params;
     const self = this;
     const s = JSON.stringify({grantcode});
-    console.log('path:', '/pages/fygl/editlist/editlist?buttonAction=' + CONSTS.BUTTON_LASTZD + '&item=' + s);
+
+    //由于发送结果信息经常截获不到，因此先保存发送信息
+    const response = fyglService.postData(CONSTS.BUTTON_GRANTCODE, self.data.params);
+    fyglService.handleAfterRemote(response, null);
+
     return {
       title: '查看帐单详情>',
       path: '/pages/fygl/editlist/editlist?buttonAction='+CONSTS.BUTTON_LASTZD+'&item='+s,
       // imageUrl:'../../images/czwgl.jpg'
-      success: function (res) {
+      success: function (res) { 
+        utils.showToast('发送成功！');
+        wx.navigateBack();
         // 转发成功,更新授权码
-        console.log("转发成功:" + JSON.stringify(res));
-        const response = fyglService.postData(CONSTS.BUTTON_GRANTCODE, self.data.params);
-        fyglService.handleAfterRemote(response, '发送帐单');
+        // console.log("转发成功:" + JSON.stringify(res));
+        // const response = fyglService.postData(CONSTS.BUTTON_GRANTCODE, self.data.params);
+        // fyglService.handleAfterRemote(response, '发送帐单');
       },
       fail: function (res) {
         // 转发失败

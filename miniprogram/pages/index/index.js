@@ -86,6 +86,8 @@ Page({
     // console.log(s.length);
     // const a = utils.currentTimeMillis()+"";
     // console.log(a.length);
+    // let a = undefined;
+    // console.log(utils.isEmpty(a));
 
     const requestUserType = options.requestUserType ? options.requestUserType:'';
     if(!utils.isEmpty(requestUserType)){

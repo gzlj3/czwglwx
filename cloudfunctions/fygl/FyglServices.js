@@ -92,8 +92,8 @@ async function queryLastzdWithGrantcode(params, userInfo) {
     throw utils.newException('帐单数据不存在！');
   //检查查帐单用户是否已经注册系统
   const userb = await commService.querySingleDoc('userb',{openId:userInfo.openId});
-  const registered = userb!==null;
-  registered = false;
+  let registered = userb!==null;
+  // registered = false;
   return {sourceList:[result],registered};
 }
 exports.queryLastzdWithGrantcode = queryLastzdWithGrantcode;
@@ -422,10 +422,10 @@ exports.updateZdList = async (zdList,autoSendMessage,curUser) => {
 
 const sendZdMessage= async (house,housefy,collid,openId)=>{
   const {dhhm,fwmc,zhxm,fyhj,zdlx} = house;
-  let message = getZdMessage(housefy);
+  let message = getPhoneMessage(housefy);
   message = message.replace(/\r\n/g,'\n');
   if(message.endsWith('\n')) message = message.substring(0,message.length - 1);  
-  message += '【极简出租】';
+  // message += '【极简出租】';
   //发送短信
   const messageId = utils.currentTimeMillis()+"";
   await phone.sendPhoneMessage(dhhm,message,messageId);
@@ -451,7 +451,7 @@ const getFyts = (fyts,fy,lineChar) => {
     ts='(退)';
     fy = Math.abs(fy);
   }
-  return fy?fyts+ts+':'+fy+'元'+lineChar:'';
+  return !utils.isEmpty(fy)?fyts+ts+':'+fy+'元'+lineChar:'';
 }
 
 const getDfts = (housefy) => {
@@ -489,6 +489,20 @@ const getZdMessage = (housefy) => {
   return s;   
 }
 
+const getPhoneMessage = (housefy) => {
+  let rq1 = housefy.rq1;
+  if (!rq1 || rq1.length < 10) return '';
+  let zdlxinfo;
+  if (housefy.zdlx == '0') zdlxinfo = '(签约帐单),';
+  else if (housefy.zdlx == '2') zdlxinfo = '(退房帐单),';
+  else zdlxinfo = housefy.zdmonth ? housefy.zdmonth : rq1.substring(0, 4) + '年' + rq1.substring(5, 7) + '月';
+  const ts1 = housefy.fyhj < 0 ? '退' : '缴';
+  const ts2 = housefy.czje < 0 ? '(退)' : '';
+
+  const s = `${housefy.fwmc}房,${housefy.zhxm},您好:\r\n${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。\r\n微信搜索【极简出租】关注，查看帐单详情。` ;
+  return s;
+}
+
 exports.processQrsz = async (params,curUser) => {
   // const {collid} = curUser;
   const { housefyid, flag,collid } = params;
@@ -512,7 +526,7 @@ exports.processQrsz = async (params,curUser) => {
     lastFyhj = house.fyhj;
     makeHousefy(house, housefy, null,null,flag);
   }else if ("sjdx" === flag) {
-    const message = getZdMessage(housefy);
+    const message = getPhoneMessage(housefy);
     return message;
   } else if ("wxzd" === flag) {
     const message = getZdMessage(housefy);
