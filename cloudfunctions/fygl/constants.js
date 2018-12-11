@@ -29,6 +29,7 @@ exports.BUTTON_QUERYUSER = 100; // 查询用户数据
 exports.BUTTON_REGISTERUSER = 101; // 注册用户
 exports.BUTTON_SENDSJYZM = 102; // 发送手机验证码
 exports.BUTTON_USERGRANT = 103; // 用户授权
+exports.BUTTON_GRANTCODE = 110; // 插入授权码(POST)(或根据授权码查帐单数据(GET))
 exports.USERTYPE_NONE = '0'; // 用户类型：未注册
 exports.USERTYPE_FD = '1'; // 用户类型：房东
 exports.USERTYPE_ZK = '2'; // 用户类型：租客

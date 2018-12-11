@@ -77,10 +77,34 @@ exports.queryFyList = async (curUser) => {
   return result;
 }
 
+async function queryLastzdWithGrantcode(params, userInfo) {
+  const {grantcode} = params;
+  let result = await commService.querySingleDoc('grantcode',{grantcode});
+  console.log('querygrantcode:',result);
+  if(!result)
+    throw utils.newException('授权码错误或已失效！');
+  const {housefyid,createtime,collid} = result;
+  if (utils.currentTimeMillis() - createtime >= config.grantcodeYxq){
+    throw utils.newException('授权码已失效！');
+  }
+  result = await commService.queryPrimaryDoc(commService.getTableName('housefy',collid), housefyid);
+  if (!result)
+    throw utils.newException('帐单数据不存在！');
+  //检查查帐单用户是否已经注册系统
+  const userb = await commService.querySingleDoc('userb',{openId:userInfo.openId});
+  const registered = userb!==null;
+  registered = false;
+  return {sourceList:[result],registered};
+}
+exports.queryLastzdWithGrantcode = queryLastzdWithGrantcode;
 
-async function queryLastzdList (params) {
+async function queryLastzdList(params, userInfo) {
   // const {collid} = curUser;
-  const {houseid,collid} = params;
+  const {houseid,collid,grantcode} = params;
+  //根据授权码查询数据
+  if(!utils.isEmpty(grantcode))
+    return await queryLastzdWithGrantcode(params, userInfo);
+
   if(utils.isEmpty(houseid))
     throw utils.newException('查询数据异常！');
   const db = cloud.database();
@@ -490,6 +514,12 @@ exports.processQrsz = async (params,curUser) => {
   }else if ("sjdx" === flag) {
     const message = getZdMessage(housefy);
     return message;
+  } else if ("wxzd" === flag) {
+    const message = getZdMessage(housefy);
+    //生成授权查询码，通过此码查当前帐单，不需要注册
+    const grantcode = utils.uuid(16);
+    const createtime = utils.currentTimeMillis();
+    return { message, collid, housefyid: housefy._id, grantcode,createtime};
   } else if ("sendsjdx" === flag) {
     await sendZdMessage(house, housefy, collid, curUser.openId);
     return queryLastzdList({ houseid, collid});

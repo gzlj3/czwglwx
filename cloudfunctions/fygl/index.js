@@ -19,30 +19,37 @@ exports.main = async (event, context) => {
 
   try {
     //检查权限，成功则返回用户的基本数据
-    const curUser = await userServices.checkAuthority(action, method,userInfo);
+    const curUser = await userServices.checkAuthority(action, method,userInfo,data);
     // console.log('操作用户：', curUser);
     services.setUser(curUser);
     if (action === 300) {
       //测试发送模板消息
       // console.log(data);
       // const result = await utils.sendTemplateMessage(data,curUser);
-      const result = await phone.queryPhoneMessageStatus("01114453971");      
+      const result = await phone.queryPhoneMessageStatus("0111445397");      
       return results.getSuccessResults(result);
     }
     let result;
     switch(action){
-      case CONSTS.BUTTON_ZK_SEELASTZD:
-        result = await userServices.seeLastzd(curUser);
-        return results.getSuccessResults(result);
+      // case CONSTS.BUTTON_ZK_SEELASTZD:
+      //   result = await userServices.seeLastzd(curUser);
+      //   return results.getSuccessResults(result);
       case CONSTS.BUTTON_QUERYUSER:
         result = await userServices.queryUser(userInfo);
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_REGISTERUSER:
         result = await userServices.registerUser(data,userInfo);
         return results.getSuccessResults(result);
-      case CONSTS.BUTTON_USERGRANT  :
+      case CONSTS.BUTTON_USERGRANT:
         result = await userServices.grantUser(data, curUser);
         return results.getSuccessResults(result);
+      case CONSTS.BUTTON_GRANTCODE:
+        if(method==='POST'){ 
+          result = await userServices.grantcode(data, curUser);
+        // }else{
+        //   result = await services.queryLastzdWithGrantcode(data, curUser);
+          return results.getSuccessResults(result);
+        }
       case CONSTS.BUTTON_SYSCONFIG  :
         result = await userServices.sysconfig(data, curUser);
         return results.getSuccessResults(result);
@@ -110,12 +117,11 @@ exports.main = async (event, context) => {
       case CONSTS.BUTTON_LASTZD:
         if (method === 'POST') {
           console.log("post lastzd");
-          result = await services.processQrsz(data,curUser);
-          
+          result = await services.processQrsz(data,curUser);          
           // result = result.data;
         } else {
           console.log("querylastzd");
-          result = await services.queryLastzdList(data,curUser);
+          result = await services.queryLastzdList(data, userInfo);
           // result = result.data;
         }
         return results.getSuccessResults(result);

@@ -161,3 +161,6 @@ const getTableName = (tableName, collid) => {
   return tableName + collid;
 }
 exports.getTableName = getTableName;
+
+// exports.queryAllDoc = () => {
+// }

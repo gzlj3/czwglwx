@@ -17,6 +17,7 @@ const initialState = {
   saveButtonText:'保存',
   pageTitle: '',
   pageDesc: '',
+  registered:true,
 }
 
 Page({
@@ -194,6 +195,13 @@ Page({
           e.dxcontent = resultData;
           self.onQrsz(e);
           return;
+        }else if(flag==='wxzd'){
+          // console.log('wxzd:',resultData);
+          const s = JSON.stringify(resultData);
+          wx.navigateTo({
+            url: '../sendzd/sendzd?item='+s,
+          })
+          return;
         }
         getApp().setFyListDirty(true);
         if(resultData === null){
@@ -217,16 +225,25 @@ Page({
       buttonAction = Number.parseInt(buttonAction);
     }
     console.log('editlist:',buttonAction,params);
+    const {grantcode} = params;
     let zdright = true;
-    if (params && buttonAction===CONSTS.BUTTON_LASTZD){
-      zdright = fyglService.checkRights(buttonAction, '103', params.yzhid);
+    if (utils.isEmpty(grantcode)){
+      if (params && buttonAction===CONSTS.BUTTON_LASTZD){
+        zdright = fyglService.checkRights(buttonAction, '103', params.yzhid);
+      }
+    }else{
+      zdright = false;
     }
-
+    let registered = true;
     const response = fyglService.queryData(buttonAction, params);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
         let showDetailZd=null;
         if(buttonAction === CONSTS.BUTTON_LASTZD){
+          if(!utils.isEmpty(grantcode)){
+            registered = resultData.registered;
+            resultData = resultData.sourceList;
+          }
           showDetailZd = this.refreshShowDetailZd(resultData);
         }
         this.setData({
@@ -238,6 +255,8 @@ Page({
           isFdZk: app.globalData.user.userType === CONSTS.USERTYPE_FDZK,
           zdright,
           params,
+          grantcode,
+          registered,
         }); 
         this.refreshState();
       }
@@ -285,6 +304,7 @@ Page({
     // console.log('refreshState:',showSaveButton,buttonAction);
     this.setData({ showSaveButton, saveButtonText,pageTitle,pageDesc});
   },
+
   autoSendMessageChange:function(e){
     console.log('autoSendMessageChange:', e.detail.value);
     const checked = e.detail.value.length>0;

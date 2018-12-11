@@ -29,6 +29,7 @@ exports.BUTTON_QUERYUSER = 100; // 查询用户数据
 exports.BUTTON_REGISTERUSER = 101; // 注册用户
 exports.BUTTON_SENDSJYZM = 102; // 发送手机验证码
 exports.BUTTON_USERGRANT = 103; // 用户授权
+exports.BUTTON_GRANTCODE = 110; // 插入授权码(POST)(或根据授权码查帐单数据(GET))
 exports.USERTYPE_NONE = '0'; // 用户类型：未注册
 exports.USERTYPE_FD = '1'; // 用户类型：房东
 exports.USERTYPE_ZK = '2'; // 用户类型：租客
@@ -44,14 +45,14 @@ exports.BUTTON_SYSCONFIG = 200; // 系统配置
 exports.ZDLX_HTZD = '0';  //合同帐单
 exports.ZDLX_YJZD = '1';  //月结帐单
 exports.ZDLX_TFZD = '2';  //退房帐单
- 
+
 //收租状态
 exports.SFSZ_WJQ = '0'; //未结清;
 exports.SFSZ_YJQ = '1'; //已结清;
 exports.SFSZ_YJZ = '2'; //已结转;
 exports.SFSZ_YTF = '3'; //已退房;
 exports.getSfszInfo = sfsz => {
-  return { '0': '未结清', '1': '已结清','2': '已结转','3': '已退房' }[sfsz];
+  return { '0': '未结清', '1': '已结清', '2': '已结转', '3': '已退房' }[sfsz];
 }
 
 // 异常信息

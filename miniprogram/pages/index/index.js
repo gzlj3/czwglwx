@@ -329,13 +329,31 @@ Page({
   },
 
   testSubmit: function(e){
-    console.log(e);
+    console.log('testsubmit:',e);
     const response = fyglService.postData(300, { form_id:e.detail.formId });
     fyglService.handleAfterRemote(response, '发送模板消息',
       (resultData) => {
         console.log(resultData)
       }
     );
+  },
+  onShareAppMessage: function(e){
+    if (e.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(e.target)
+    }
+    return {
+      title: '自定义转发标题',
+      path: '/page/index/index',
+      // imageUrl:'../../images/czwgl.jpg'
+    }
+  },
+  onbindload:function(e){
+    console.log('onbindload:',e);
+  },
+  onbinderror: function (e) {
+    console.log('onbinderror:',e);
   }
+
 
 })

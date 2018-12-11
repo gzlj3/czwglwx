@@ -5,6 +5,6 @@
   <!-- <view class="weui-toptips weui-toptips_warn" wx:if="{{status!=0}}">{{msg}}</view> -->
   <template is="FmCb" data="{{sourceList,pageTitle,pageDesc}}" wx:if="{{buttonAction===CONSTS.BUTTON_CB}}"/>
   <template is="FmMakezd" data="{{sourceList,pageTitle,pageDesc,autoSendMessage,showSaveButton}}" wx:if="{{buttonAction===CONSTS.BUTTON_MAKEZD}}"/>
-  <template is="FmLastzd" data="{{sourceList,isFd,isZk,isFdZk,showDetailZd,CONSTS,zdright}}" wx:if="{{buttonAction===CONSTS.BUTTON_LASTZD}}"/>
+  <template is="FmLastzd" data="{{sourceList,isFd,isZk,isFdZk,showDetailZd,CONSTS,zdright,registered}}" wx:if="{{buttonAction===CONSTS.BUTTON_LASTZD}}"/>
   <button form-type="submit" wx:if="{{showSaveButton}}">{{saveButtonText}}</button>
 </form>

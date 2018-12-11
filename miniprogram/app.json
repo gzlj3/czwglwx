@@ -1,13 +1,14 @@
 {
   "pages": [
-    "pages/index/index",
     "pages/fygl/fyglmain",
+    "pages/index/index",
     "pages/fygl/addfy/addfy",
     "pages/user/userGrant",
     "pages/fygl/editlist/editlist",
     "pages/storageConsole/storageConsole",
     "pages/fygl/msg/msg_success",
-    "pages/sysmanager/sysconfig/sysconfig"
+    "pages/sysmanager/sysconfig/sysconfig",
+    "pages/fygl/sendzd/sendzd"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",
