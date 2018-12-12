@@ -130,6 +130,8 @@ exports.main = async (event, context) => {
     }
   } catch (e) {
     console.log(e);
+    if(!e.code) e.code = e.errCode;
+    // if (e.code === -502005 ) e.code = 900;
     return results.getErrorResults(e.message,e.code);
   }
 }

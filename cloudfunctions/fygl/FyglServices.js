@@ -212,14 +212,14 @@ exports.saveFy = async (house,collid) => {
   //如果是添加房源，则检查集合是否存在，不存在，则创建
   if(isAddDoc){
     try{
-      const coll = await db.collection(commService.getTableName('house', 'abcd')).limit(1).get();
+      const coll = await db.collection(commService.getTableName('house', collid)).limit(1).get();
     }catch(e){
-      
+      if (e.errCode === -502005){
+        console.log('create savefy:', e);
+        await db.createCollection(commService.getTableName('house',collid));
+        await db.createCollection(commService.getTableName('housefy', collid));
+      }
     }
-    console.log('savefy:',coll);
-    return;
-      // await db.createCollection('house_' + collid);
-    // await db.createCollection('housefy_' + collid);
   }
 
   let result;

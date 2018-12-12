@@ -159,7 +159,7 @@ exports.queryAllDoc = async (tablename, whereObj) => {
       }
     } catch (e) {
       //批表查询如果出错，暂不抛出异常
-      console.log('updateAllDoc:', e);
+      console.log('queryAllDoc:', e);
     }
   }
   return resultList;

@@ -18,16 +18,22 @@ export function handleAfterRemote(response, tsinfo, successCallback,failCallback
       }; 
       if (successCallback) successCallback(data);
     } else {
-      wx.showToast({
-        title: `${tsinfo}失败！${msg}`,
-        icon: 'none',
-        duration: 5000,
-      });
       if (errCode === 100 || errCode === 101 || errCode===102) {
         //用户未注册或用户数据异常，回到主页面
         wx.reLaunch({
           url: '/pages/index/index',
         })
+      } else if (errCode === -502005 && isFd()) {
+        //系统初始化需录入1条房源数据
+        wx.navigateTo({
+          url: '/pages/fygl/addfy/addfy?buttonAction=' + CONSTS.BUTTON_ADDFY,
+        }) 
+      }else{
+        wx.showToast({
+          title: `${tsinfo}失败！${msg}`,
+          icon: 'none',
+          duration: 5000,
+        });
       }
     }
   }).catch(err => {
