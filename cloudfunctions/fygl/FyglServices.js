@@ -104,6 +104,22 @@ async function queryLastzdList(params, userInfo) {
   //根据授权码查询数据
   if(!utils.isEmpty(grantcode))
     return await queryLastzdWithGrantcode(params, userInfo);
+  //检查刷帐单标志，是否先刷新当前帐单
+  if(params.refreshzd==='1'){
+    // try{
+      const house = await commService.queryPrimaryDoc(commService.getTableName('house',collid),houseid);
+      if(!house)
+        throw utils.newException('查询数据异常！');
+      let copyParams = {...params};
+      copyParams.housefyid = house.housefyid;
+      copyParams.flag = 'sxzd';
+      console.log('refreshzd:',copyParams);
+      await processQrsz(copyParams,USER);
+    // }catch(e){
+    //   // 初始刷新帐单失败，不抛出异常
+    //   console.log('初始刷新帐单异常：',e);
+    // }
+  }
 
   if(utils.isEmpty(houseid))
     throw utils.newException('查询数据异常！');
@@ -186,8 +202,27 @@ exports.queryZdList = queryZdList;
 
 
 exports.saveFy = async (house,collid) => {
+  let isAddDoc;
+  if (utils.isEmpty(house._id)) {
+    isAddDoc = true;
+    house._id = utils.id();
+  } else {
+    isAddDoc = false;
+  }
+  //如果是添加房源，则检查集合是否存在，不存在，则创建
+  if(isAddDoc){
+    try{
+      const coll = await db.collection(commService.getTableName('house', 'abcd')).limit(1).get();
+    }catch(e){
+      
+    }
+    console.log('savefy:',coll);
+    return;
+      // await db.createCollection('house_' + collid);
+    // await db.createCollection('housefy_' + collid);
+  }
+
   let result;
-  // let {collid} = curUser;
   const yzhid = house.yzhid;
   // 检查房屋名称是否重复
   // console.log('querysingleDoc:', commService.getTableName('house', collid), { yzhid, _id: _.neq(house._id), fwmc: house.fwmc })
@@ -195,13 +230,6 @@ exports.saveFy = async (house,collid) => {
   // console.log(result); 
   if(result)
     throw utils.newException("房屋名称已经存在！");
-  let isAddDoc;
-  if(utils.isEmpty(house._id)){
-    isAddDoc = true;
-    house._id = utils.id();
-  }else{
-    isAddDoc = false;
-  }
   let { _id: saveHouseid, dhhm, avatarUrl } = house;
   //处理所有租户查询手机号码
   let querySjhm = ',';
@@ -323,6 +351,8 @@ async function tfFy(data,curUser){
   const {collid} = curUser;
   const { houseid } = data;
   const house = await commService.queryPrimaryDoc(commService.getTableName('house',collid), houseid);
+  if(!house)
+    throw utils.newException('未查询到房源数据：'+houseid);
   const housefyList = await commService.queryDocs(commService.getTableName('housefy',collid),{houseid});
 
   if(housefyList){
@@ -424,8 +454,8 @@ const sendZdMessage= async (house,housefy,collid,openId)=>{
   const {dhhm,fwmc,zhxm,fyhj,zdlx} = house;
   let message = getPhoneMessage(housefy);
   message = message.replace(/\r\n/g,'\n');
-  if(message.endsWith('\n')) message = message.substring(0,message.length - 1);  
-  // message += '【极简出租】';
+  // if(message.endsWith('\n')) message = message.substring(0,message.length - 1);  
+  message += '微信搜索【极简出租】关注，查看帐单详情。';
   //发送短信
   const messageId = utils.currentTimeMillis()+"";
   await phone.sendPhoneMessage(dhhm,message,messageId);
@@ -498,19 +528,17 @@ const getPhoneMessage = (housefy) => {
   else zdlxinfo = housefy.zdmonth ? housefy.zdmonth : rq1.substring(0, 4) + '年' + rq1.substring(5, 7) + '月';
   const ts1 = housefy.fyhj < 0 ? '退' : '缴';
   const ts2 = housefy.czje < 0 ? '(退)' : '';
-
-  const s = `${housefy.fwmc}房,${housefy.zhxm},您好:\r\n${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。\r\n微信搜索【极简出租】关注，查看帐单详情。` ;
+  const s = `${housefy.fwmc}房,${housefy.zhxm},您好:\r\n${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。`;
   return s;
 }
 
-exports.processQrsz = async (params,curUser) => {
+const processQrsz = async (params,curUser) => {
   // const {collid} = curUser;
   const { housefyid, flag,collid } = params;
   const db = cloud.database();
   const _ = db.command;
 
   let housefy = await commService.queryPrimaryDoc(commService.getTableName('housefy',collid),housefyid);
-  // const housefy = result.data;
   if (!housefy) throw utils.newException("未查到房源帐单记录：" + housefyid);
   const {houseid} = housefy;
   let house = await commService.queryPrimaryDoc(commService.getTableName('house',collid), houseid);
@@ -518,6 +546,8 @@ exports.processQrsz = async (params,curUser) => {
 
   if ("sxzd" === flag && housefyid !== house.housefyid)
     throw utils.newException("帐单数据与主房屋不匹配，刷新帐单失败！");
+  if ("sxzd" === flag && housefy.sfsz!==CONSTS.SFSZ_WJQ)
+    throw utils.newException("只能刷新未结帐单！");
   if ("htzd" === flag && housefyid !== house.housefyid)
     throw utils.newException("只能回退当期帐单！");
   let lastFyhj;
@@ -547,8 +577,7 @@ exports.processQrsz = async (params,curUser) => {
     return queryLastzdList({ houseid, collid });
   } else {
     jzHouse(house, housefy, flag);
-  }
-  
+  }  
   house.zhxgr=curUser.openId;
   house.zhxgsj = utils.getCurrentTimestamp();
   housefy.zhxgr=curUser.openId;
@@ -564,9 +593,9 @@ exports.processQrsz = async (params,curUser) => {
     await tfFy({ houseid },curUser);
     return null;
   }
-
   return queryLastzdList({ houseid, collid});
 }
+exports.processQrsz = processQrsz;
 
 const htHouse = async (house, housefy, collid) => {
   const housefyList = await queryLastzdList({houseid:house._id,collid});
@@ -583,6 +612,9 @@ const htHouse = async (house, housefy, collid) => {
   house.sfhj = lastHousefy.sfhj;
   house.dfhj = lastHousefy.dfhj;
   house.fyhj = lastHousefy.fyhj;
+  //回退收租日期
+  house.szrq = lastHousefy.yffrq2;
+
   //回退水电数据
   house.dscds = lastHousefy.dscds;
   house.dbcds = lastHousefy.dbcds;

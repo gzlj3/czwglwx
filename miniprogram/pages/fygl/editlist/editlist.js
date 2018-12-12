@@ -65,14 +65,14 @@ Page({
             break;
           case 2:
             const {sourceList} = self.data;
-            if (sourceList.length < 2){
-              utils.showToast('最后一条帐单，不能回退！');
-              return;
-            }
-            if (sourceIndex !==0 ) {
-              utils.showToast('只能从第一条帐单开始回退！');
-              return;
-            }
+            // if (sourceList.length < 2){
+            //   utils.showToast('最后一条帐单，不能回退！');
+            //   return;
+            // }
+            // if (sourceIndex !==0 ) {
+            //   utils.showToast('只能从第一条帐单开始回退！');
+            //   return;
+            // }
             e.currentTarget.id = "htzd";
             self.onQrsz(e);
             break;
@@ -99,13 +99,17 @@ Page({
 
   handleSubmit(){
     const { buttonAction, sourceList, autoSendMessage} = this.data;
+    // console.log(this.data);
     const response = fyglService.postData(buttonAction, sourceList, autoSendMessage);
-    // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
     fyglService.handleAfterRemote(response, CONSTS.getButtonActionInfo(buttonAction),
       (resultData) => {
         getApp().setFyListDirty(true);
         if(buttonAction === CONSTS.BUTTON_CB){
-          utils.redirectToSuccessPage('抄表完成后，如果帐单已经结清，可以出新帐单。', '开始出帐单','/pages/fygl/editlist/editlist',CONSTS.BUTTON_MAKEZD,this.data.params);
+          if (!utils.isEmptyObj(this.data.params) && sourceList.length === 1 && sourceList[0].sfsz===CONSTS.SFSZ_WJQ){
+            utils.redirectToSuccessPage('抄表完成后,可以立即刷新帐单并进入帐单详情页进一步处理。', '立即刷新帐单', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { ...this.data.params, yzhid: sourceList[0].yzhid, refreshzd: '1' });
+          }else{
+            utils.redirectToSuccessPage('抄表完成后，帐单已经结清，可以出新帐单。', '开始出帐单','/pages/fygl/editlist/editlist',CONSTS.BUTTON_MAKEZD,this.data.params);
+          }
         }else if (buttonAction === CONSTS.BUTTON_MAKEZD && !utils.isEmptyObj(this.data.params)) {
           utils.redirectToSuccessPage('出帐单完成后，可以进入帐单处理页面查看或处理新出的帐单。', '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, this.data.params);
         }else{
@@ -181,7 +185,7 @@ Page({
        flag = e.flag;
        e.flag = null;
     }
-    console.log('onqrczCz:', { housefyid, flag, collid: params.collid });
+    console.log('onqrczCz:', { buttonAction, housefyid, flag, collid: params.collid });
     const response = fyglService.postData(buttonAction,{housefyid,flag,collid:params.collid});
     const self = this;
     const tsinfo = e.title;
@@ -225,7 +229,9 @@ Page({
       buttonAction = Number.parseInt(buttonAction);
     }
     console.log('editlist:',buttonAction,params);
-    let {grantcode} = params;
+    let {grantcode,refreshzd} = params;
+    if(!refreshzd) refreshzd = '';  //是否先刷当前帐单
+
     if(!grantcode) grantcode='';
     let zdright = true;
     if (utils.isEmpty(grantcode)){
@@ -233,7 +239,9 @@ Page({
         zdright = fyglService.checkRights(buttonAction, '103', params.yzhid);
       }
     }else{
+      //通过授权码查询进入
       zdright = false;
+      buttonAction = CONSTS.BUTTON_LASTZD;
     }
     let registered = true;
     const response = fyglService.queryData(buttonAction, params);
@@ -345,9 +353,9 @@ Page({
     })
   },
 
-  onGetUserInfo: function (e) {
+  toIndex: function (e) {
     // app.setUserData(e.detail.userInfo);
-    console.log(e);
+    // console.log(e);
     wx.reLaunch({
       url: '/pages/index/index',
     })

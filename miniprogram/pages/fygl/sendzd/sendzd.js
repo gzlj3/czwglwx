@@ -69,11 +69,11 @@ Page({
    * 用户点击按钮分享
    */
   onShareAppMessage: function (e) {
-    console.log(e);
-    if (e.from !== 'button') {
-      // 不是来自页面内转发按钮
-      return;
-    }
+    // console.log(e);
+    // if (e.from !== 'button') {
+    //   // 不是来自页面内转发按钮
+    //   return;
+    // }
     const {grantcode} = this.data.params;
     const self = this;
     const s = JSON.stringify({grantcode});
@@ -84,7 +84,7 @@ Page({
 
     return {
       title: '查看帐单详情>',
-      path: '/pages/fygl/editlist/editlist?buttonAction='+CONSTS.BUTTON_LASTZD+'&item='+s,
+      path: '/pages/fygl/editlist/editlist?item='+s,
       // imageUrl:'../../images/czwgl.jpg'
       success: function (res) { 
         utils.showToast('发送成功！');

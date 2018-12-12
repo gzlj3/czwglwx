@@ -50,8 +50,11 @@ exports.checkAuthority = async(action,method,userInfo,data) => {
     if ([CONSTS.BUTTON_CB, CONSTS.BUTTON_MAKEZD, CONSTS.BUTTON_ADDFY, CONSTS.EDITFY, CONSTS.DELETEFY, CONSTS.BUTTON_EXITFY, CONSTS.BUTTON_USERGRANT, CONSTS.BUTTON_SYSCONFIG].indexOf(action) >= 0) {
       throw utils.codeException(101);
     }
-    if ([CONSTS.BUTTON_LASTZD].indexOf(action) >= 0 && method === 'POST') {
-      throw utils.codeException(101);
+    if ([CONSTS.BUTTON_LASTZD].indexOf(action) >= 0){
+      if(method === 'POST') 
+        throw utils.codeException(101);
+      if (method === 'GET' && data && data.refreshzd==='1')  //先刷新帐单再提取数据
+        throw utils.codeException(101);
     }
   }  
   return curUser;
@@ -264,9 +267,9 @@ exports.registerUser = async (data,userInfo) => {
   console.log('新用户注册：',userb);
   let result = await commService.addDoc('userb',userb);
   if (commService.isFd(sjData.userType)){
-    //房东注册，则创建新用户的集合表
-    await db.createCollection('house_' + collid);
-    await db.createCollection('housefy_' + collid);
+    //房东注册，则创建新用户的集合表(新注册的时候不建表，新插入数据的时候建)
+    // await db.createCollection('house_' + collid);
+    // await db.createCollection('housefy_' + collid);
   }
 
   //租客注册完成，关联房屋头像数据
@@ -287,6 +290,7 @@ exports.sysconfig = async (data, curUser) => {
 }
 
 exports.grantcode = async (data, curUser) => {
-  console.log('grantcode:',data);
+  delete data.message;
+  // console.log('grantcode:',data);
   return await commService.addDoc('grantcode',data);
 }

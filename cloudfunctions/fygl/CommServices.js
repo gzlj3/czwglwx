@@ -12,6 +12,8 @@ const _ = db.command;
  * 更新表的记录，返回更新成功的记录数
  */
 exports.updateDoc = async (tableName, docObj) => {
+  // if (utils.isEmptyObj(docObj))
+  //   throw utils.newException('参数异常！');
   const db = cloud.database();
   const { _id } = docObj;
   delete docObj._id;
@@ -31,6 +33,8 @@ exports.updateDoc = async (tableName, docObj) => {
  * 删除表的记录，返回删除成功的记录数
  */
 exports.removeDoc = async (tableName, _id) => {
+  if (utils.isEmpty(_id))
+    throw utils.newException('参数异常！');
   const db = cloud.database();
   const result = await db.collection(tableName).doc(_id).remove();
   const removedNum = result.stats.removed;
@@ -51,6 +55,9 @@ exports.addDoc = async (tableName, docObj) => {
 }
 
 exports.querySingleDoc = async (tableName, whereObj) => {
+  if (utils.isEmptyObj(whereObj))
+    throw utils.newException('参数异常！');
+
   const db = cloud.database();
   const result = await db.collection(tableName).where(whereObj).get();
   if (result && result.data.length > 0)
@@ -59,6 +66,7 @@ exports.querySingleDoc = async (tableName, whereObj) => {
 }
 
 exports.queryPrimaryDoc = async (tableName, _id) => {
+  if(utils.isEmpty(_id)) return null;
   const db = cloud.database();
   const result = await db.collection(tableName).doc(_id).get();
   if (result) return result.data;
@@ -66,6 +74,8 @@ exports.queryPrimaryDoc = async (tableName, _id) => {
 }
 
 exports.queryDocs = async (tableName, whereObj) => {
+  if (utils.isEmptyObj(whereObj))
+    throw utils.newException('参数异常！');
   const db = cloud.database();
   const result = await db.collection(tableName).where(whereObj).get();
   if (result && result.data.length > 0)

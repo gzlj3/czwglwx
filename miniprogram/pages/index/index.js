@@ -340,15 +340,15 @@ Page({
     );
   },
   onShareAppMessage: function(e){
-    if (e.from === 'button') {
-      // 来自页面内转发按钮
-      console.log(e.target)
-    }
-    return {
-      title: '自定义转发标题',
-      path: '/page/index/index',
-      // imageUrl:'../../images/czwgl.jpg'
-    }
+    // if (e.from === 'button') {
+    //   // 来自页面内转发按钮
+    //   console.log(e.target)
+    // }
+    // return {
+    //   title: '自定义转发标题',
+    //   path: '/page/index/index',
+    //   // imageUrl:'../../images/czwgl.jpg'
+    // }
   },
   onbindload:function(e){
     console.log('onbindload:',e);

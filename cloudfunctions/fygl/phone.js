@@ -7,10 +7,10 @@ const request = require('request');
 //其中的appId,appSecret为榛子云平台注册的帐号信息
 exports.sendPhoneMessage = async (sjhm, message,messageId) => {
   console.log('sendmessagelength:',message.length);
-  if(!config.production) {
-    //测试环境不真正发短信
-    return;
-  }
+  // if(!config.production) {
+  //   //测试环境不真正发短信
+  //   return;
+  // }
   if(!messageId) messageId = utils.currentTimeMillis()+"";
   const options = {
     method: 'POST',

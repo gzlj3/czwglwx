@@ -168,9 +168,12 @@
             </view>
         </view>
  
-        <view class="weui-form-preview__item" wx:if="{{!registered}}">
+        <view class="weui-form-preview__item" wx:if="{{grantcode && !registered}}">
           <view style="text-align:center;width:100%">注册后，你能查看更多帐单</view>
-          <button type='primary' open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">现在注册</button>
+          <button type='primary' bindtap="toIndex">现在注册</button>
+        </view>
+        <view class="weui-form-preview__item" wx:if="{{grantcode && registered}}">
+          <button type='primary' bindtap="toIndex">返回首页</button>
         </view>
 
     </view>

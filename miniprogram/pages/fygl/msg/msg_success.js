@@ -6,7 +6,7 @@ Page({
   },
 
   onLoad: function (options) {
-    console.log(options);
+    // console.log(options);
     const { pageDesc, button2 } = options;
     const button2Obj = button2 ? JSON.parse(button2) : {};
     this.setData({

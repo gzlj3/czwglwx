@@ -121,6 +121,7 @@ Page({
     formObject.photos = currentObject.photos;
     console.log('提交存储数据：',formObject);
 
+    const { sfsz } = currentObject;
     // const response = fyglService.saveFy(buttonAction, formObject);
     const response = fyglService.postData(buttonAction, formObject,this.data.collid);
     // console.log(buttonAction+"===:"+CONSTS.getButtonActionInfo(buttonAction));
@@ -132,11 +133,15 @@ Page({
           const s = JSON.stringify({ houseid: resultData._id });
           let pageDesc;
           if(buttonAction===CONSTS.BUTTON_EDITFY){
-            pageDesc = '数据修改完成后，如帐单数据有变动，可进入帐单详情页查看并刷新帐单。';
+            pageDesc = '数据修改完成后，可进入帐单详情页查看帐单。';
           }else{ 
             pageDesc = '房源新建完成后，可进入帐单详细页查看签约帐单。';
           }
-          utils.redirectToSuccessPage(pageDesc, '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id, collid: this.data.collid, yzhid: formObject.yzhid });
+          if (buttonAction === CONSTS.BUTTON_EDITFY && sfsz === CONSTS.SFSZ_WJQ){
+            utils.redirectToSuccessPage('数据修改完成后,可以立即刷新帐单并进入帐单详情页进一步处理。', '立即刷新帐单', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id, collid: this.data.collid, yzhid: formObject.yzhid,refreshzd:'1'});
+          }else{
+            utils.redirectToSuccessPage(pageDesc, '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id, collid: this.data.collid, yzhid: formObject.yzhid });
+          }
         }else{
           wx.navigateBack();
         }
