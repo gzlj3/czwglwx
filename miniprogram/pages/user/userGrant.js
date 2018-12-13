@@ -3,33 +3,80 @@ const fyglService = require('../../services/fyglServices.js');
 // const commService = require('../../services/commServices.js');
 const CONSTS = require('../../utils/constants.js');
 const app = getApp()
+const refreshRightsChecked = (rights) =>{
+  if(!rights) return {};
+  let rightsChecked = {};
+  rights.map(value => {
+    rightsChecked[value] = true;
+  });
+  return rightsChecked;
+}
+
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    rights:{},
-    user: app.globalData.user
+    sjhm:'',
+    rightsChecked:{},
+    grantedSjhms:[],
+    // user: app.globalData.user
   },
-
+  
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
     // console.log('usergrant onload');
     fyglService.checkAuthority(CONSTS.BUTTON_USERGRANT);
-    this.setData({ user: app.globalData.user }); 
+    const { grantedSjhm } = app.globalData.user;
+    let { sjhm } = this.data;
+    let grantedSjhms = [],rights=[];
+    if(grantedSjhm){
+      let found = false;
+      for (let i = 0; i < grantedSjhm.length;i++){
+        const tmpSjhm = grantedSjhm[i].sjhm ? grantedSjhm[i].sjhm : grantedSjhm[i];
+        grantedSjhms.push(tmpSjhm);
+        if((utils.isEmpty(sjhm) && i===0) || tmpSjhm===sjhm){
+          found = true;
+          sjhm = tmpSjhm;
+          rights = grantedSjhm[i].rights ? grantedSjhm[i].rights:[];
+        }
+      }
+      if(!found && grantedSjhm.length>0){
+        const tmpSjhm = grantedSjhm[0].sjhm ? grantedSjhm[0].sjhm : grantedSjhm[0];
+        sjhm = tmpSjhm;
+        rights = grantedSjhm[0].rights ? grantedSjhm[0].rights : [];
+      }
+    }
+    this.setData({ sjhm, rightsChecked: refreshRightsChecked(rights), grantedSjhms });
+  },
+
+
+  getGrant: function(e){
+    const { item: sjhm } = e.currentTarget.dataset;
+    const { grantedSjhm } = app.globalData.user;
+    let rights = {};
+    if (grantedSjhm) {
+      for (let i = 0; i < grantedSjhm.length; i++) {
+        const tmpSjhm = grantedSjhm[i].sjhm;
+        if (tmpSjhm === sjhm){
+          rights = grantedSjhm[i].rights;
+        }
+      }
+    }
+    this.setData({ sjhm, rightsChecked: refreshRightsChecked(rights) });
   },
 
   grantCheckboxChange: function (e) {
-    // console.log('checkbox发生change事件，携带value值为：', e.detail.value);
-    const rightsChecked = e.detail.value;
-    let rights={};
-    rightsChecked.map(value=>{
-      rights[value] = true;
-    })
-    this.setData({rights});
+    console.log('checkbox发生change事件，携带value值为：', e.detail.value);
+    const rights = e.detail.value;
+    // let rights={};
+    // rightsChecked.map(value=>{
+    //   rights[value] = true;
+    // })
+    this.setData({rightsChecked: refreshRightsChecked(rights)});
   },
   cancelGrant: function(e){
     const { item: sjhm } = e.currentTarget.dataset;
@@ -66,7 +113,8 @@ Page({
     fyglService.handleAfterRemote(response, '用户授权',
       (resultData) => {
         app.setUserData(resultData);
-        this.setData({ user: app.globalData.user });
+        this.onLoad();
+        // this.setData({ user: app.globalData.user });
         // console.log(resultData);
         // this.setData({ sendingYzm: true });
         // this.timer();

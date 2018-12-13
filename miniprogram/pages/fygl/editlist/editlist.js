@@ -34,7 +34,7 @@ Page({
   },
   onMoreAction(e) {
     const { item,index} = e.currentTarget.dataset;
-    console.log("moreAction:",item);
+    // console.log("moreAction:",item);
     let itemList;
     // if (utils.isEmpty(item.zhxm)) {
     //   this.actionSheet2(e);

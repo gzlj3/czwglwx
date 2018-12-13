@@ -15,7 +15,9 @@ Page({
    */
   onLoad: function (options) {
     const params = options.item? JSON.parse(options.item) : {};
-    console.log('sendzd:', params);
+    // console.log('sendzd:', params);
+    const { message } = params;
+    wx.setClipboardData({ data: message });
     this.setData({ params});
   },
 
@@ -61,10 +63,10 @@ Page({
   onReachBottom: function () {
 
   },
-  onCopyzd:function(e){
-    const {message} = this.data.params;
-    wx.setClipboardData({ data: message });
-  },
+  // onCopyzd: function (e) {
+  //   const {message} = this.data.params;
+  //   wx.setClipboardData({ data: message });
+  // },
   /**
    * 用户点击按钮分享
    */

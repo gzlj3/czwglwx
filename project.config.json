@@ -10,7 +10,7 @@
 	},
 	"appid": "wx074eecae1210da4a",
 	"projectname": "czwglwx",
-	"libVersion": "2.4.1",
+	"libVersion": "2.4.2",
 	"condition": {
 		"search": {
 			"current": -1,
@@ -29,7 +29,15 @@
 		},
 		"miniprogram": {
 			"current": 0,
-			"list": []
+			"list": [
+				{
+					"id": 0,
+					"name": "测试",
+					"pathName": "pages/index/index",
+					"query": "",
+					"scene": "1001"
+				}
+			]
 		}
 	}
 }

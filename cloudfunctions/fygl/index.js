@@ -2,6 +2,7 @@
 const results = require('results.js');
 const CONSTS = require('constants.js');
 const services = require('FyglServices.js');
+const commService = require('CommServices.js');
 const userServices = require('UserServices.js');
 const utils = require('utils.js');  
 const phone = require('phone.js');  
@@ -24,9 +25,7 @@ exports.main = async (event, context) => {
     services.setUser(curUser);
     if (action === 300) {
       //测试发送模板消息
-      // console.log(data);
-      // const result = await utils.sendTemplateMessage(data,curUser);
-      const result = await phone.queryPhoneMessageStatus("0111445397");      
+      const result = await commService.testService(data);
       return results.getSuccessResults(result);
     }
     let result;

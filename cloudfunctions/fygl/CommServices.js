@@ -172,5 +172,12 @@ const getTableName = (tableName, collid) => {
 }
 exports.getTableName = getTableName;
 
-// exports.queryAllDoc = () => {
-// }
+exports.testService = async (data) => {
+  //doc(undefined)
+  //置为null, string：失败，number:成功
+  //置为undefined
+  let sfhj='',sdj='';
+  const result = await db.collection('house_1').doc('GVe1ZTXFeQ8zzHJG').update({data:{sdj,sfhj}});
+  console.log('test:', result);
+  return result;
+}

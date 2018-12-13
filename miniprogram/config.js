@@ -5,4 +5,4 @@ exports.conf = {
 } 
 exports.uploadFileMaxCount = 5;       //每个房间上传文件最大数 
 exports.uploadFileMaxSize = 200*1024;  //上传文件大小最大值：200k
-exports.refreshUserInterval=5*60*1000;    //刷新用户缓存时间间隔(在app.onshow触发的情况下计算)
+exports.refreshUserInterval=5*60*1000;    //刷新用户缓存时间间隔(在app.onshow触发的情况下计算):5分钟

@@ -86,8 +86,9 @@ Page({
     // console.log(s.length);
     // const a = utils.currentTimeMillis()+"";
     // console.log(a.length);
-    // let a = undefined;
-    // console.log(utils.isEmpty(a));
+    // let a = [{sjhm:'aaaaaaa'}];
+    // console.log(typeof(a[0]) ==='string');
+    
 
     const requestUserType = options.requestUserType ? options.requestUserType:'';
     if(!utils.isEmpty(requestUserType)){
@@ -333,7 +334,7 @@ Page({
   testSubmit: function(e){
     console.log('testsubmit:',e);
     const response = fyglService.postData(300, { form_id:e.detail.formId });
-    fyglService.handleAfterRemote(response, '发送模板消息',
+    fyglService.handleAfterRemote(response, '测试服务',
       (resultData) => {
         console.log(resultData)
       }

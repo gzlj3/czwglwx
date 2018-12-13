@@ -7,12 +7,12 @@
     <view class="page__bd">
       <view class="weui-cells__title">已授权手机号</view>
       <view class="weui-cells weui-cells_after-title">
-        <view class="weui-cell" wx:for="{{user.grantedSjhm}}" wx:key="item">
-          <view class="weui-cell__hd">
+        <view class="weui-cell" wx:for="{{grantedSjhms}}" wx:key="item">
+          <view class="weui-cell__hd" data-item="{{item}}" style="{{item===sjhm?'background-color:#cfcfcf':''}}" catchtap="getGrant">
             {{item}}
           </view>
-          <view class="weui-cell__bd" style="margin-left:30px">
-            <button size='mini' type="primary" data-item="{{item}}" ontap="cancelGrant">取消授权</button>
+          <view class="weui-cell__bd" style="margin-left:50px">
+            <button size='mini' type="primary" data-item="{{item}}" catchtap="cancelGrant">取消授权</button>
           </view>
         </view>
       </view>
@@ -23,33 +23,33 @@
             <view class="weui-label">授权手机号</view>
           </view>
           <view class="weui-cell__bd">
-            <input class="weui-input" name="sjhm" type="number" maxlength='11' placeholder="请输入被授权人手机号" />
+            <input class="weui-input" name="sjhm" id="sjhm" type="number" maxlength='11' value="{{sjhm}}" placeholder="请输入被授权人手机号" />
           </view>
         </view>
         <view class="weui-cell weui-cell_input">
           <checkbox-group name="rights" bindchange="grantCheckboxChange">
             <label class="weui-cell weui-check__label">
-              <checkbox class="weui-check" value="101"/>
+              <checkbox class="weui-check" value="101" checked="{{rightsChecked['101']}}"/>
               <view class="weui-cell__hd weui-check__hd_in-checkbox">
               <!-- {{...rights}} -->
-                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rights['101']}}"></icon>
-                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rights['101']}}"></icon>
+                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rightsChecked['101']}}"></icon>
+                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rightsChecked['101']}}"></icon>
               </view>
               <view class="weui-cell__bd">查看我的房源</view>
             </label>
             <label class="weui-cell weui-check__label">
-              <checkbox class="weui-check" value="102"/>
+              <checkbox class="weui-check" value="102" checked="{{rightsChecked['102']}}"/>
               <view class="weui-cell__hd weui-check__hd_in-checkbox">
-                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rights['102']}}"></icon>
-                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rights['102']}}"></icon>
+                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rightsChecked['102']}}"></icon>
+                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rightsChecked['102']}}"></icon>
               </view>
               <view class="weui-cell__bd">修改我的房源</view>
             </label>  
             <label class="weui-cell weui-check__label">
-              <checkbox class="weui-check" value="103"/>
+              <checkbox class="weui-check" value="103" checked="{{rightsChecked['103']}}"/>
               <view class="weui-cell__hd weui-check__hd_in-checkbox">
-                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rights['103']}}"></icon>
-                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rights['103']}}"></icon>
+                  <icon class="weui-icon-checkbox_circle" type="circle" size="23" wx:if="{{!rightsChecked['103']}}"></icon>
+                  <icon class="weui-icon-checkbox_success" type="success" size="23" wx:if="{{rightsChecked['103']}}"></icon>
               </view>
               <view class="weui-cell__bd">管理我的帐单</view>
             </label>

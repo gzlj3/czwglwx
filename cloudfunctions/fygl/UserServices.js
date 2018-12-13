@@ -177,7 +177,6 @@ exports.grantUser = async (data, curUser) => {
   const oldGranted = userb.granted
   let newGranted = [];
   let found = false;
-  let newGrantedSjhm = [];
   let grantedState = '';
   if (oldGranted){
     oldGranted.map(value=>{
@@ -217,12 +216,30 @@ exports.grantUser = async (data, curUser) => {
     //修改本次授权的手机号
     let {grantedSjhm} = curUser;
     if(!grantedSjhm) grantedSjhm = [];
-    if(grantedState==='delete'){
-      grantedSjhm.splice(grantedSjhm.indexOf(sjhm), 1)
-    } else if (grantedState === 'add') {
-      grantedSjhm.push(sjhm);
+    let newGrantedSjhm = [];
+    let addFound  =false;
+    for(let i=0;i<grantedSjhm.length;i++){
+      if (typeof (grantedSjhm[i]) === 'string'){
+        //兼容处理,将之前授权的字串改为对象
+        grantedSjhm[i] = { sjhm: grantedSjhm[i]};
+      };
+      if (grantedState === 'delete' && sjhm === grantedSjhm[i].sjhm) continue;
+      if ((grantedState === 'modify' || grantedState === 'add') && sjhm === grantedSjhm[i].sjhm) {
+        addFound = true;
+        grantedSjhm[i].rights = rights;
+      }
+      newGrantedSjhm.push(grantedSjhm[i]);
     }
-    curUser.grantedSjhm = grantedSjhm;
+    if (grantedState === 'add' && !addFound) {
+      newGrantedSjhm.push({sjhm,rights});
+    }
+    // console.log('grantuser:',grantedState,newGrantedSjhm);
+    // if(grantedState==='delete'){
+    //   grantedSjhm.splice(grantedSjhm.indexOf(sjhm), 1)
+    // } else if (grantedState === 'add') {
+    //   if(!grantedSjhm.includes(sjhm)) grantedSjhm.push(sjhm);
+    // }
+    curUser.grantedSjhm = newGrantedSjhm;
     curUser.zhxgsj = utils.getCurrentTimestamp();
     updatedNum = await commService.updateDoc('userb', curUser);
   }

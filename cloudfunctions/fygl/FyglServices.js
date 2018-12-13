@@ -488,7 +488,7 @@ const getDfts = (housefy) => {
   if(housefy.dfhj){
     let dgtdsts='';
     if (!utils.isEmpty(housefy.dgtds)) dgtdsts = `,公摊:${housefy.dgtds}`;
-    return `电费:${housefy.dfhj}元(上月:${housefy.dscds},本月:${housefy.dbcds}${dgtdsts});\r\n`;
+    return `电费:${housefy.dfhj}元(上月:${housefy.dscds},本月:${housefy.dbcds}${dgtdsts},单价:${housefy.ddj}元);\r\n`;
   }
   return '';
 }
@@ -496,7 +496,7 @@ const getSfts = (housefy) => {
   if (housefy.sfhj){
     let sgtdsts = '';
     if (!utils.isEmpty(housefy.sgtds)) sgtdsts = `,公摊:${housefy.sgtds}`;
-    return `水费:${housefy.sfhj}元(上月:${housefy.sscds},本月:${housefy.sbcds}${sgtdsts});\r\n`;
+    return `水费:${housefy.sfhj}元(上月:${housefy.sscds},本月:${housefy.sbcds}${sgtdsts},单价:${housefy.sdj}元);\r\n`;
   }
   return '';
 }
