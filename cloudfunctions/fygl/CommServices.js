@@ -176,8 +176,8 @@ exports.testService = async (data) => {
   //doc(undefined)
   //置为null, string：失败，number:成功
   //置为undefined
-  let sfhj=null,sdj=null,sbcds=null;
-  const result = await db.collection('house_1').doc('GVe1ZTXFeQ8zzHJG').update({data:{sbcds,sdj,sfhj}});
+  let sfhj=null,sdj=null,sbcds=null,ljfyff=null;
+  const result = await db.collection('house_1').doc('GVe1ZTXFeQ8zzHJG').update({ data: { sbcds, sdj, sfhj, ljfyff}});
   console.log('test:', result);
   return result;
 }
