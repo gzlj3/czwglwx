@@ -8,7 +8,9 @@
     "pages/storageConsole/storageConsole",
     "pages/fygl/msg/msg_success",
     "pages/sysmanager/sysconfig/sysconfig",
-    "pages/fygl/sendzd/sendzd"
+    "pages/fygl/sendzd/sendzd",
+    "pages/sxqm/sxqm",
+    "pages/fygl/htqy/htqy"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",

@@ -9,7 +9,7 @@
  <official-account bindload="onbindload" binderror="onbinderror"></official-account>
  <form bind:submit="testSubmit" report-submit="true" report-submit="true">
     <button formType="submit">测试服务</button> 
-    <!-- <button  open-type="share">测试opentype</button>  -->
+    <button bindtap='testPage'>测试页面</button> 
  </form>
   <view class="page__bd page__bd_spacing">
       <view class="grant-container grant-container-wxgrant" wx:if="{{!waitingCloud && !user}}">

@@ -14,6 +14,12 @@ const menuList = [
     page: '../fygl/fyglmain'
   },
   {
+    id: 'nav',
+    name: '面对面签约',
+    open: false,
+    page: '../fygl/htqy/htqy'
+  },
+  {
     id: 'widget',
     name: '集中抄表',
     open: false,
@@ -339,6 +345,18 @@ Page({
         console.log(resultData)
       }
     );
+  },
+  testPage: function (e) {
+    wx.navigateTo({
+      url: '../sxqm/sxqm',
+    })
+  //   console.log('testPage:', e);
+  //   const response = fyglService.postData(300, { form_id: e.detail.formId });
+  //   fyglService.handleAfterRemote(response, '测试服务',
+  //     (resultData) => {
+  //       console.log(resultData)
+  //     }
+  //   );
   },
   onShareAppMessage: function(e){
     // if (e.from === 'button') {

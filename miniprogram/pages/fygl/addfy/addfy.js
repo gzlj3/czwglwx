@@ -40,7 +40,7 @@ const initialState = {
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
   pageTitle:'',
   pageDesc:'',
-  tabs: ["基本信息", "更多信息","图片"],
+  tabs: ["基本信息", "更多信息", "图片", "签约合同"],
   activeIndex: 0,
   sliderOffset: 0,
   sliderLeft: 0
