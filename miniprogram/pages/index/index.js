@@ -76,6 +76,7 @@ Page({
     ], 
     waitingCloud:true,
     requestUserType:'',  //用户请求入口身份（房东或租客）
+    disabledSjhm: false,  //如果手机号码是带入的，则不允许修改，而且默认为是租客注册
   },
   
   onLoad: function (options) {
@@ -95,18 +96,19 @@ Page({
     // let a = [{sjhm:'aaaaaaa'}];
     // console.log(typeof(a[0]) ==='string');
     
-
-    const requestUserType = options.requestUserType ? options.requestUserType:'';
-    if(!utils.isEmpty(requestUserType)){
-      if (requestUserType === CONSTS.USERTYPE_ZK){
-        this.data.radioItems[0].checked = false;
-        this.data.radioItems[1].checked = true;
-        this.setData({ requestUserType, radioItems: this.data.radioItems});
-      }
+    let requestUserType = options.requestUserType ? options.requestUserType:'';
+    const sjhm = !utils.isEmpty(options.sjhm) ? options.sjhm : '';
+    let {radioItems,disabledSjhm} = this.data;
+    if (requestUserType === CONSTS.USERTYPE_ZK){
+      radioItems[0].checked = false;
+      radioItems[1].checked = true;
     }
+    if(!utils.isEmpty(sjhm) && utils.checkSjhm(sjhm)){
+      disabledSjhm = true;
+      if (utils.isEmpty(requestUserType)) requestUserType = CONSTS.USERTYPE_ZK;
+    }
+    this.setData({ requestUserType, sjhm, disabledSjhm });
     this.waitingCloudNormal();
-
-
   },  
 
   waitingCloudNormal: function () {

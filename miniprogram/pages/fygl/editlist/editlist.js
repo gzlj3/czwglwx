@@ -17,7 +17,9 @@ const initialState = {
   saveButtonText:'保存',
   pageTitle: '',
   pageDesc: '',
+  grantcodeParas: {sjhm:'',flag:''},
   registered:true,
+  // sjhm:'',
 }
 
 Page({
@@ -199,8 +201,7 @@ Page({
           e.dxcontent = resultData;
           self.onQrsz(e);
           return;
-        }else if(flag==='wxzd'){
-          // console.log('wxzd:',resultData);
+        }else if(flag==='wxzd' || flag==='wxyjzd'){
           const s = JSON.stringify(resultData);
           wx.navigateTo({
             url: '../sendzd/sendzd?item='+s,
@@ -244,6 +245,7 @@ Page({
       buttonAction = CONSTS.BUTTON_LASTZD;
     }
     let registered = true;
+    let grantcodeParas = {};
     const response = fyglService.queryData(buttonAction, params);
     fyglService.handleAfterRemote(response, null,
       (resultData) => { 
@@ -251,9 +253,14 @@ Page({
         if(buttonAction === CONSTS.BUTTON_LASTZD){
           if(!utils.isEmpty(grantcode)){
             registered = resultData.registered;
+            grantcodeParas = resultData.grantcodeParas;
             resultData = resultData.sourceList;
           }
           showDetailZd = this.refreshShowDetailZd(resultData);
+          if (!utils.isEmpty(grantcode) && showDetailZd.length>0){
+            //租客查看帐单进入，则默认显示为展开，不管状态
+            showDetailZd[0] = true;
+          }
         }
         this.setData({
           buttonAction,
@@ -265,6 +272,7 @@ Page({
           zdright,
           params,
           grantcode,
+          grantcodeParas,
           registered,
         }); 
         this.refreshState();
@@ -354,10 +362,16 @@ Page({
   },
 
   toIndex: function (e) {
-    // app.setUserData(e.detail.userInfo);
-    // console.log(e);
     wx.reLaunch({
       url: '/pages/index/index',
+    })
+  },
+  toIndex_zk: function (e) {
+    let { grantcodeParas } = this.data;
+    let sjhm = '';
+    if (grantcodeParas) sjhm = grantcodeParas.sjhm;
+    wx.reLaunch({
+      url: '/pages/index/index?requestUserType='+CONSTS.USERTYPE_ZK+'&sjhm='+sjhm
     })
   },
 

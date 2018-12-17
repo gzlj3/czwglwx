@@ -83,7 +83,7 @@ async function queryLastzdWithGrantcode(params, userInfo) {
   console.log('querygrantcode:',result);
   if(!result)
     throw utils.newException('授权码错误或已失效！');
-  const {housefyid,createtime,collid} = result;
+  const {housefyid,createtime,collid,flag,sjhm} = result;
   if (utils.currentTimeMillis() - createtime >= config.grantcodeYxq){
     throw utils.newException('授权码已失效！');
   }
@@ -94,7 +94,7 @@ async function queryLastzdWithGrantcode(params, userInfo) {
   const userb = await commService.querySingleDoc('userb',{openId:userInfo.openId});
   let registered = userb!==null;
   // registered = false;
-  return {sourceList:[result],registered};
+  return {sourceList:[result],registered,grantcodeParas:{flag,sjhm}};
 }
 exports.queryLastzdWithGrantcode = queryLastzdWithGrantcode;
 
@@ -501,7 +501,7 @@ const getSfts = (housefy) => {
   return '';
 }
 
-const getZdMessage = (housefy) => {
+const getZdMessage = (housefy,flag) => {
   let rq1 = housefy.rq1;
   if (!rq1 || rq1.length < 10) return '';
   let zdlxinfo;
@@ -510,12 +510,20 @@ const getZdMessage = (housefy) => {
   else zdlxinfo = housefy.zdmonth ? housefy.zdmonth:rq1.substring(0, 4) + '年' + rq1.substring(5, 7) + '月';
   const ts1 = housefy.fyhj<0?'退':'缴';
   const ts2 = housefy.czje<0?'(退)':'';
-
-  const s = `${housefy.fwmc}房,${housefy.zhxm},您好:\r\n${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。\r\n`+
-            `${getFyts('月租费', housefy.czje, ';\r\n')}`+
-            `${getFyts('押金', housefy.yj,';\r\n')}`+getDfts(housefy)+getSfts(housefy)+
-            `${getFyts('网络费', housefy.wlf)}${getFyts('卫生费', housefy.ljf)}${getFyts('管理费', housefy.glf)}`+
-            `${getFyts('其它费', housefy.qtf)}${getFyts('上月结转费', housefy.syjzf)}`;
+  let s = `${housefy.fwmc}房,${housefy.zhxm},您好:\r\n${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。\r\n`;
+  if(flag === 'wxyjzd'){
+    //生成已结清帐单信息
+    if(CONSTS.SFSZ_WJQ===housefy.sfsz)
+      throw utils.newException('帐单未结清，不能发送已结信息！');
+    if (CONSTS.SFSZ_YJZ===housefy.sfsz) s += '已结转下月';
+    else s += '已结清';
+  }else{
+    s = s+
+        `${getFyts('月租费', housefy.czje, ';\r\n')}`+
+        `${getFyts('押金', housefy.yj,';\r\n')}`+getDfts(housefy)+getSfts(housefy)+
+        `${getFyts('网络费', housefy.wlf)}${getFyts('卫生费', housefy.ljf)}${getFyts('管理费', housefy.glf)}`+
+        `${getFyts('其它费', housefy.qtf)}${getFyts('上月结转费', housefy.syjzf)}`;
+  }
   return s;   
 }
 
@@ -558,12 +566,12 @@ const processQrsz = async (params,curUser) => {
   }else if ("sjdx" === flag) {
     const message = getPhoneMessage(housefy);
     return message;
-  } else if ("wxzd" === flag) {
-    const message = getZdMessage(housefy);
+  } else if ("wxzd" === flag || "wxyjzd"===flag) {
+    const message = getZdMessage(housefy,flag);
     //生成授权查询码，通过此码查当前帐单，不需要注册
     const grantcode = utils.uuid(16);
     const createtime = utils.currentTimeMillis();
-    return { message, collid, housefyid: housefy._id, grantcode,createtime};
+    return { message, collid, housefyid: housefy._id, grantcode,createtime,flag,sjhm:house.dhhm};
   } else if ("sendsjdx" === flag) {
     await sendZdMessage(house, housefy, collid, curUser.openId);
     return queryLastzdList({ houseid, collid});

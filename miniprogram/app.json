@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/fygl/htqy/htqy",
     "pages/fygl/fyglmain",
     "pages/fygl/addfy/addfy",
     "pages/user/userGrant",
@@ -9,8 +10,7 @@
     "pages/fygl/msg/msg_success",
     "pages/sysmanager/sysconfig/sysconfig",
     "pages/fygl/sendzd/sendzd",
-    "pages/sxqm/sxqm",
-    "pages/fygl/htqy/htqy"
+    "pages/sxqm/sxqm"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",

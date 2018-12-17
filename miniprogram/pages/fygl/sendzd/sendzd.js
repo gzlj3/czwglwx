@@ -80,7 +80,7 @@ Page({
     const self = this;
     const s = JSON.stringify({grantcode});
 
-    //由于发送结果信息经常截获不到，因此先保存发送信息
+    //由于发送结果信息截获不到，因此先保存发送信息
     const response = fyglService.postData(CONSTS.BUTTON_GRANTCODE, self.data.params);
     fyglService.handleAfterRemote(response, null);
 
@@ -91,10 +91,6 @@ Page({
       success: function (res) { 
         utils.showToast('发送成功！');
         wx.navigateBack();
-        // 转发成功,更新授权码
-        // console.log("转发成功:" + JSON.stringify(res));
-        // const response = fyglService.postData(CONSTS.BUTTON_GRANTCODE, self.data.params);
-        // fyglService.handleAfterRemote(response, '发送帐单');
       },
       fail: function (res) {
         // 转发失败

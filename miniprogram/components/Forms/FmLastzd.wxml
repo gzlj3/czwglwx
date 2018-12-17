@@ -163,6 +163,7 @@
 
             </view>
             <view class="weui-form-preview__ft" wx:if="{{item.sfsz!=='0' && (isFd) && zdright && showDetailZd[index]}}">
+                <view class="weui-form-preview__btn weui-form-preview__btn_primary" hover-class="weui-form-preview__btn_active" id="wxyjzd" data-item="{{item._id}}" catchtap="onQrszCz">发送帐单已结信息</view>
                 <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="htzd" data-item="{{item._id}}" catchtap="onQrsz" wx:if="{{sourceList.length>1 && index===0}}">回退帐单</view>
                 <view class="weui-form-preview__btn weui-form-preview__btn_default" hover-class="weui-form-preview__btn_active" id="sczd" data-item="{{item._id}}" catchtap="onQrsz" wx:if="{{sourceList.length<=1}}">删除账单</view>
             </view>
@@ -170,7 +171,7 @@
  
         <view class="weui-form-preview__item" wx:if="{{grantcode && !registered}}">
           <view style="text-align:center;width:100%">注册后，你能查看更多帐单</view>
-          <button type='primary' catchtap="toIndex">现在注册</button>
+          <button type='primary' catchtap="toIndex_zk">现在注册</button>
         </view>
         <view class="weui-form-preview__item" wx:if="{{grantcode && registered}}">
           <button type='primary' catchtap="toIndex">返回首页</button>

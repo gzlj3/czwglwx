@@ -1,1 +1,52 @@
-/* miniprogram/pages/fygl/htqy/htqy.wxss */
+.inputcontainer{
+  display: flex;
+  font-size: 16px;
+  /* justify-content: space-between; */
+  align-items: center;
+}
+
+.addwrap{
+  flex-flow: wrap;
+}
+
+.inputlabel_9{
+  width: 140px;
+}
+
+.input_underline{
+  border-bottom: 1rpx solid;
+}
+.inputlabel_5{
+  width: 80px;
+}
+.input_box{
+  border: 1rpx solid #efefef;
+}
+
+.weui-article__section {
+  /* margin-top: 5px; */
+  background-color: white;
+}
+
+.weui-article {
+  /* padding: 20px 15px; */
+  font-size: 15px;
+}
+
+.htlabel_h2 {
+  display: flex;
+  font-size: 16px;
+  font-weight: 400;
+  flex-flow: wrap;
+  /* margin-bottom: 0.34em; */
+}
+
+/* .input{
+  width: 100%;
+  border-bottom: 1rpx solid #efefef;
+  height: 88rpx;
+  border-top: 1rpx solid #efefef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+} */
