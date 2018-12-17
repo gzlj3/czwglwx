@@ -1,7 +1,7 @@
 <template name="FmHt">
   <view class="page">
     <view class="page__hd">
-      <view class="page__title">个人房屋租赁合同</view>
+      <view class="page__title" style="text-align:center">个人房屋租赁合同</view>
       <!-- <view class="page__desc">文章</view> -->
     </view>
     <view class="page__bd">
@@ -12,7 +12,11 @@
         </view>
         <view class="inputcontainer">
           <text class="inputlabel_9">甲方身份证号:</text>
-          <input lass='input_underline' value='52242719720918243X'></input>
+          <input class='input_underline' value='52242719720918243X'></input>
+        </view>
+        <view class="inputcontainer">
+          <text class="inputlabel_9">甲方手机号:</text>
+          <input class='input_underline' value='13332875650'></input>
         </view>
         <view class="inputcontainer">
           <text class="inputlabel_9">乙方(承租方)姓名:</text>
@@ -21,6 +25,10 @@
         <view class="inputcontainer">
           <text class="inputlabel_9">乙方身份证号:</text>
           <input class='input_underline' value='52242719720918243X'></input>
+        </view>
+        <view class="inputcontainer">
+          <text class="inputlabel_9">乙方手机号:</text>
+          <input class='input_underline' value='13332875650'></input>
         </view>
         <view class="weui-article__section">
           <view>1、房屋基本信息</view>
@@ -39,7 +47,7 @@
         </view>
         <view class="weui-article__section">
           <view>2、租赁期限</view>
-          <view class="inputcontainer" style="justify-content:space-between">自
+          <view class="inputcontainer" >自
             <picker mode="date" bindchange="onInputBlur">
               <view class="weui-input">2018-12-16</view>
             </picker>至
@@ -68,15 +76,24 @@
             6、其它费用：网络费:<input class='input_underline' value='50' style="width:30px"/><text>元;</text>卫生费:<input class='input_underline' value='15' style="width:30px"/><text>元;</text>管理费:<input class='input_underline' value='15' style="width:30px"/><text>元;</text>
           </view>
         </view>
-        <view class="weui-article__section">
+        <view class="weui-article__section"> 
           <view class="inputcontainer addwrap">
             <text>7、乙方租住满三个月后灯光坏、下水道堵塞等由乙方负责更换和清理。</text>
-            <text>8、乙方要注意安全，搞好环境卫生，不得从高处乱掉垃圾，未经甲方同意，不得养猫狗等动物。</text>
+            <text>8、乙方要注意安全，搞好环境卫生，不得从高处乱扔垃圾，未经甲方同意，不得养猫狗等动物。</text>
             <text>9、未经甲方同意，乙方不得转租、转卖、改卖房屋结构，如因乙方管理不善发生水灾、火灾、盗窃及人为破坏行为，法律责任及经济损失由乙方承担。</text>
             <text>10、租赁期满时，双方对所租房屋、家具及其它设施进行验收，如有损坏者，由乙负责修复或照价赔偿，退租时把房屋卫生打扫干净，否则从押金扣除房屋清洁费用100元。</text>
           </view>
         </view>
-
+        <view class="weui-article__section"> 
+          <view class="inputcontainer" style="justify-content: space-between">
+            <text style="width:150px;text-align:center">甲方签名</text>
+            <text style="width:150px;text-align:center">乙方签名</text>
+          </view>
+          <view class="inputcontainer" style="justify-content: space-between">
+            <image style="width:170px; height: 80px;" src='../../../images/czwgl.jpg'></image>
+            <image style="width:170px; height: 80px;" src='../../../images/czwgl.jpg' catchtap='onsxqm_yf'></image>
+          </view>
+        </view>
       </view>
     </view>
   </view>

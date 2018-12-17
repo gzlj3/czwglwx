@@ -1,7 +1,7 @@
 .content {
 width: 100%;
 height: 500px;
-background-color: red;
+/* background-color: red; */
 }
 .firstCanvas {
 background-color: blue;
@@ -11,5 +11,5 @@ height: 200px;
 image {
 width: 100%;
 height: 200px;
-background-color: orange;
+/* background-color: orange; */
 }
