@@ -221,8 +221,8 @@ exports.queryHtdata = async (data, curUser) => {
 }
 
 const saveHtmb = async (formObject, curUser) => {
-  const { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk} = formObject;
-  const htmb = { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk };
+  const { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk, fdQmCloudPath} = formObject;
+  const htmb = { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk, fdQmCloudPath };
   const {yzhid} = curUser;
   let result = await commService.querySingleDoc('sysconfig',{yzhid,code:'htmb'});
   if(!result){
@@ -236,6 +236,7 @@ const saveHtmb = async (formObject, curUser) => {
 
 const processSxqm = async (data, curUser) => {
   const { formObject, flag } = data;
+  console.log('processSxqm:',formObject);
   if (!utils.isEmpty(formObject.zkQmTempCloudPath)){
     if (!utils.isEmpty(formObject.zkQmCloudPath)){
       await cloud.deleteFile({ fileList: [formObject.zkQmCloudPath] });
@@ -255,21 +256,26 @@ const processSxqm = async (data, curUser) => {
 exports.processHt = async (data, curUser) => {
   const { openId} = curUser;
   const {formObject,flag} = data;
-  //先处理签名图片
-  await processSxqm(data,curUser);
   
   if(flag==='htmb'){
+    //先处理签名图片
+    await processSxqm(data, curUser);
   //存为合同模板
     await saveHtmb(formObject,curUser);
+    return formObject;
   }else if(flag==='hthc'){
   //合同缓存
     let session = await commService.querySingleDoc('session', { openId});
     if(!session)
       throw utils.newException('会话数据错误！');
+    //先处理签名图片
+    await processSxqm(data, curUser);
+
     session.htdata = formObject;
     const updatedNum = await commService.updateDoc('session',session);
-    if (updatedNum < 1) throw utils.newException('缓存合同未更新!');
-    return updatedNum;
+    return formObject;
+    // if (updatedNum < 1) throw utils.newException('缓存合同未更新!');
+    // return updatedNum;
   }else{
     throw utils.newException('未确定合同处理动作：'+flag);
   }

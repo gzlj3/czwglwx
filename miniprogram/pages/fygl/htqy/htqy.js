@@ -51,16 +51,22 @@ Page({
       const cloudPath = yzhid + '/fdqm/' + utils.uuid(5);
       commService.uploadCloudFile(currentObject.fdQmFilePath, cloudPath,(resultData)=>{
         e.detail.value.fdQmTempCloudPath = resultData;
-        //上传租客签名图片
-        if (!utils.isEmpty(currentObject.zkQmFilePath)) {
-          const cloudPath = yzhid + '/zkqm/' + utils.uuid(5);
-          commService.uploadCloudFile(currentObject.zkQmFilePath, cloudPath, (resultData) => {
-            e.detail.value.zkQmTempCloudPath = resultData;
-            this.handleSubmit(e);
-          })
-        } else this.handleSubmit(e);
+        this.uploadZkqm(e);
       })
-    }else this.handleSubmit(e);
+    } else this.uploadZkqm(e);
+  }, 
+
+  uploadZkqm: function(e){
+    const { currentObject } = this.data;
+    const yzhid = getApp().globalData.user.yzhid;
+    if (!utils.isEmpty(currentObject.zkQmFilePath)) {
+      const { currentObject } = this.data;
+      const cloudPath = yzhid + '/zkqm/' + utils.uuid(10);
+      commService.uploadCloudFile(currentObject.zkQmFilePath, cloudPath, (resultData) => {
+        e.detail.value.zkQmTempCloudPath = resultData;
+        this.handleSubmit(e);
+      });
+    } else this.handleSubmit(e);
   },
 
   handleSubmit: function(e){
@@ -70,9 +76,16 @@ Page({
     const self = this;
     fyglService.handleAfterRemote(response, tsinfo[flag],
       (resultData) => {
-        console.log(resultData);
+        this.setData({ currentObject:resultData });
       }
     );
+  },
+
+  onInputBlur: function (e) {
+    const name = e.target.id;
+    let { currentObject} = this.data;
+    currentObject[name] = e.detail.value;
+    this.setData({currentObject});
   },
 
   htClick: function(e) {
