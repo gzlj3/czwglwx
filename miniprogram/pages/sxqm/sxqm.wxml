@@ -4,6 +4,6 @@
 
   <button bindtap='clearClick'>清除</button>
   <button bindtap='saveClick'>保存图片</button>
-  <image style="width: 100px; height: 30px" id='signatureImg' src='{{signImage}}'></image>
+  <image style="width: 170px; height: 80px" id='signatureImg' src='{{signImage}}'></image>
 
 </view>

@@ -33,6 +33,13 @@ exports.main = async (event, context) => {
       // case CONSTS.BUTTON_ZK_SEELASTZD:
       //   result = await userServices.seeLastzd(curUser);
       //   return results.getSuccessResults(result);
+      case CONSTS.BUTTON_HTQY:
+        if (method === 'POST') { 
+          result = await services.processHt(data,curUser);
+        }else{ 
+          result = await services.queryHtdata(data, curUser);
+        }
+        return results.getSuccessResults(result);
       case CONSTS.BUTTON_QUERYUSER:
         result = await userServices.queryUser(userInfo);
         return results.getSuccessResults(result);

@@ -1,8 +1,8 @@
 .inputcontainer{
-  display: flex;
+  display: inline-flex;
   font-size: 16px;
-  /* justify-content: space-between; */
   align-items: center;
+  width:100%;
 }
 
 .addwrap{
@@ -14,6 +14,7 @@
 }
 
 .input_underline{
+  display: inline-flex;
   text-align: center;
   border-bottom: 1rpx solid;
 }
@@ -32,14 +33,6 @@
 .weui-article {
   /* padding: 20px 15px; */
   font-size: 15px;
-}
-
-.htlabel_h2 {
-  display: flex;
-  font-size: 16px;
-  font-weight: 400;
-  flex-flow: wrap;
-  /* margin-bottom: 0.34em; */
 }
 
 /* .input{

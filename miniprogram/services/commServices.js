@@ -1,5 +1,7 @@
 const CONSTS = require('../utils/constants.js');
 const utils = require('../utils/utils.js');
+const config = require('../config.js');
+
 export function handleAfterRemote(response, tsinfo, successCallback,failCallback) {
   if (!response) return;
   // const { buttonAction } = this.data;
@@ -47,6 +49,60 @@ export function handleAfterRemote(response, tsinfo, successCallback,failCallback
     if (failCallback) failCallback(err);
   })
 }
+
+const uploadCloudFile = (filePath, cloudPath, successCallback, failCallback) =>{
+  let self = this;
+  wx.getFileInfo({
+    filePath: filePath,
+    success: function (res) {
+      //检查文件大小
+      const fileSize = res.size;
+      if (fileSize > config.uploadFileMaxSize) {
+        utils.showToast('上传文件大小不能超过：' + (config.uploadFileMaxSize / 1024) + 'k');
+        return;
+      }
+      wx.showLoading({
+        title: '上传中',
+      })
+      // const filePath = res.tempFilePaths[0]
+      // 给云文件加上源文件一样的后缀
+      if(cloudPath.indexOf('.')<0){
+        const fileType = filePath.match(/\.[^.]+?$/)[0];
+        cloudPath += fileType;
+      }
+      console.log('upload file:', filePath, cloudPath);
+      wx.cloud.uploadFile({
+        cloudPath,
+        filePath,
+        success: res => {
+          // console.log('[上传文件] 成功111：', res)
+          // console.log(this.data.currentObject);
+          if(successCallback) successCallback(res.fileID);
+          // let { currentObject } = self.data;
+          // if (!currentObject.photos) currentObject.photos = [];
+          // currentObject.photos.push(res.fileID);
+          // self.setData({ currentObject });
+        },
+        fail: e => {
+          // console.error('[上传文件] 失败：', e)
+          wx.showToast({
+            icon: 'none',
+            title: '上传失败',
+          })
+          if(failCallback) failCallback(e);
+        },
+        complete: () => {
+          wx.hideLoading()
+        }
+      })
+    },
+    fail: e => {
+      // console.error(e)
+      if (failCallback) failCallback(e);
+    }
+  })
+}
+export { uploadCloudFile};
 
 const isZk = ()=>{
   return getApp().globalData.user.userType === CONSTS.USERTYPE_ZK;

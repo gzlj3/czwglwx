@@ -1,8 +1,9 @@
+const utils = require('../../utils/utils.js');
 var content = null;
 var touchs = [];
 var canvasw = 0;
 var canvash = 0;
-
+let qmTempFilePath ='qmTempFilePath';  //签名保存的临时文件名位置，放在globalData中的属性名
 //获取系统信息
 wx.getSystemInfo({
   success: function (res) {
@@ -44,7 +45,7 @@ wx.getSystemInfo({
 
     // 画布的触摸移动结束手势响应
     end: function (e) {
-      console.log("触摸结束" + e)
+      // console.log("触摸结束" + e)
       //清空轨迹数组
       for (let i = 0; i < touchs.length; i++) {
         touchs.pop()
@@ -69,10 +70,15 @@ wx.getSystemInfo({
      * 生命周期函数--监听页面加载
      */
     onLoad: function (options) {
+      qmTempFilePath = options.qmTempFilePath ? options.qmTempFilePath:'';
+      if (utils.isEmpty(qmTempFilePath)) qmTempFilePath = 'qmTempFilePath';
+      getApp().globalData[qmTempFilePath] = null;
+
       //获得Canvas的上下文
       content = wx.createCanvasContext('firstCanvas')
       //设置线的颜色
-      content.setStrokeStyle("#00ff00")
+      // content.setStrokeStyle("#00ff00")
+      content.setStrokeStyle("black")
       //设置线的宽度
       content.setLineWidth(5)
       //设置线两端端点样式更加圆润
@@ -111,10 +117,12 @@ wx.getSystemInfo({
         success: function (res) {
           //打印图片路径
           console.log(res.tempFilePath)
+          getApp().globalData[qmTempFilePath] = res.tempFilePath;
+          wx.navigateBack();
           //设置保存的图片
-          that.setData({
-            signImage: res.tempFilePath
-          })
+          // that.setData({
+          //   signImage: res.tempFilePath
+          // })
         }
       })
 

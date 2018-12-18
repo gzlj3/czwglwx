@@ -200,6 +200,80 @@ async function queryZdList(curUser,data) {
 }
 exports.queryZdList = queryZdList;
 
+exports.queryHtdata = async (data, curUser) => {
+  const { openId,yzhid } = curUser;
+  // const { formObject, flag } = data;
+  let session = await commService.querySingleDoc('session', { openId });
+  if (!session)
+    throw utils.newException('会话数据错误！');
+  let htdata = session.htdata;
+  if (!htdata){
+    //如无缓存数据，则读取合同模板数据
+    let sysconfig = await commService.querySingleDoc('sysconfig', { yzhid,code:'htmb' });
+    if(!sysconfig){
+      sysconfig = await commService.querySingleDoc('sysconfig', { yzhid: config.defaultname, code: 'htmb' });
+    }
+    if (sysconfig) {
+      htdata = sysconfig.value;
+    }
+  }
+  return htdata;
+}
+
+const saveHtmb = async (formObject, curUser) => {
+  const { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk} = formObject;
+  const htmb = { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk };
+  const {yzhid} = curUser;
+  let result = await commService.querySingleDoc('sysconfig',{yzhid,code:'htmb'});
+  if(!result){
+    result = {yzhid,code:'htmb',name:'合同模板',value:htmb}
+    await commService.addDoc('sysconfig',result);
+  }else{
+    result.value = htmb;
+    await commService.updateDoc('sysconfig',result);
+  }
+}
+
+const processSxqm = async (data, curUser) => {
+  const { formObject, flag } = data;
+  if (!utils.isEmpty(formObject.zkQmTempCloudPath)){
+    if (!utils.isEmpty(formObject.zkQmCloudPath)){
+      await cloud.deleteFile({ fileList: [formObject.zkQmCloudPath] });
+    }
+    formObject.zkQmCloudPath = formObject.zkQmTempCloudPath;
+    formObject.zkQmTempCloudPath = '';
+  }
+  if (!utils.isEmpty(formObject.fdQmTempCloudPath)) {
+    if (!utils.isEmpty(formObject.fdQmCloudPath)) {
+      await cloud.deleteFile({ fileList: [formObject.fdQmCloudPath] });
+    }
+    formObject.fdQmCloudPath = formObject.fdQmTempCloudPath;
+    formObject.fdQmTempCloudPath = '';
+  }
+}
+
+exports.processHt = async (data, curUser) => {
+  const { openId} = curUser;
+  const {formObject,flag} = data;
+  //先处理签名图片
+  await processSxqm(data,curUser);
+  
+  if(flag==='htmb'){
+  //存为合同模板
+    await saveHtmb(formObject,curUser);
+  }else if(flag==='hthc'){
+  //合同缓存
+    let session = await commService.querySingleDoc('session', { openId});
+    if(!session)
+      throw utils.newException('会话数据错误！');
+    session.htdata = formObject;
+    const updatedNum = await commService.updateDoc('session',session);
+    if (updatedNum < 1) throw utils.newException('缓存合同未更新!');
+    return updatedNum;
+  }else{
+    throw utils.newException('未确定合同处理动作：'+flag);
+  }
+}
 
 exports.saveFy = async (house,collid) => {
   let isAddDoc;

@@ -14,6 +14,9 @@ exports.BUTTON_LASTZD = 7; // 查看/处理最近帐单
 exports.BUTTON_QUERYSDB = 8; // 查询水电表
 exports.BUTTON_QUERYMAKEZD = 9; // 查询创建帐单列表
 exports.BUTTON_EXITFY = 10; // 退房
+exports.BUTTON_HTQY = 11; // 合同签约
+
+
 exports.getButtonActionInfo = buttonAction => {
   try {
     return ['', '查询房源', '添加房源', '编辑房源', '删除房源', '抄表', '出帐单', '查看/处理帐单', '', ''][
@@ -58,5 +61,5 @@ exports.getSfszInfo = sfsz => {
 // 异常信息
 exports.EXCEPTION = {
   100: '用户未注册',
-  101: '用户无权操作'
+  101: '用户无权操作',
 }

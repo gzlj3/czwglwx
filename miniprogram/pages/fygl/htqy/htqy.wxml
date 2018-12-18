@@ -1,5 +1,7 @@
 <import src="../../../components/Forms/FmHt.wxml"/>
 <form bindsubmit="formSubmit">
-  <template is="FmHt" data="{{sourceList,pageTitle,pageDesc}}"></template>
-  <button form-type="submit" >保存</button>
+  <template is="FmHt" data="{{currentObject}}"></template>
+  <button size='mini' type='primary' form-type="submit" id='hthc' catchtap='htClick'>缓存合同</button>
+  <button size='mini' type='primary' form-type="submit" id='htmb' catchtap='htClick'>存为我的模板</button>
+  <button form-type="submit" id="htsave" catchtap='htClick'>签约完成，生成帐单</button>
 </form>
