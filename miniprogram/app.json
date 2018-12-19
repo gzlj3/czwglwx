@@ -10,7 +10,8 @@
     "pages/fygl/msg/msg_success",
     "pages/sysmanager/sysconfig/sysconfig",
     "pages/fygl/sendzd/sendzd",
-    "pages/sxqm/sxqm"
+    "pages/sxqm/sxqm",
+    "pages/pageform/pageform"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",

@@ -16,7 +16,7 @@
     <view class="page__hd">
       <view class="page__title" style="text-align:center">个人房屋租赁合同</view>
     </view> 
-    <view class="page__bd" wx:if="{{currentObject}}">
+    <view class="page__bd">
       <view class="weui-article">
         <view class="inputcontainer">
           <text class="inputlabel_9">甲方(出租方)姓名:</text>
@@ -54,7 +54,7 @@
           </view>
           <view class="inputcontainer">
             <text class="inputlabel_5">房屋配套:</text>
-            <textarea style="height:45px" disabled="{{seeHt}}" auto-height="true" class='input_box' value='空调1台，热水器1台，'></textarea>
+            <textarea style="height:45px" disabled="{{seeHt}}" auto-height="true" class='input_box' value='空调1台，热水器1台，' catchtap='onFwpt'></textarea>
           </view>
         </view>
         <view class="weui-article__section">

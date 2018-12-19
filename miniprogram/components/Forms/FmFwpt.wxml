@@ -1,0 +1,27 @@
+<template name="FmFwpt">
+                    <view class="weui-cells__title">房屋配套</view>
+                    <view class="weui-cells weui-cells_after-title">
+                      <view class="weui-cell weui-cell_input" wx:for="{{[{label1:'空调(台)',name1:'kt',label2:'热水器(套)',name2:'rsq'},{label1:'冰箱(台)',name1:'bx',label2:'钥匙(条)',name2:'ys'},{label1:'洗衣机(台)',name1:'xyj',label2:'油烟机(台)',name2:'yyj'},{label1:'沙发(张)',name1:'sf',label2:'茶几(张)',name2:'cj'},{label1:'床(张)',name1:'c',label2:'衣柜(个)',name2:'yg'},{label1:'书桌(张)',name1:'sz',label2:'凳子(张)',name2:'dz'}]}}"  wx:for-index="fwpt_index" wx:for-item="fwpt_item" wx:key="{{fwpt_index}}">
+                          <view class="weui-cell__hd">
+                              <view class="weui-label" style='width:90px'>{{fwpt_item.label1}}</view>
+                          </view>
+                          <view class="weui-cell__bd">
+                              <input id="{{fwpt_item.name1}}" style='width:40px' value="{{currentObject[fwpt_item.name1]}}" bindinput="onInputBlur" maxlength='2' type="number" class="weui-input" placeholder="无"/>
+                          </view>
+                          <view class="weui-cell__hd">
+                              <view class="weui-label" style='width:90px'>{{fwpt_item.label2}}</view>
+                          </view>
+                          <view class="weui-cell__bd">
+                              <input id="{{fwpt_item.name2}}" style='width:40px' value="{{currentObject[fwpt_item.name2]}}" bindinput="onInputBlur" maxlength='2' type="number" class="weui-input" placeholder="无"/>
+                          </view>
+                      </view>
+                    </view>
+                    <view class="weui-cells weui-cells_after-title">
+                      <view class="weui-cell weui-cell_input">
+                          <view class="weui-cell__bd">
+                              <textarea id="qtpt" class="weui-textarea" value="{{currentObject['qtpt']}}" bindinput="onInputBlur"  placeholder="其它配套" maxlength='100' style="height: 3.3em" />
+                              <!-- <view class="weui-textarea-counter">0/200</view> -->
+                          </view>
+                      </view>
+                    </view>
+</template>

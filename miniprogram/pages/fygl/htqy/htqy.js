@@ -14,6 +14,7 @@ const tsinfo = {
 
 const zkTempFilePath = 'zkTempFilePath';
 const fdTempFilePath = 'fdTempFilePath';
+const fwptObjectname = 'fwpt';
 
 const httk = '7、乙方租住满三个月后发生的房屋设施（如灯、水龙头、油烟机、洗衣机等）坏，由乙方负责更换或修理。由于乙方原因造成的下水道堵塞由乙方负责清理。\r\n8、乙方要注意安全，搞好环境卫生，不得从高处乱扔垃圾，未经甲方同意，不得养猫狗等动物。\r\n9、未经甲方同意，乙方不得转租、转卖、改卖房屋结构，如因乙方管理不善发生水灾、火灾、盗窃及人为破坏行为，法律责任及经济损失由乙方承担。\r\n10、租赁期满时，双方对所租房屋、家具及其它设施进行验收，如有损坏者，由乙负责修复或照价赔偿，退租时把房屋卫生打扫干净，否则从押金扣除房屋清洁费用100元。\r\n';
 
@@ -54,12 +55,13 @@ Page({
         }else{
           if(!currentObject) currentObject = {httk};
         }
-        this.setData({ currentObject, grantcodeParas, grantcode, seeHt});
+        this.setData({ currentObject, grantcodeParas, grantcode, seeHt, options});
       }
     );
   },
+  
   onRefreshHt: function(e){
-    
+    this.onLoad(this.data.options);
   },
 
   validForm: function(e) {
@@ -180,6 +182,15 @@ Page({
 
   },
 
+  onFwpt: function (e) {
+    let { currentObject } = this.data;
+    if (!currentObject.fwpt) currentObject.fwpt = {};
+    getApp().globalData[fwptObjectname] = currentObject.fwpt;
+    wx.navigateTo({
+      url: '/pages/pageform/pageform?formname=FmFwpt&objectname=' + fwptObjectname,
+    })
+  },
+
   /**
    * 生命周期函数--监听页面显示
    */
@@ -198,7 +209,14 @@ Page({
       getApp().globalData[fdTempFilePath] = null;
       currentObject.fdQmFilePath = fdQmFilePath;
       this.setData({ currentObject });
-    }    
+    }   
+
+    //房屋配套返回值
+    const fwptObject = getApp().globalData[fwptObjectname];
+    if(fwptObject){
+      getApp().globalData[fwptObjectname] = null;
+
+    }
   },
 
   toIndex: function (e) {
