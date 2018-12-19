@@ -5,5 +5,6 @@ exports.conf = {
 }
 exports.production = production;
 exports.queryPhoneInterval = 10*1000; //手机短信结果查询时间间隔，10秒
-exports.grantcodeYxq = 3 * 24 * 3600 * 1000; //授权码有效期（3天）
-exports.defaultname = 'default'; //缺少设置名
+exports.grantcodeYxq = 3 * 24 * 3600 * 1000; //帐单查看授权码有效期（3天）
+exports.defaultname = 'default'; //缺省设置名
+exports.grantcodeHtqyYxq = 30 * 60 * 1000; //合同签约授权码有效期（30分钟）

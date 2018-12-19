@@ -54,7 +54,7 @@ exports.addDoc = async (tableName, docObj) => {
   return result._id;
 }
 
-exports.querySingleDoc = async (tableName, whereObj) => {
+const querySingleDoc = async (tableName, whereObj) => {
   if (utils.isEmptyObj(whereObj))
     throw utils.newException('参数异常！');
 
@@ -64,6 +64,7 @@ exports.querySingleDoc = async (tableName, whereObj) => {
     return result.data[0];
   return null;
 }
+exports.querySingleDoc = querySingleDoc;
 
 exports.queryPrimaryDoc = async (tableName, _id) => {
   if(utils.isEmpty(_id)) return null;
@@ -181,3 +182,24 @@ exports.testService = async (data) => {
   console.log('test:', result);
   return result;
 }
+
+const createGrantcode = (message, otherObj) => {
+  const grantcode = utils.uuid(16);
+  const createtime = utils.currentTimeMillis();
+  return { message, grantcode, createtime, ...otherObj };
+}
+exports.createGrantcode = createGrantcode;
+
+const queryGrantcode = async (grantcode,yxq,openId) => {
+  let result = await querySingleDoc('grantcode', { grantcode });
+  if (!result)
+    throw utils.newException('授权码错误或已失效！');
+  result.isValid = (utils.currentTimeMillis() - result.createtime < yxq);
+
+  //检查用户是否已经注册系统
+  const userb = await querySingleDoc('userb', { openId});
+  result.registered = (userb !== null);
+
+  return result;
+}
+exports.queryGrantcode = queryGrantcode;

@@ -1,7 +1,21 @@
 <import src="../../../components/Forms/FmHt.wxml"/>
-<form bindsubmit="formSubmit">
-  <template is="FmHt" data="{{currentObject}}"></template>
-  <button size='mini' type='primary' form-type="submit" id='hthc' catchtap='htClick'>缓存合同</button>
-  <button size='mini' type='primary' form-type="submit" id='htmb' catchtap='htClick'>存为我的模板</button>
-  <button form-type="submit" id="htsave" catchtap='htClick'>签约完成，生成帐单</button>
-</form>
+<form bindsubmit="formSubmit" wx:if="{{currentObject}}">
+  <template is="FmHt" data="{{currentObject,seeHt}}"></template>
+  <block wx:if="{{!grantcode}}">
+    <view style="display:flex;justify-content:space-between" >
+      <button size='mini' type='primary' form-type="submit" id='hthc' catchtap='htClick'>缓存合同</button>
+      <button size='mini' type='primary' form-type="submit" id='sendzkht' catchtap='htClick'>发送租客</button>
+      <button size='mini' type='default' form-type="submit" id='hthc' catchtap='htClick'>刷新合同</button>
+    </view> 
+    <button form-type="submit" id='htmb' catchtap='htClick'>存为我的模板</button>
+    <button form-type="submit" id="htsave" catchtap='htClick'>签约完成，生成帐单</button> 
+  </block>
+  <block wx:else>
+     <button catchtap='onRefreshHt'>刷新合同</button>
+     <button type='primary' form-type="submit" id="savezkqm" catchtap='htClick'>上传签名</button> 
+  </block>
+</form> 
+<view class="weui-form-preview__item" wx:if="{{grantcode && !currentObject}}">
+  <view style="text-align:center;width:100%">授权码已失效</view>
+  <button type='primary' catchtap="toIndex">返回首页</button>
+</view> 

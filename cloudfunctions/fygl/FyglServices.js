@@ -79,22 +79,27 @@ exports.queryFyList = async (curUser) => {
 
 async function queryLastzdWithGrantcode(params, userInfo) {
   const {grantcode} = params;
-  let result = await commService.querySingleDoc('grantcode',{grantcode});
-  console.log('querygrantcode:',result);
-  if(!result)
-    throw utils.newException('授权码错误或已失效！');
-  const {housefyid,createtime,collid,flag,sjhm} = result;
-  if (utils.currentTimeMillis() - createtime >= config.grantcodeYxq){
-    throw utils.newException('授权码已失效！');
+  let result = await commService.queryGrantcode(grantcode, config.grantcodeYxq,userInfo.openId);
+  // let result = await commService.querySingleDoc('grantcode',{grantcode});
+  // // console.log('querygrantcode:',result);
+  // if(!result)
+  //   throw utils.newException('授权码错误或已失效！');
+  const { housefyid, createtime, collid, flag, sjhm, registered} = result;
+  // if (utils.currentTimeMillis() - createtime >= config.grantcodeYxq){
+  if (!result.isValid){
+    result = [];
+    // throw utils.newException('授权码已失效！');
+  }else{
+    result = await commService.queryPrimaryDoc(commService.getTableName('housefy',collid), housefyid);
+    if (!result)
+      throw utils.newException('帐单数据不存在！');
+    result = [result];
   }
-  result = await commService.queryPrimaryDoc(commService.getTableName('housefy',collid), housefyid);
-  if (!result)
-    throw utils.newException('帐单数据不存在！');
   //检查查帐单用户是否已经注册系统
-  const userb = await commService.querySingleDoc('userb',{openId:userInfo.openId});
-  let registered = userb!==null;
+  // const userb = await commService.querySingleDoc('userb',{openId:userInfo.openId});
+  // let registered = userb!==null;
   // registered = false;
-  return {sourceList:[result],registered,grantcodeParas:{flag,sjhm}};
+  return {sourceList:result,registered,grantcodeParas:{flag,sjhm}};
 }
 exports.queryLastzdWithGrantcode = queryLastzdWithGrantcode;
 
@@ -200,7 +205,28 @@ async function queryZdList(curUser,data) {
 }
 exports.queryZdList = queryZdList;
 
+const queryHtdataWithGrantcode = async (data,curUser) => {
+  const { grantcode } = data;
+  let grantcodeParas = await commService.queryGrantcode(grantcode, config.grantcodeHtqyYxq,curUser.openId);
+  // console.log('grantcodeParas', grantcodeParas);
+  const { htid, isValid } = grantcodeParas;
+  let htdata;
+  if (!isValid) {
+    htdata = null;
+  } else {
+    let session = await commService.querySingleDoc('session', {htid});
+    if (!session)
+      throw utils.newException('未查到合同数据，可能合同已经更新，请与房东确认！');
+    htdata = session.htdata;
+  }
+  return { htdata, grantcodeParas};
+}
+
 exports.queryHtdata = async (data, curUser) => {
+  const {grantcode} = data;
+  if (!utils.isEmpty(grantcode))
+    return await queryHtdataWithGrantcode(data,curUser);
+
   const { openId,yzhid } = curUser;
   // const { formObject, flag } = data;
   let session = await commService.querySingleDoc('session', { openId });
@@ -236,7 +262,7 @@ const saveHtmb = async (formObject, curUser) => {
 
 const processSxqm = async (data, curUser) => {
   const { formObject, flag } = data;
-  console.log('processSxqm:',formObject);
+  // console.log('processSxqm:',formObject);
   if (!utils.isEmpty(formObject.zkQmTempCloudPath)){
     if (!utils.isEmpty(formObject.zkQmCloudPath)){
       await cloud.deleteFile({ fileList: [formObject.zkQmCloudPath] });
@@ -246,34 +272,59 @@ const processSxqm = async (data, curUser) => {
   }
   if (!utils.isEmpty(formObject.fdQmTempCloudPath)) {
     if (!utils.isEmpty(formObject.fdQmCloudPath)) {
-      await cloud.deleteFile({ fileList: [formObject.fdQmCloudPath] });
+      //房东签名暂不能删除
+      // await cloud.deleteFile({ fileList: [formObject.fdQmCloudPath] });
     }
     formObject.fdQmCloudPath = formObject.fdQmTempCloudPath;
     formObject.fdQmTempCloudPath = '';
   }
 }
 
+
 exports.processHt = async (data, curUser) => {
   const { openId} = curUser;
-  const {formObject,flag} = data;
+  const { formObject, flag, grantcodeParas} = data;
+
+  //先处理签名图片
+  await processSxqm(data, curUser);
   
   if(flag==='htmb'){
-    //先处理签名图片
-    await processSxqm(data, curUser);
   //存为合同模板
     await saveHtmb(formObject,curUser);
     return formObject;
-  }else if(flag==='hthc'){
+  } else if (flag === 'savezkqm') {
+    //保存租客签名
+    // console.log('savezkqm:', grantcodeParas);
+    const {grantcode} = grantcodeParas;
+    let curGrantcodeParas = await commService.queryGrantcode(grantcode, config.grantcodeHtqyYxq, curUser.openId);
+    let session = await commService.querySingleDoc('session', { htid: curGrantcodeParas.htid });
+    if (!session || utils.isEmptyObj(session.htdata)) 
+      throw utils.newException('未查到合同数据，可能合同已经更新，请与房东确认！');
+    session.htdata.zkQmCloudPath = formObject.zkQmCloudPath;
+    const updatedNum = await commService.updateDoc('session', session);
+    // console.log('savezkqm:',updatedNum);
+    return formObject;
+  }else if(flag==='hthc' || flag==='sendzkht'){
   //合同缓存
     let session = await commService.querySingleDoc('session', { openId});
     if(!session)
       throw utils.newException('会话数据错误！');
     //先处理签名图片
-    await processSxqm(data, curUser);
-
+    // await processSxqm(data, curUser);
+    //房东不能修改租客签名
+    if(!utils.isEmptyObj(session.htdata) && !utils.isEmpty(session.htdata.zkQmCloudPath)){
+      formObject.zkQmCloudPath = session.htdata.zkQmCloudPath;
+    }
     session.htdata = formObject;
+    const htid = utils.uuid(16);
+    if (flag === 'sendzkht'){
+      session.htid = htid;
+    }
     const updatedNum = await commService.updateDoc('session',session);
-    return formObject;
+    if(flag==='hthc') 
+      return formObject;
+    if(flag==='sendzkht')
+      return commService.createGrantcode('个人房屋租赁合同\r\n租客签名确认！\r\n\r\n请在30分钟内确认。', { page:'/pages/fygl/htqy/htqy',htid,flag,sjhm:formObject.dhhm});
     // if (updatedNum < 1) throw utils.newException('缓存合同未更新!');
     // return updatedNum;
   }else{
@@ -649,9 +700,11 @@ const processQrsz = async (params,curUser) => {
   } else if ("wxzd" === flag || "wxyjzd"===flag) {
     const message = getZdMessage(housefy,flag);
     //生成授权查询码，通过此码查当前帐单，不需要注册
-    const grantcode = utils.uuid(16);
-    const createtime = utils.currentTimeMillis();
-    return { message, collid, housefyid: housefy._id, grantcode,createtime,flag,sjhm:house.dhhm};
+    // const grantcode = utils.uuid(16);
+    // const createtime = utils.currentTimeMillis();
+    return commService.createGrantcode(message, {
+      page:'/pages/fygl/editlist/editlist',collid, housefyid: housefy._id, grantcode,createtime,flag,sjhm:house.dhhm});
+    // return { message, collid, housefyid: housefy._id, grantcode, createtime, flag, sjhm: house.dhhm };
   } else if ("sendsjdx" === flag) {
     await sendZdMessage(house, housefy, collid, curUser.openId);
     return queryLastzdList({ houseid, collid});

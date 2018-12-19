@@ -3,7 +3,7 @@
   </canvas>
 
   <button bindtap='clearClick'>清除</button>
-  <button bindtap='saveClick'>保存图片</button>
-  <image style="width: 170px; height: 80px" id='signatureImg' src='{{signImage}}'></image>
+  <button bindtap='saveClick'>保存签名</button>
+  <image class='firstCanvas' id='signatureImg' src='{{lastQmFilePath}}'></image>
 
 </view>

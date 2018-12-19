@@ -1,6 +1,8 @@
 // miniprogram/pages/fygl/sendzd/sendzd.js
 import * as fyglService from '../../../services/fyglServices.js'; 
 import * as CONSTS from '../../../utils/constants.js';
+const utils = require('../../../utils/utils.js');
+
 Page({
 
   /**
@@ -76,26 +78,30 @@ Page({
     //   // 不是来自页面内转发按钮
     //   return;
     // }
-    const {grantcode} = this.data.params;
-    const self = this;
+    const {grantcode,page} = this.data.params;
     const s = JSON.stringify({grantcode});
+    let path = '/pages/fygl/editlist/editlist';
+    if(!utils.isEmpty(page)) path = page;
+    if(path.indexOf('?')>=0) path += '&';
+    else path += '?';
+    path += 'item='+s;
 
     //由于发送结果信息截获不到，因此先保存发送信息
-    const response = fyglService.postData(CONSTS.BUTTON_GRANTCODE, self.data.params);
+    const response = fyglService.postData(CONSTS.BUTTON_GRANTCODE, this.data.params);
     fyglService.handleAfterRemote(response, null);
 
     return {
-      title: '查看帐单详情>',
-      path: '/pages/fygl/editlist/editlist?item='+s,
+      title: '查看详情>',
+      path,
       // imageUrl:'../../images/czwgl.jpg'
-      success: function (res) { 
-        utils.showToast('发送成功！');
-        wx.navigateBack();
-      },
-      fail: function (res) {
-        // 转发失败
-        utils.showToast("转发失败:" + JSON.stringify(res));
-      }
+      // success: function (res) { 
+      //   utils.showToast('发送成功！');
+      //   wx.navigateBack();
+      // },
+      // fail: function (res) {
+      //   // 转发失败
+      //   utils.showToast("转发失败:" + JSON.stringify(res));
+      // }
     }
   },
 })

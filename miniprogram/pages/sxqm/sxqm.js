@@ -17,7 +17,7 @@ wx.getSystemInfo({
      * 页面的初始数据
      */
     data: {
-      signImage: '',
+      lastQmFilePath: '',//上次签名文件路径
     },
     // 画布的触摸移动开始手势响应
     start: function (event) {
@@ -71,6 +71,7 @@ wx.getSystemInfo({
      */
     onLoad: function (options) {
       qmTempFilePath = options.qmTempFilePath ? options.qmTempFilePath:'';
+      const lastQmFilePath = options.lastQmFilePath ? options.lastQmFilePath : '';
       if (utils.isEmpty(qmTempFilePath)) qmTempFilePath = 'qmTempFilePath';
       getApp().globalData[qmTempFilePath] = null;
 
@@ -85,6 +86,8 @@ wx.getSystemInfo({
       content.setLineCap('round')
       //设置两条线连接处更加圆润
       content.setLineJoin('round')
+
+      this.setData({ lastQmFilePath});
     },
 
     /**

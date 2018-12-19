@@ -17,11 +17,15 @@ exports.checkAuthority = async(action,method,userInfo,data) => {
   const { openId } = userInfo;
   if ([CONSTS.BUTTON_QUERYUSER, CONSTS.BUTTON_REGISTERUSER,CONSTS.BUTTON_SENDSJYZM].indexOf(action)>=0){
     //用户注册等基本操作不检查权限
-    return {};
+    return { openId};
   }
-  if ([CONSTS.BUTTON_LASTZD].indexOf(action) >= 0 && method==='GET' && data && !utils.isEmpty(data.grantcode)) {
+  if ([CONSTS.BUTTON_LASTZD, CONSTS.BUTTON_HTQY].indexOf(action) >= 0 && method==='GET' && data && !utils.isEmpty(data.grantcode)) {
     //根据注册码查询帐单数据不检查权限
-    return {};
+    return { openId};
+  }
+  if ([CONSTS.BUTTON_HTQY].indexOf(action) >= 0 && method === 'POST' && data && data.flag ==='savezkqm') {
+    //合同签约上传租客签名不检查权限
+    return { openId };
   }
 
   // throw utils.codeException(100);
@@ -50,7 +54,7 @@ exports.checkAuthority = async(action,method,userInfo,data) => {
     if ([CONSTS.BUTTON_CB, CONSTS.BUTTON_MAKEZD, CONSTS.BUTTON_ADDFY, CONSTS.EDITFY, CONSTS.DELETEFY, CONSTS.BUTTON_EXITFY, CONSTS.BUTTON_USERGRANT, CONSTS.BUTTON_SYSCONFIG].indexOf(action) >= 0) {
       throw utils.codeException(101);
     }
-    if ([CONSTS.BUTTON_LASTZD].indexOf(action) >= 0){
+    if ([CONSTS.BUTTON_LASTZD, CONSTS.BUTTON_HTQY].indexOf(action) >= 0){
       if(method === 'POST') 
         throw utils.codeException(101);
       if (method === 'GET' && data && data.refreshzd==='1')  //先刷新帐单再提取数据
@@ -308,6 +312,7 @@ exports.sysconfig = async (data, curUser) => {
 
 exports.grantcode = async (data, curUser) => {
   delete data.message;
+  delete data.page;
   // console.log('grantcode:',data);
   return await commService.addDoc('grantcode',data);
 }

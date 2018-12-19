@@ -1,6 +1,6 @@
 <!--miniprogram/pages/fygl/sendzd/sendzd.wxml-->
 <text selectable="true" style="font-size:20px">{{params.message}}</text>
 <view class="weui-footer_fixed-bottom">
-  <button open-type="share" type='primary'>发送帐单</button>
+  <button open-type="share" type='primary'>发送</button>
   <!-- <button bindtap='onCopyzd'>复制帐单</button> -->
 </view>
