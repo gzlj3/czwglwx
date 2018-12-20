@@ -7,7 +7,7 @@ const commService = require('../../../services/commServices.js');
 const config = require('../../../config.js');
 
 const fyxxMetas = {
-  fwmc: { label: '房屋名称', name: 'fwmc', require: true },
+  fwmc: { label: '房屋编号', name: 'fwmc', require: true },
   zhxm: { label: '租户姓名', name: 'zhxm'},
   sfzh: { label: '身份证号', name: 'sfzh', type:'idcard' },
   dhhm: { label: '手机号码', name: 'dhhm', type:"number"},
@@ -40,7 +40,7 @@ const initialState = {
   buttonAction: CONSTS.BUTTON_NONE, // 当前处理按钮（动作）
   pageTitle:'',
   pageDesc:'',
-  tabs: ["基本信息", "更多信息", "图片", "签约合同"],
+  tabs: ["基本信息", "更多信息", "图片"],
   activeIndex: 0,
   sliderOffset: 0,
   sliderLeft: 0

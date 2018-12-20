@@ -222,10 +222,23 @@ const queryHtdataWithGrantcode = async (data,curUser) => {
   return { htdata, grantcodeParas};
 }
 
+const queryHtdataWithHouse = async (data, curUser) => {
+  const { houseid,collid } = data;
+  const house = await commService.queryPrimaryDoc(commService.getTableName('house',collid),houseid);
+  if(!house)
+    throw utils.newException('房屋数据查询有误！');
+  const {htdata} = house;
+  if (!htdata)
+    throw utils.newException('未查到房屋的合同数据！');
+  return htdata;
+}
+
 exports.queryHtdata = async (data, curUser) => {
-  const {grantcode} = data;
+  const { grantcode, seeHouseHt} = data;
   if (!utils.isEmpty(grantcode))
     return await queryHtdataWithGrantcode(data,curUser);
+  if (seeHouseHt === "1")
+    return await queryHtdataWithHouse(data, curUser);
 
   const { openId,yzhid } = curUser;
   // const { formObject, flag } = data;
@@ -247,8 +260,8 @@ exports.queryHtdata = async (data, curUser) => {
 }
 
 const saveHtmb = async (formObject, curUser) => {
-  const { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk, fdQmCloudPath} = formObject;
-  const htmb = { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk, fdQmCloudPath };
+  const { fdxm, fdsfzh, fdsjhm, fwdz, fwpt, fwpts,zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk, fdQmCloudPath} = formObject;
+  const htmb = { fdxm, fdsfzh, fdsjhm, fwdz, fwpt,fwpts, zzqx, jzr, jzqx, sdj, sgtds, ddj, dgtds, wlf, ljf, glf, httk, fdQmCloudPath };
   const {yzhid} = curUser;
   let result = await commService.querySingleDoc('sysconfig',{yzhid,code:'htmb'});
   if(!result){
@@ -304,11 +317,12 @@ exports.processHt = async (data, curUser) => {
     const updatedNum = await commService.updateDoc('session', session);
     // console.log('savezkqm:',updatedNum);
     return formObject;
-  }else if(flag==='hthc' || flag==='sendzkht'){
+  } else if (flag === 'hthc' || flag === 'sendzkht' || flag === 'htsave'){
   //合同缓存
     let session = await commService.querySingleDoc('session', { openId});
     if(!session)
       throw utils.newException('会话数据错误！');
+    const sessionid = session._id;
     //先处理签名图片
     // await processSxqm(data, curUser);
     //房东不能修改租客签名
@@ -325,19 +339,53 @@ exports.processHt = async (data, curUser) => {
       return formObject;
     if(flag==='sendzkht')
       return commService.createGrantcode('个人房屋租赁合同\r\n租客签名确认！\r\n\r\n请在30分钟内确认。', { page:'/pages/fygl/htqy/htqy',htid,flag,sjhm:formObject.dhhm});
-    // if (updatedNum < 1) throw utils.newException('缓存合同未更新!');
-    // return updatedNum;
+    if (flag === 'htsave') {
+      //签约完成
+      //计算下次收租日期
+      let htrqq1 = moment(formObject.htrqq);
+      if(!htrqq1.isValid())
+        throw utils.newException('合同起始日期不合法！');
+      const jzday = utils.getInteger(formObject.jzr);
+      htrqq1 = htrqq1.add(1,'months');
+      const szrq = moment([htrqq1.year(), htrqq1.month(), jzday]);
+      if(!szrq.isValid)
+        throw utils.newException('计算下次收租日期错误，可能是每月交租日输入有误：' + formObject.jzr);
+      //计算房屋押金
+      const yj = utils.getInteger(formObject.fwyj) + utils.getInteger(formObject.ysyj);
+
+      const {fwmc,zhxm,sfzh,dhhm,czje,htrqq,htrqz,dscds,sscds,ddj,sdj,dgtds,sgtds,wlf,ljf,glf,fwpt} = formObject;
+      let house = { fwmc, zhxm, sfzh, dhhm, czje, htrqq, htrqz, dscds, sscds, ddj, sdj, dgtds, sgtds, wlf, ljf, glf,fwpt };
+      house.szrq = szrq.format('YYYY-MM-DD');
+      house.yj = yj + "";
+      house.htdata = formObject;
+      const resultData = await saveFy(house, curUser.collid,curUser);
+      //保存完成，删除当前合同
+      await db.collection('session').doc(sessionid).update({
+        data: {
+          htdata: _.remove(),
+          htid: _.remove(),
+        }
+      });
+      return resultData;
+    }
   }else{
     throw utils.newException('未确定合同处理动作：'+flag);
   }
 }
 
-exports.saveFy = async (house,collid) => {
+const saveFy = async (house,collid,curUser) => {
   let isAddDoc;
   if (utils.isEmpty(house._id)) {
     isAddDoc = true;
+    house.yzhid = curUser.yzhid;
+    house.lrr = curUser.openId;
+    house.lrsj = utils.getCurrentTimestamp();
+    house.zhxgr = curUser.openId;
+    house.zhxgsj = house.lrsj;
     house._id = utils.id();
   } else {
+    house.zhxgr = curUser.openId;
+    house.zhxgsj = utils.getCurrentTimestamp();       
     isAddDoc = false;
   }
   //如果是添加房源，则检查集合是否存在，不存在，则创建
@@ -360,7 +408,7 @@ exports.saveFy = async (house,collid) => {
   result = await commService.querySingleDoc(commService.getTableName('house',collid),{yzhid,_id:_.neq(house._id),fwmc:house.fwmc});
   // console.log(result); 
   if(result)
-    throw utils.newException("房屋名称已经存在！");
+    throw utils.newException("房屋编号已经存在！");
   let { _id: saveHouseid, dhhm, avatarUrl } = house;
   //处理所有租户查询手机号码
   let querySjhm = ',';
@@ -405,6 +453,7 @@ exports.saveFy = async (house,collid) => {
   }
   return {_id:saveHouseid};
 }
+exports.saveFy = saveFy;
 
 exports.exitFy = async (data,curUser) => {
   const { houseid,tfrq } = data;

@@ -69,21 +69,21 @@ exports.main = async (event, context) => {
           return results.getSuccessResults(result);
       case CONSTS.BUTTON_ADDFY:
         // console.log('addfy');
-          data.yzhid = curUser.yzhid;
-          data.lrr=curUser.openId;
-          data.lrsj=utils.getCurrentTimestamp();
-          data.zhxgr=curUser.openId;
-          data.zhxgsj=data.lrsj;
-          result = await services.saveFy(data,curUser.collid);
+          // data.yzhid = curUser.yzhid;
+          // data.lrr=curUser.openId;
+          // data.lrsj=utils.getCurrentTimestamp();
+          // data.zhxgr=curUser.openId;
+          // data.zhxgsj=data.lrsj;
+          result = await services.saveFy(data,curUser.collid,curUser);
           return results.getSuccessResults(result);
         break;
       case CONSTS.BUTTON_EDITFY:
         console.log("editfy");
-        data.zhxgr=curUser.openId;
-        data.zhxgsj=utils.getCurrentTimestamp();       
+        // data.zhxgr=curUser.openId;
+        // data.zhxgsj=utils.getCurrentTimestamp();       
         const collid = restData && restData.length > 0 ? restData[0] : curUser.collid;
         console.log('editfy',collid);
-        result = await services.saveFy(data,collid);
+        result = await services.saveFy(data,collid,curUser);
         return results.getSuccessResults(result);
       case CONSTS.BUTTON_DELETEFY:
         console.log("deletefy");

@@ -67,7 +67,7 @@ Page({
 
   actionSheet1: function(e){
     const { item, fyitem } = e.currentTarget.dataset;
-    const itemList = ['抄表', '出帐单', '删除房源', '退房', '取消']; 
+    const itemList = ['抄表', '出帐单', '查看合同','删除房源', '退房', '取消']; 
     const self = this;
     wx.showActionSheet({
       itemList,
@@ -89,9 +89,15 @@ Page({
             });
             break;
           case 2:
-            utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源(' + item.fwmc + ')吗？', () => { self.deletefy(item._id); });
+            const params = JSON.stringify({ seeHouseHt:'1',houseid: item._id, collid: fyitem });
+            wx.navigateTo({
+              url: '/pages/fygl/htqy/htqy?item=' + params
+            });
             break;
           case 3:
+            utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源(' + item.fwmc + ')吗？', () => { self.deletefy(item._id); });
+            break;
+          case 4:
             const { sfsz, zdlx } = item;
             if (CONSTS.ZDLX_TFZD === zdlx && CONSTS.SFSZ_YJQ === sfsz) {
               utils.showModal('退房', '退房后将不能恢复，你真的确定退房(' + item.fwmc + ')吗？', () => { self.tffy(item._id) });
@@ -105,8 +111,6 @@ Page({
               });
             }
             break;
-          case 4:
-            return;
         }
       }
     });

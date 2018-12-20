@@ -63,3 +63,5 @@ exports.EXCEPTION = {
   100: '用户未注册',
   101: '用户无权操作',
 }
+
+exports.globalRetuSuffix = '_retu';   //form编辑数据后的返回对象后缀

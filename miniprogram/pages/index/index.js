@@ -80,21 +80,7 @@ Page({
   },
   
   onLoad: function (options) {
-    
-    // newHouse._id = utils.id();
-    // console.log('tffy:', newHouse);
-    // const arr=['aaa','bbb'];
-    // console.log('test:',arr.includes(''));
-    // let s = '1234567890'; 
-    // console.log(/1234567890/.test('1234567890'));
-    // let s = 'a\r\nb\r\nc';
-    // console.log(s.length);
-    // s =  s.replace(/\r\n/g,'\n');
-    // console.log(s.length);
-    // const a = utils.currentTimeMillis()+"";
-    // console.log(a.length);
-    // let a = [{sjhm:'aaaaaaa'}];
-    // console.log(typeof(a[0]) ==='string');
+    // console.log(moment([moment().year(),moment().month(),0]).isValid());    
     
     let requestUserType = options.requestUserType ? options.requestUserType:'';
     const sjhm = !utils.isEmpty(options.sjhm) ? options.sjhm : '';

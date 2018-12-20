@@ -46,7 +46,7 @@
           <view>1、房屋基本信息</view>
           <view class="inputcontainer">
             <text class="inputlabel_5">房屋地址:</text>
-            <textarea style="height:45px" disabled="{{seeHt}}" auto-height="true" class='input_box' name='fwdz' id='fwdz' type='text' value='{{currentObject.fwdz}}' bindblur="onInputBlur"></textarea>
+            <input class='input_underline' disabled="{{seeHt}}" name='fwdz' id='fwdz' type='text' value='{{currentObject.fwdz}}' bindblur="onInputBlur"></input>
           </view>
           <view class="inputcontainer">
             <text class="inputlabel_5">房屋编号:</text>
@@ -54,7 +54,7 @@
           </view>
           <view class="inputcontainer">
             <text class="inputlabel_5">房屋配套:</text>
-            <textarea style="height:45px" disabled="{{seeHt}}" auto-height="true" class='input_box' value='空调1台，热水器1台，' catchtap='onFwpt'></textarea>
+            <textarea style="height:45px" disabled="{{true}}" auto-height="true" class='input_box' name='fwpts' id='fwpts' value='{{currentObject.fwpts}}' catchtap="{{seeHt?'':'onFwpt'}}"></textarea>
           </view>
         </view>
         <view class="weui-article__section">
@@ -70,17 +70,17 @@
         </view>
         <view class="weui-article__section">
           <view class="inputcontainer addwrap">
-            <view>3、本房屋押金:<input class='input_underline' disabled="{{seeHt}}" style="width:45px" name='fwyj' id='fwyj' type='number' value='{{currentObject.fwyj}}' bindblur="onInputBlur"/>元，锁匙押金:<input class='input_underline' disabled="{{seeHt}}" style="width:40px" name='ysyj' id='ysyj' type='number' value='{{currentObject.ysyj}}' bindblur="onInputBlur"/>元。押金租住期满退还，如租住不满:<input class='input_underline' disabled="{{seeHt}}" style="width:30px" name='zzqx' id='zzqx' type='number' value='{{currentObject.zzqx}}' bindblur="onInputBlur"/>个月，押金不退。</view>
-          </view>
-        </view>
-        <view class="weui-article__section">
-          <view class="inputcontainer addwrap">
-            <view>4、本房屋租金为人民币:<input class='input_underline' disabled="{{seeHt}}" style="width:45px" name='czje' id='czje' type='number' value='{{currentObject.czje}}' bindblur="onInputBlur"/>元/月（不包括水费、电费、卫生费、网络费等），每月:<input class='input_underline' disabled="{{seeHt}}" style="width:30px" name='jzr' id='jzr' type='number' value='{{currentObject.jzr}}' bindblur="onInputBlur"/>日前交租金，如超过:<input class='input_underline' disabled="{{seeHt}}" style="width:30px;" name='jzqx' id='jzqx' type='number' value='{{currentObject.jzqx}}' bindblur="onInputBlur"/>天不交租金，甲方有权停水电并收回房屋。</view>
+            <view>3、本房屋租金为人民币:<input class='input_underline' disabled="{{seeHt}}" style="width:45px" name='czje' id='czje' type='number' value='{{currentObject.czje}}' bindblur="onInputBlur"/>元/月（不包括水费、电费、卫生费、网络费等），每月:<input class='input_underline' disabled="{{seeHt}}" style="width:30px" name='jzr' id='jzr' type='number' value='{{currentObject.jzr}}' bindblur="onInputBlur"/>日前交租金，如超过:<input class='input_underline' disabled="{{seeHt}}" style="width:30px;" name='jzqx' id='jzqx' type='number' value='{{currentObject.jzqx}}' bindblur="onInputBlur"/>天不交租金，甲方有权停水电并收回房屋。</view>
           </view>
         </view> 
         <view class="weui-article__section">
           <view class="inputcontainer addwrap">
-            <view>5、乙方租住期间，水费:<input class='input_underline' disabled="{{seeHt}}" style="width:30px" name='sdj' id='sdj' type='digit' value='{{currentObject.sdj}}' bindblur="onInputBlur"/>元/吨，每月加:<input class='input_underline' disabled="{{seeHt}}" style="width:30px" name='sgtds' id='sgtds' type='number' value='{{currentObject.sgtds}}' bindblur="onInputBlur"/>吨为公摊水费;电费:<input class='input_underline'  disabled="{{seeHt}}" style="width:30px" name='ddj' id='ddj' type='digit' value='{{currentObject.ddj}}' bindblur="onInputBlur"/>元/度，每月加:<input class='input_underline' style="width:30px" disabled="{{seeHt}}" name='dgtds' id='dgtds' type='number' value='{{currentObject.dgtds}}' bindblur="onInputBlur"/>度为公摊电费。</view>
+            <view>4、本房屋押金:<input class='input_underline' disabled="{{seeHt}}" style="width:45px" name='fwyj' id='fwyj' type='number' value='{{currentObject.fwyj}}' bindblur="onInputBlur"/>元，锁匙押金:<input class='input_underline' disabled="{{seeHt}}" style="width:40px" name='ysyj' id='ysyj' type='number' value='{{currentObject.ysyj}}' bindblur="onInputBlur"/>元。押金租住期满退还，如租住不满:<input class='input_underline' disabled="{{seeHt}}" style="width:30px" name='zzqx' id='zzqx' type='number' value='{{currentObject.zzqx}}' bindblur="onInputBlur"/>个月，押金不退。</view>
+          </view>
+        </view>
+        <view class="weui-article__section">
+          <view class="inputcontainer addwrap">
+            <view>5、乙方租住期间，水费:<input class='input_underline' disabled="{{seeHt}}" style="width:30px" name='sdj' id='sdj' type='digit' value='{{currentObject.sdj}}' bindblur="onInputBlur"/>元/吨，每月加:<input class='input_underline' disabled="{{seeHt}}" style="width:30px" name='sgtds' id='sgtds' type='number' value='{{currentObject.sgtds}}' bindblur="onInputBlur"/>吨为公摊水费，水初始读数:<input class='input_underline' disabled="{{seeHt}}" style="width:50px" name='sscds' id='sscds' type='number' value='{{currentObject.sscds}}' bindblur="onInputBlur"/>吨;电费:<input class='input_underline'  disabled="{{seeHt}}" style="width:30px" name='ddj' id='ddj' type='digit' value='{{currentObject.ddj}}' bindblur="onInputBlur"/>元/度，每月加:<input class='input_underline' style="width:30px" disabled="{{seeHt}}" name='dgtds' id='dgtds' type='number' value='{{currentObject.dgtds}}' bindblur="onInputBlur"/>度为公摊电费，电初始读数:<input class='input_underline' disabled="{{seeHt}}" style="width:50px" name='dscds' id='dscds' type='number' value='{{currentObject.dscds}}' bindblur="onInputBlur"/>度。</view>
           </view>
         </view>
         <view class="weui-article__section">
@@ -96,7 +96,7 @@
         <view class="weui-article__section"> 
           <view>补充条款</view> 
           <view class="inputcontainer addwrap">
-            <textarea style="width:100%;height:50px" class='input_box' disabled="{{seeHt}}" name='bctk' id='bctk' type='text' value='{{currentObject.bctk}}' bindblur="onInputBlur"></textarea>
+            <textarea style="width:100%;height:50px" auto-height="true" class='input_box' disabled="{{seeHt}}" name='bctk' id='bctk' type='text' value='{{currentObject.bctk}}' bindblur="onInputBlur"></textarea>
           </view> 
         </view>
         <view class="weui-article__section"> 

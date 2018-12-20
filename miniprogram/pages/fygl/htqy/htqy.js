@@ -4,7 +4,6 @@ import * as commService from '../../../services/commServices.js';
 const config = require('../../../config.js');
 const utils = require('../../../utils/utils.js');
 
-let flag='';
 const tsinfo = {
   'hthc':'合同缓存', 
   'htmb':'保存模板',
@@ -17,6 +16,36 @@ const fdTempFilePath = 'fdTempFilePath';
 const fwptObjectname = 'fwpt';
 
 const httk = '7、乙方租住满三个月后发生的房屋设施（如灯、水龙头、油烟机、洗衣机等）坏，由乙方负责更换或修理。由于乙方原因造成的下水道堵塞由乙方负责清理。\r\n8、乙方要注意安全，搞好环境卫生，不得从高处乱扔垃圾，未经甲方同意，不得养猫狗等动物。\r\n9、未经甲方同意，乙方不得转租、转卖、改卖房屋结构，如因乙方管理不善发生水灾、火灾、盗窃及人为破坏行为，法律责任及经济损失由乙方承担。\r\n10、租赁期满时，双方对所租房屋、家具及其它设施进行验收，如有损坏者，由乙负责修复或照价赔偿，退租时把房屋卫生打扫干净，否则从押金扣除房屋清洁费用100元。\r\n';
+const fwptattr = [{ label: '空调(台)', name: 'kt' }, { label: '热水器(套)', name: 'rsq' }, { label: '抽油烟机(台)', name: 'yyj' }, { label: '大门钥匙(条)', name: 'dmys' }, { label: '房间钥匙(条)', name: 'fjys' }, { label: '洗衣机(台)', name: 'xyj' }, { label: '冰箱(台)', name: 'bx' }, { label: '沙发(张)', name: 'sf' }, { label: '茶几(张)', name: 'cj' }, { label: '床(张)', name: 'c' }, { label: '衣柜(个)', name: 'yg' }, { label: '书桌(张)', name: 'sz' }, { label: '凳子(张)', name: 'dz' }];
+const fyxxMetas = {
+  fdxm:{label:'甲方姓名'},
+  fdsjhm: { label: '甲方手机号' },
+  fwmc: { label: '房屋编号', name: 'fwmc', require: true },
+  zhxm: { label: '乙方姓名', name: 'zhxm' },
+  sfzh: { label: '身份证号', name: 'sfzh', type: 'idcard' },
+  dhhm: { label: '乙方手机号码', name: 'dhhm', type: "number" },
+  czje: { label: '出租金额', name: 'czje', type: "number" },
+  fwyj: { label: '房屋押金', name: 'yj', type: "number" },
+  htrqq: { label: '合同日期起', name: 'htrqq', type: 'date' },
+  htrqz: { label: '合同日期止', name: 'htrqz', type: 'date' },
+  jzr: { label: '每月交租日', name: 'szrq', type: 'date' },
+  dscds: { label: '电上次读数', name: 'dscds', type: "number" },
+  sscds: { label: '水上次读数', name: 'sscds', type: "number" },
+  ddj: { label: '电费单价', name: 'ddj', type: "digit" },
+  sdj: { label: '水费单价', name: 'sdj', type: "digit" },
+  dgtds: { label: '电公摊度数', name: 'dgtds', type: "digit" },
+  sgtds: { label: '水公摊度数', name: 'sgtds', type: "digit" },
+  // dbcds: { label: '电本次读数', name: 'dbcds', type: "number" },
+  // sbcds: { label: '水本次读数', name: 'sbcds', type: "number" },
+  wlf: { label: '网络费', name: 'wlf', type: "digit" },
+  ljf: { label: '卫生费', name: 'ljf', type: "digit" },
+  glf: { label: '管理费', name: 'glf', type: "digit" },
+  qtf: { label: '其它费', name: 'qtf' },
+  syjzf: { label: '上月结转费', name: 'syjzf', type: "digit" },
+  bz: { label: '备注', name: 'bz' },
+}
+
+const blx = ['fdxm','fdsjhm','fwmc','zhxm','dhhm', 'czje', 'fwyj', 'htrqq', 'htrqz', 'jzr', 'dscds', 'sscds', 'ddj', 'sdj'];
 
 Page({
 
@@ -28,19 +57,19 @@ Page({
     grantcode:null,
     grantcodeParas:{},
     seeHt:false,
+    flag:'',
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    console.log('htqy:', options);
+    // console.log('htqy:', options);
     const params = options.item ? JSON.parse(options.item) : {};
-    let { grantcode} = params;
+    let { grantcode, seeHouseHt} = params;
     if (!grantcode) grantcode = '';
 
     const response = fyglService.queryData(CONSTS.BUTTON_HTQY, params);
-    const self = this;
     const tsinfo = '';
     fyglService.handleAfterRemote(response, tsinfo,
       (resultData) => {
@@ -51,6 +80,10 @@ Page({
         if(!utils.isEmpty(grantcode)){
           currentObject = resultData.htdata;
           grantcodeParas = resultData.grantcodeParas;
+          seeHt = true;
+        } else if (seeHouseHt==='1'){
+          //查询合同入口
+          currentObject = resultData;
           seeHt = true;
         }else{
           if(!currentObject) currentObject = {httk};
@@ -65,6 +98,11 @@ Page({
   },
 
   validForm: function(e) {
+    const {flag} = this.data;
+    if(utils.isEmpty(flag)){
+      utils.showToast('点击异常！');
+      return false;
+    }
     const formObject = e.detail.value;
     const {currentObject} = this.data;
     if(flag === 'sendzkht'){
@@ -79,20 +117,49 @@ Page({
         utils.showToast('点击签名图片，签名后再上传！')
         return false;
       }
+    } else if (flag === 'htsave') {
+      const formObject = e.detail.value;
+      let errorFields = '';
+      blx.map(value => {
+        if (utils.isEmpty(formObject[value])) {
+          errorFields += fyxxMetas[value].label + ',';
+        }
+      });
+      if (!utils.isEmpty(errorFields)) {
+        utils.showToast(errorFields + '未录入!');
+        return false;
+      }
+      //校验是否签名
+      if(utils.isEmpty(formObject.zkQmFilePath) && utils.isEmpty(formObject.zkQmCloudPath)){
+        utils.showToast('乙方未签名！');
+        return false;
+      }
+      if (utils.isEmpty(formObject.fdQmFilePath) && utils.isEmpty(formObject.fdQmCloudPath)) {
+        utils.showToast('男方未签名！');
+        return false;
+      }
+      //校验手机号
+      const { dhhm,fdsjhm } = formObject;
+      if (!utils.checkSjhm(dhhm) || !utils.checkSjhm(fdsjhm)) {
+        utils.showToast('甲方手机号或乙方手机号输入有误');
+        return false;
+      }
+      utils.showModal('签约确认', `合同签约完成后，将不能被修改！\r\n请确认合同是否签约完成？`,()=>this.formSubmit(e,true));
+      return false;
     }
     return true;
   },
 
-  formSubmit: function (e) {
-    if (!this.validForm(e)) return;
-    // if(flag === 'sxht'){
-    //   //租客刷新合同
-    //   const {grantcode} = this.data;
-    //   const s = JSON.stringify({ grantcode})
-    //   this.onLoad({item:s});
-    //   return;
-    // }
+  formSubmit: function (e,noValid) {
+    console.log(e);
+    const {flag} = this.data;
+    console.log('formsubmit:', flag);
+
+    if (!noValid && !this.validForm(e)) return;
     const {currentObject} = this.data;
+    //房屋配套需要单独处理
+    e.detail.value.fwpt = currentObject.fwpt;
+
     const yzhid = getApp().globalData.user.yzhid;
     if(!utils.isEmpty(currentObject.fdQmFilePath)){
       const cloudPath = yzhid + '/fdqm/' + utils.uuid(5);
@@ -117,11 +184,10 @@ Page({
   },
 
   handleSubmit: function(e){
-    const { grantcodeParas} = this.data;
-    console.log('htqy formsubmit:', e.detail.value);
+    const { grantcodeParas,flag} = this.data;
+    // console.log('htqy formsubmit:', e.detail.value);
     const formObject = e.detail.value;
     const response = fyglService.postData(CONSTS.BUTTON_HTQY, { formObject, flag, grantcodeParas});
-    const self = this;
     fyglService.handleAfterRemote(response, tsinfo[flag],
       (resultData) => {
         if (flag ==='sendzkht'){
@@ -129,6 +195,12 @@ Page({
           wx.navigateTo({
             url: '../sendzd/sendzd?item=' + s,
           })
+          return;
+        }else if(flag==='htsave'){
+          const s = JSON.stringify({ houseid: resultData._id });
+          let pageDesc = '合同签约完成后，可进入帐单详细页查看签约帐单。';
+          const {collid,yzhid} = getApp().globalData.user;
+          utils.redirectToSuccessPage(pageDesc, '查看帐单详情', '/pages/fygl/editlist/editlist', CONSTS.BUTTON_LASTZD, { houseid: resultData._id, collid, yzhid});
           return;
         }
         this.setData({ currentObject:resultData });
@@ -145,14 +217,16 @@ Page({
   },
 
   onsendzk: function(e){
-    flag = 'sendzkht';
+    this.setData({flag:'sendzkht'});
+    // flag = 'sendzkht';
     e.detail.value = this.data.currentObject;
     // console.log('sendzk',e.detail.value);
     this.formSubmit(e);
   },
 
   htClick: function(e) {
-    flag = e.currentTarget.id;
+    this.setData({ flag: e.currentTarget.id});
+    console.log('htclick:',this.data.flag);
   },
 
   onsxqm_zk: function(e){
@@ -185,7 +259,7 @@ Page({
   onFwpt: function (e) {
     let { currentObject } = this.data;
     if (!currentObject.fwpt) currentObject.fwpt = {};
-    getApp().globalData[fwptObjectname] = currentObject.fwpt;
+    getApp().globalData[fwptObjectname] = {...currentObject.fwpt};
     wx.navigateTo({
       url: '/pages/pageform/pageform?formname=FmFwpt&objectname=' + fwptObjectname,
     })
@@ -212,10 +286,25 @@ Page({
     }   
 
     //房屋配套返回值
-    const fwptObject = getApp().globalData[fwptObjectname];
+    const fwptObject = getApp().globalData[fwptObjectname + CONSTS.globalRetuSuffix];
+    // console.log('htqy onshow:',fwptObject);
     if(fwptObject){
-      getApp().globalData[fwptObjectname] = null;
-
+      getApp().globalData[fwptObjectname + CONSTS.globalRetuSuffix] = null;
+      let {currentObject} = this.data;
+      currentObject.fwpt = fwptObject;
+      let fwpts = '';
+      fwptattr.map(({label,name})=>{
+        const value = fwptObject[name];
+        if(!utils.isEmpty(value)){
+          fwpts += label+':'+value+';';
+        }
+      });
+      if(!utils.isEmpty(fwptObject['qtpt'])){
+        fwpts += '其它配套:' + fwptObject['qtpt'];
+      }
+      fwpts += '\r\n';      
+      currentObject.fwpts = fwpts;
+      this.setData({currentObject});
     }
   },
 

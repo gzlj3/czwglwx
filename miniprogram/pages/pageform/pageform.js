@@ -1,4 +1,5 @@
 // miniprogram/pages/pageform/pageform.js
+import * as CONSTS from '../../utils/constants.js';
 Page({
 
   /**
@@ -16,23 +17,27 @@ Page({
    * objectname,存储在globalData上的对象名
    */
   onLoad: function (options) {
-    console.log('onload:',options);
+    // console.log('onload:',options);
     const {formname,objectname} = options;
     this.setData({formname,objectname,currentObject:getApp().globalData[objectname]});
-    console.log(this.data);
+    getApp().globalData[objectname] = null;
+    getApp().globalData[objectname + CONSTS.globalRetuSuffix]  = null;
+    // console.log(this.data);
   },
 
   formSubmit: function (e) {
-    // Object.assign(currentObject,e.detail.value);
-    // console.log(e.detail.value);
+    const { objectname } = this.data;    
+    getApp().globalData[objectname + CONSTS.globalRetuSuffix] = e.detail.value;
+    console.log(objectname + CONSTS.globalRetuSuffix,e);
+    wx.navigateBack();
   },
 
   onInputBlur: function (e) {
-    const name = e.target.id;
-    let { currentObject } = this.data;
-    currentObject[name] = e.detail.value;
+    // const name = e.target.id;
+    // let { currentObject } = this.data;
+    // currentObject[name] = e.detail.value;
     // console.log('oninputblur:', name, e.detail.value, currentObject[name]);
-    this.setData({ currentObject });
+    // this.setData({ currentObject });
   },
 
   /**

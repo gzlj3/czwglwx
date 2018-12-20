@@ -15,6 +15,7 @@
 
 .input_underline{
   display: inline-flex;
+  flex:1;
   text-align: center;
   border-bottom: 1rpx solid;
 }

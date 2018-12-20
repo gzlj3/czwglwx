@@ -54,10 +54,16 @@ exports.checkAuthority = async(action,method,userInfo,data) => {
     if ([CONSTS.BUTTON_CB, CONSTS.BUTTON_MAKEZD, CONSTS.BUTTON_ADDFY, CONSTS.EDITFY, CONSTS.DELETEFY, CONSTS.BUTTON_EXITFY, CONSTS.BUTTON_USERGRANT, CONSTS.BUTTON_SYSCONFIG].indexOf(action) >= 0) {
       throw utils.codeException(101);
     }
-    if ([CONSTS.BUTTON_LASTZD, CONSTS.BUTTON_HTQY].indexOf(action) >= 0){
+    if ([CONSTS.BUTTON_LASTZD].indexOf(action) >= 0){
       if(method === 'POST') 
         throw utils.codeException(101);
       if (method === 'GET' && data && data.refreshzd==='1')  //先刷新帐单再提取数据
+        throw utils.codeException(101);
+    }
+    if ([CONSTS.BUTTON_HTQY].indexOf(action) >= 0) {
+      if (method === 'POST')
+        throw utils.codeException(101);
+      if (method === 'GET' && data && data.seeHouseHt !== '1')  //租客合同签约查询入口只能是查看合同
         throw utils.codeException(101);
     }
   }  
