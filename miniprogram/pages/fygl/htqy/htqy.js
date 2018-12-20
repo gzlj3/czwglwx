@@ -15,7 +15,7 @@ const zkTempFilePath = 'zkTempFilePath';
 const fdTempFilePath = 'fdTempFilePath';
 const fwptObjectname = 'fwpt';
 
-const httk = '7、乙方租住满三个月后发生的房屋设施（如灯、水龙头、油烟机、洗衣机等）坏，由乙方负责更换或修理。由于乙方原因造成的下水道堵塞由乙方负责清理。\r\n8、乙方要注意安全，搞好环境卫生，不得从高处乱扔垃圾，未经甲方同意，不得养猫狗等动物。\r\n9、未经甲方同意，乙方不得转租、转卖、改卖房屋结构，如因乙方管理不善发生水灾、火灾、盗窃及人为破坏行为，法律责任及经济损失由乙方承担。\r\n10、租赁期满时，双方对所租房屋、家具及其它设施进行验收，如有损坏者，由乙负责修复或照价赔偿，退租时把房屋卫生打扫干净，否则从押金扣除房屋清洁费用100元。\r\n';
+const httk = '7、乙方租住满三个月后发生的房屋设施（如灯、水龙头、油烟机、洗衣机等）坏，由乙方负责更换或修理。由于乙方原因造成的下水道堵塞由乙方负责清理。\r\n8、乙方要注意安全，搞好环境卫生，不得从高处乱扔垃圾，未经甲方同意，不得养猫狗等动物。\r\n9、未经甲方同意，乙方不得转租、转卖、改变房屋结构，如因乙方管理不善发生水灾、火灾、盗窃及人为破坏行为，法律责任及经济损失由乙方承担。\r\n10、租赁期满时，双方对所租房屋、家具及其它设施进行验收，如有损坏者，由乙负责修复或照价赔偿，退租时把房屋卫生打扫干净，否则从押金扣除房屋清洁费用100元。\r\n';
 const fwptattr = [{ label: '空调(台)', name: 'kt' }, { label: '热水器(套)', name: 'rsq' }, { label: '抽油烟机(台)', name: 'yyj' }, { label: '大门钥匙(条)', name: 'dmys' }, { label: '房间钥匙(条)', name: 'fjys' }, { label: '洗衣机(台)', name: 'xyj' }, { label: '冰箱(台)', name: 'bx' }, { label: '沙发(张)', name: 'sf' }, { label: '茶几(张)', name: 'cj' }, { label: '床(张)', name: 'c' }, { label: '衣柜(个)', name: 'yg' }, { label: '书桌(张)', name: 'sz' }, { label: '凳子(张)', name: 'dz' }];
 const fyxxMetas = {
   fdxm:{label:'甲方姓名'},
@@ -46,7 +46,7 @@ const fyxxMetas = {
 }
 
 const blx = ['fdxm','fdsjhm','fwmc','zhxm','dhhm', 'czje', 'fwyj', 'htrqq', 'htrqz', 'jzr', 'dscds', 'sscds', 'ddj', 'sdj'];
-
+let flag;
 Page({
 
   /**
@@ -57,7 +57,6 @@ Page({
     grantcode:null,
     grantcodeParas:{},
     seeHt:false,
-    flag:'',
   },
 
   /**
@@ -98,7 +97,7 @@ Page({
   },
 
   validForm: function(e) {
-    const {flag} = this.data;
+    // const {flag} = this.data;
     if(utils.isEmpty(flag)){
       utils.showToast('点击异常！');
       return false;
@@ -107,7 +106,7 @@ Page({
     const {currentObject} = this.data;
     if(flag === 'sendzkht'){
       //发送租客确认，需要输入租客手机号
-      if(utils.isEmpty(formObject.dhhm) || !utils.checkSjhm(formObject.dhhm)){
+      if(!utils.checkSjhm(formObject.dhhm)){
         utils.showToast('租客手机号未输入或输入有误！')
         return false;
       }
@@ -151,8 +150,8 @@ Page({
   },
 
   formSubmit: function (e,noValid) {
-    console.log(e);
-    const {flag} = this.data;
+    // console.log(e);
+    // const {flag} = this.data;
     console.log('formsubmit:', flag);
 
     if (!noValid && !this.validForm(e)) return;
@@ -184,7 +183,7 @@ Page({
   },
 
   handleSubmit: function(e){
-    const { grantcodeParas,flag} = this.data;
+    const { grantcodeParas} = this.data;
     // console.log('htqy formsubmit:', e.detail.value);
     const formObject = e.detail.value;
     const response = fyglService.postData(CONSTS.BUTTON_HTQY, { formObject, flag, grantcodeParas});
@@ -217,16 +216,27 @@ Page({
   },
 
   onsendzk: function(e){
-    this.setData({flag:'sendzkht'});
-    // flag = 'sendzkht';
-    e.detail.value = this.data.currentObject;
-    // console.log('sendzk',e.detail.value);
-    this.formSubmit(e);
+    // this.setData({flag:'sendzkht'});
+    const {seeHt,grantcode,grantcodeParas} = this.data;
+    console.log('onsendzk',seeHt,grantcode);
+    if(seeHt && !grantcode) return;
+    if(grantcode){
+      if(grantcodeParas.registered){
+        utils.showToast('您已经注册系统！');
+      }else{
+        this.toIndex(e);
+      }
+    }else{
+      flag = 'sendzkht';
+      e.detail.value = this.data.currentObject;
+      this.formSubmit(e);
+    }
   },
 
   htClick: function(e) {
-    this.setData({ flag: e.currentTarget.id});
-    console.log('htclick:',this.data.flag);
+    flag = e.currentTarget.id;
+    // this.setData({ flag: e.currentTarget.id});
+    console.log('htclick:',flag);
   },
 
   onsxqm_zk: function(e){
@@ -302,7 +312,7 @@ Page({
       if(!utils.isEmpty(fwptObject['qtpt'])){
         fwpts += '其它配套:' + fwptObject['qtpt'];
       }
-      fwpts += '\r\n';      
+      // fwpts += '\r\n';      
       currentObject.fwpts = fwpts;
       this.setData({currentObject});
     }

@@ -18,8 +18,10 @@ Page({
   onLoad: function (options) {
     const params = options.item? JSON.parse(options.item) : {};
     // console.log('sendzd:', params);
-    const { message } = params;
-    wx.setClipboardData({ data: message });
+    const { message, noclipboard } = params;
+    if (noclipboard!=='1'){
+      wx.setClipboardData({ data: message });
+    }
     this.setData({ params});
   },
 

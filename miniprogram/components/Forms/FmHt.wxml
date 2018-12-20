@@ -3,12 +3,12 @@
   module.exports.getZkQmPath = function(item){
     if(item.zkQmFilePath) return item.zkQmFilePath;
     if(item.zkQmCloudPath) return item.zkQmCloudPath;
-    return '';
+    return '../../../images/qm.png';
   }
   module.exports.getFdQmPath = function(item){
     if(item.fdQmFilePath) return item.fdQmFilePath;
     if(item.fdQmCloudPath) return item.fdQmCloudPath;
-    return '';
+    return '../../../images/qm.png';
   }
 </wxs>
 <template name="FmHt">
@@ -39,7 +39,7 @@
           <input class='input_underline' disabled="{{seeHt}}" name='sfzh' id='sfzh' type='idcard' value='{{currentObject.sfzh}}' bindblur="onInputBlur"></input>
         </view>
         <view class="inputcontainer">
-          <text class="inputlabel_9" style="{{seeHt?'':'color:blue;border-bottom:1rpx solid'}}" catchtap="{{seeHt?'':'onsendzk'}}">乙方手机号(发送):</text>
+          <text class="inputlabel_9" style="{{seeHt && !grantcode?'':'color:blue;border-bottom:1rpx solid'}}" catchtap="onsendzk">乙方手机号{{grantcode?'(验证)':(seeHt?'':'(发送)')}}:</text>
           <input class='input_underline' disabled="{{seeHt}}" name='dhhm' id='dhhm' type='number' value='{{currentObject.dhhm}}' bindblur="onInputBlur"></input>
         </view>
         <view class="weui-article__section">
@@ -103,8 +103,8 @@
           <input class="displaynone" id='zkQmCloudPath' name='zkQmCloudPath' value="{{currentObject.zkQmCloudPath}}"/>
           <input class="displaynone" id='fdQmCloudPath' name='fdQmCloudPath' value="{{currentObject.fdQmCloudPath}}"/>
           <view class="inputcontainer" style="justify-content: space-between">
-            <text style="width:150px;text-align:center">甲方签名</text> 
-            <text style="width:150px;text-align:center">乙方签名</text>
+            <text style="width:170px;text-align:center">甲方签名</text> 
+            <text style="width:170px;text-align:center">乙方签名</text>
           </view>
           <view class="inputcontainer" style="justify-content: space-between">
             <image style="width:170px; height: 80px;" src='{{m.getFdQmPath(currentObject)}}' catchtap='onsxqm_fd'></image>

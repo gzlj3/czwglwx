@@ -338,7 +338,7 @@ exports.processHt = async (data, curUser) => {
     if(flag==='hthc') 
       return formObject;
     if(flag==='sendzkht')
-      return commService.createGrantcode('个人房屋租赁合同\r\n租客签名确认！\r\n\r\n请在30分钟内确认。', { page:'/pages/fygl/htqy/htqy',htid,flag,sjhm:formObject.dhhm});
+      return commService.createGrantcode('个人房屋租赁合同\r\n租客签名确认！\r\n\r\n请在30分钟内确认。', { page:'/pages/fygl/htqy/htqy',htid,flag,sjhm:formObject.dhhm,noclipboard:'1'});
     if (flag === 'htsave') {
       //签约完成
       //计算下次收租日期
@@ -752,7 +752,7 @@ const processQrsz = async (params,curUser) => {
     // const grantcode = utils.uuid(16);
     // const createtime = utils.currentTimeMillis();
     return commService.createGrantcode(message, {
-      page:'/pages/fygl/editlist/editlist',collid, housefyid: housefy._id, grantcode,createtime,flag,sjhm:house.dhhm});
+      page:'/pages/fygl/editlist/editlist',collid, housefyid: housefy._id,flag,sjhm:house.dhhm});
     // return { message, collid, housefyid: housefy._id, grantcode, createtime, flag, sjhm: house.dhhm };
   } else if ("sendsjdx" === flag) {
     await sendZdMessage(house, housefy, collid, curUser.openId);
