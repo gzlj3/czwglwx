@@ -1,10 +1,10 @@
 <import src="../../../components/Forms/FmHt.wxml"/>
 <form bindsubmit="formSubmit" wx:if="{{currentObject}}">
-  <template is="FmHt" data="{{currentObject,seeHt,grantcode}}"></template>
+  <template is="FmHt" data="{{currentObject,seeHt,grantcode,seeHouseHt}}"></template>
   <block wx:if="{{!grantcode && !seeHt}}">
     <view style="display:flex;justify-content:space-between;margin-bottom:10px" >
       <button size='mini' type='primary' form-type="submit" id='hthc' bindtouchstart='htClick'>缓存合同</button>
-      <button size='mini' type='primary' form-type="submit" id='sendzkht' bindtouchstart='htClick'>发送租客</button>
+      <button size='mini' type='primary' form-type="submit" id='sendzkht' bindtouchstart='htClick'>发送租客确认</button>
       <button size='mini' type='default' form-type="submit" id='hthc' bindtouchstart='htClick'>刷新合同</button>
     </view> 
     <button form-type="submit" id='htmb' bindtouchstart='htClick'>存为我的模板</button>
@@ -16,6 +16,6 @@
   </block>
 </form> 
 <view class="weui-form-preview__item" wx:if="{{grantcode && !currentObject}}">
-  <view style="text-align:center;width:100%">授权码已失效</view>
+  <view style="text-align:center;width:100%">合同已更新或授权码已失效</view>
   <button type='primary' catchtap="toIndex">返回首页</button>
 </view> 

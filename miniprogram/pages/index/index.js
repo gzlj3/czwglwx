@@ -228,8 +228,13 @@ Page({
     });
   },
 
-  onRegister: function(e) {
+  onRegister: function(e) { 
+    const {requestUserType} = this.data;
+    if(!utils.isEmpty(requestUserType)){
+      e.detail.value.userType = requestUserType;
+    }
     console.log(e.detail.value);
+
     const {sjhm,sjyzm} = e.detail.value;
     if (!utils.checkSjhm(sjhm) || utils.isEmpty(sjyzm) || sjyzm.length!==6) {
       wx.showToast({ 

@@ -13,6 +13,7 @@
 </wxs>
 <template name="FmHt">
   <view class="page">
+    <view class="fixed-top-right" wx:if="{{seeHouseHt!=='1'}}"><text style="border: 2rpx solid red; padding:2px 5px" catchtap="{{grantcode?'onRefreshHt':''}}">草稿</text></view>
     <view class="page__hd">
       <view class="page__title" style="text-align:center">个人房屋租赁合同</view>
     </view> 

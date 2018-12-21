@@ -57,6 +57,8 @@ Page({
     grantcode:null,
     grantcodeParas:{},
     seeHt:false,
+    seeHouseHt:null,
+    sendzkhted:'',
   },
 
   /**
@@ -65,14 +67,15 @@ Page({
   onLoad: function (options) {
     // console.log('htqy:', options);
     const params = options.item ? JSON.parse(options.item) : {};
-    let { grantcode, seeHouseHt} = params;
-    if (!grantcode) grantcode = '';
+    let { grantcode='', seeHouseHt=''} = params;
+    // if (!grantcode) grantcode = '';
+    // console.log('===:',grantcode);
 
     const response = fyglService.queryData(CONSTS.BUTTON_HTQY, params);
     const tsinfo = '';
     fyglService.handleAfterRemote(response, tsinfo,
       (resultData) => {
-        console.log('htqy resultdata:',resultData);
+        // console.log('htqy resultdata:',resultData);
         let currentObject = resultData;
         let grantcodeParas = {};
         let seeHt = false;
@@ -87,7 +90,11 @@ Page({
         }else{
           if(!currentObject) currentObject = {httk};
         }
-        this.setData({ currentObject, grantcodeParas, grantcode, seeHt, options});
+        this.setData({ currentObject, grantcodeParas, grantcode, seeHt, seeHouseHt,options});
+      },
+      ()=>{
+        // console.log('err:',grantcode);
+        this.setData({ currentObject: null, grantcode});
       }
     );
   },
@@ -108,6 +115,10 @@ Page({
       //发送租客确认，需要输入租客手机号
       if(!utils.checkSjhm(formObject.dhhm)){
         utils.showToast('租客手机号未输入或输入有误！')
+        return false;
+      }
+      if (this.data.sendzkhted==='1'){
+        utils.showModal('发送租客确认', `你已经发送过租客，租客点击刷新即可查看合同最新数据。\r\n是否确认再次发送？`, () => this.formSubmit(e, true));
         return false;
       }
     }else if (flag === 'savezkqm') {
@@ -134,7 +145,7 @@ Page({
         return false;
       }
       if (utils.isEmpty(formObject.fdQmFilePath) && utils.isEmpty(formObject.fdQmCloudPath)) {
-        utils.showToast('男方未签名！');
+        utils.showToast('甲方未签名！');
         return false;
       }
       //校验手机号
@@ -152,8 +163,7 @@ Page({
   formSubmit: function (e,noValid) {
     // console.log(e);
     // const {flag} = this.data;
-    console.log('formsubmit:', flag);
-
+    // console.log('formsubmit:', flag);
     if (!noValid && !this.validForm(e)) return;
     const {currentObject} = this.data;
     //房屋配套需要单独处理
@@ -190,6 +200,7 @@ Page({
     fyglService.handleAfterRemote(response, tsinfo[flag],
       (resultData) => {
         if (flag ==='sendzkht'){
+          this.setData({ sendzkhted:'1'});
           const s = JSON.stringify(resultData);
           wx.navigateTo({
             url: '../sendzd/sendzd?item=' + s,
@@ -222,7 +233,7 @@ Page({
     if(seeHt && !grantcode) return;
     if(grantcode){
       if(grantcodeParas.registered){
-        utils.showToast('您已经注册系统！');
+        utils.showToast('您已经注册系统，合同签约完成后，可进入【我的房源列表】查看正式合同！');
       }else{
         this.toIndex(e);
       }

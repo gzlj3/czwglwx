@@ -2,7 +2,7 @@
   <view class="nickname" wx:if="{{user.wxgranted}}">
     {{user.nickName}},欢迎您！
   </view> 
-  <view class="page__hd"> 
+  <view class="page__hd">
       <!-- <view class="page__title"></view> --> 
       <view class="page__desc">极简出租为房东提供简洁高效的房屋出租管理，为租客提供方便快捷的帐单查询。</view> 
   </view>
@@ -28,7 +28,7 @@
       </view>
       <view class="grant-container {{requestUserType?'grant-container-zkzc':''}}" wx:if="{{user && user.wxgranted && user.userType===CONSTS.USERTYPE_NONE}}"> 
       <!-- <view class="grant-container {{requestUserType?'grant-container-zkzc':''}}" >  -->
-          <view class='grant-item' style="{{requestUserType?'display:none':''}}">需要注册确定您的身份</view>
+          <view class='grant-item' style="{{requestUserType?'display:none':''}}">请确定您的身份</view>
           <view class='grant-item'>
             <form bindsubmit="onRegister">
               <view style="{{requestUserType?'display:none':''}}">
@@ -68,7 +68,7 @@
                   </view> -->
               </view>
               <view class='weui-cell'>
-                <button size='default' type='primary' form-type="submit" style="margin-top:15px">确认注册</button>
+                <button size='default' type='primary' form-type="submit" style="margin-top:15px">确认</button>
               </view>
             </form>          
           </view>
@@ -79,7 +79,9 @@
               <view class="kind-list__item">
                   <view id="{{item.page}}" class="weui-flex kind-list__item-hd {{item.open ? 'kind-list__item-hd_show' : ''}}" bindtap="kindToggle">
                       <view class="weui-flex__item  weui-cell_access weui-cell_link addfontsize20">{{item.name}}</view>
-                      <image class="kind-list__img" src="../../images/icon_nav_{{item.id}}.png"></image>
+                      <!-- <image class="kind-list__img" src="../../images/icon_nav_{{item.id}}.png"></image> -->
+                                          <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+
                   </view>
                   <view class="kind-list__item-bd {{item.open ? 'kind-list__item-bd_show' : ''}}">
                       <view class="weui-cells {{item.open ? 'weui-cells_show' : ''}}">

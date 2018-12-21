@@ -89,10 +89,11 @@ Page({
             });
             break;
           case 2:
-            const params = JSON.stringify({ seeHouseHt:'1',houseid: item._id, collid: fyitem });
-            wx.navigateTo({
-              url: '/pages/fygl/htqy/htqy?item=' + params
-            });
+            // const params = JSON.stringify({ seeHouseHt:'1',houseid: item._id, collid: fyitem });
+            // wx.navigateTo({
+            //   url: '/pages/fygl/htqy/htqy?item=' + params
+            // });
+            self.onSeeht(e);
             break;
           case 3:
             utils.showModal('删除房源', '删除后将不能恢复，你真的确定删除房源(' + item.fwmc + ')吗？', () => { self.deletefy(item._id); });
@@ -162,6 +163,14 @@ Page({
     wx.navigateTo({
       url: 'addfy/addfy?buttonAction='+CONSTS.BUTTON_EDITFY+'&item='+s,
     }) 
+  },
+
+  onSeeht(e) {
+    const { item,fyitem } = e.currentTarget.dataset;
+    const params = JSON.stringify({ seeHouseHt: '1', houseid: item._id, collid: fyitem });
+    wx.navigateTo({
+      url: '/pages/fygl/htqy/htqy?item=' + params
+    });
   },
 
   onLastzd(e){

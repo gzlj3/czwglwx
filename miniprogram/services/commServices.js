@@ -36,6 +36,7 @@ export function handleAfterRemote(response, tsinfo, successCallback,failCallback
           icon: 'none',
           duration: 5000,
         });
+        if (failCallback) failCallback(data);
       }
     }
   }).catch(err => {

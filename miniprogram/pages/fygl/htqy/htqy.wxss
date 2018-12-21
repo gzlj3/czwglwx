@@ -36,6 +36,16 @@
   font-size: 15px;
 }
 
+.fixed-top-right {  
+  position: fixed;
+  top: 0.52em;
+  left: 0;
+  right: 0;
+  margin: 5px;
+  text-align: right;
+  color: red;
+}
+
 /* .input{
   width: 100%;
   border-bottom: 1rpx solid #efefef;

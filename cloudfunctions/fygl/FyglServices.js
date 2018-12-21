@@ -298,10 +298,9 @@ exports.processHt = async (data, curUser) => {
   const { openId} = curUser;
   const { formObject, flag, grantcodeParas} = data;
 
-  //先处理签名图片
-  await processSxqm(data, curUser);
-  
   if(flag==='htmb'){
+    //先处理签名图片
+    await processSxqm(data, curUser);
   //存为合同模板
     await saveHtmb(formObject,curUser);
     return formObject;
@@ -313,6 +312,9 @@ exports.processHt = async (data, curUser) => {
     let session = await commService.querySingleDoc('session', { htid: curGrantcodeParas.htid });
     if (!session || utils.isEmptyObj(session.htdata)) 
       throw utils.newException('未查到合同数据，可能合同已经更新，请与房东确认！');
+    //先处理签名图片
+    await processSxqm(data, curUser);
+
     session.htdata.zkQmCloudPath = formObject.zkQmCloudPath;
     const updatedNum = await commService.updateDoc('session', session);
     // console.log('savezkqm:',updatedNum);
@@ -324,7 +326,8 @@ exports.processHt = async (data, curUser) => {
       throw utils.newException('会话数据错误！');
     const sessionid = session._id;
     //先处理签名图片
-    // await processSxqm(data, curUser);
+    await processSxqm(data, curUser);
+
     //房东不能修改租客签名
     if(!utils.isEmptyObj(session.htdata) && !utils.isEmpty(session.htdata.zkQmCloudPath)){
       formObject.zkQmCloudPath = session.htdata.zkQmCloudPath;

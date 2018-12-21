@@ -69,6 +69,12 @@
                     <view data-item="{{item._id}}" data-fyitem="{{fyItem.collid}}" data-yzhid="{{fyItem.yzhid}}" bindtap="onLastzd" class="weui-cell__bd weui-cell_access weui-cell_link addfontsize18" wx:if="{{item.zhxm}}">帐单详情</view>
                     <view data-item="{{item}}" data-fyitem="{{fyItem.collid}}" bindtap="onMoreAction" class="weui-cell__bd weui-cell_access weui-cell_link addfontsize18">更多操作</view>
                     <!-- <view class="weui-cell__ft weui-cell__ft_in-access"></view> -->
+                </view> 
+            </view>
+            <view class="weui-panel__ft" wx:if="{{isZk}}">
+                <view class="weui-cell">
+                    <view data-item="{{item}}" data-fyitem="{{fyItem.collid}}" bindtap="onSeeht" class="weui-cell__bd weui-cell_access weui-cell_link addfontsize18" wx:if="{{item.zhxm}}">查看合同</view>
+                    <view data-item="{{item._id}}" data-fyitem="{{fyItem.collid}}" data-yzhid="{{fyItem.yzhid}}" bindtap="onLastzd" class="weui-cell__bd weui-cell_access weui-cell_link addfontsize18" wx:if="{{item.zhxm}}">帐单详情</view>
                 </view>
             </view>
         </view>
