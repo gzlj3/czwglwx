@@ -173,16 +173,6 @@ const getTableName = (tableName, collid) => {
 }
 exports.getTableName = getTableName;
 
-exports.testService = async (data) => {
-  //doc(undefined)
-  //置为null, string：失败，number:成功
-  //置为undefined
-  let sfhj=null,sdj=null,sbcds=null,ljfyff=null;
-  const result = await db.collection('house_1').doc('GVe1ZTXFeQ8zzHJG').update({ data: { sbcds, sdj, sfhj, ljfyff}});
-  console.log('test:', result);
-  return result;
-}
-
 const createGrantcode = (message, otherObj) => {
   const grantcode = utils.uuid(16);
   const createtime = utils.currentTimeMillis();
@@ -203,3 +193,20 @@ const queryGrantcode = async (grantcode,yxq,openId) => {
   return result;
 }
 exports.queryGrantcode = queryGrantcode;
+
+exports.testService = async (data) => {
+  // const fileID = 'cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/1/fdqm/BIrpF.png'
+  // const res = await cloud.downloadFile({
+  //   fileID,
+  // })
+  // const buffer = res.fileContent;
+  // console.log(buffer.length);
+  // return buffer;
+  //doc(undefined)
+  //置为null, string：失败，number:成功
+  //置为undefined
+  // let sfhj = null, sdj = null, sbcds = null, ljfyff = null;
+  // const result = await db.collection('house_1').doc('GVe1ZTXFeQ8zzHJG').update({ data: { sbcds, sdj, sfhj, ljfyff } });
+  // console.log('test:', result);
+  // return result;
+}

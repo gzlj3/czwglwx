@@ -1,9 +1,11 @@
 <view class='content'>
+  <view class="weui-cells__title">签名板</view>
   <canvas class='firstCanvas' canvas-id="firstCanvas" bindtouchmove='move' bindtouchstart='start' bindtouchend='end' bindtouchcancel='cancel' bindlongtap='tap' disable-scroll='true' binderror='error'>
   </canvas>
 
   <button bindtap='clearClick'>清除</button>
   <button bindtap='saveClick'>保存签名</button>
+  <view class="weui-cells__title">上次签名</view>
   <image class='firstCanvas' id='signatureImg' src='{{lastQmFilePath}}'></image>
 
 </view>

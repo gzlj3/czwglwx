@@ -340,34 +340,53 @@ Page({
     );
   },
   testPage: function (e) {
-    wx.navigateTo({
-      url: '../sxqm/sxqm',
-    })
-  //   console.log('testPage:', e);
-  //   const response = fyglService.postData(300, { form_id: e.detail.formId });
-  //   fyglService.handleAfterRemote(response, '测试服务',
-  //     (resultData) => {
-  //       console.log(resultData)
-  //     }
-  //   );
+    this.doUpload();
   },
   onShareAppMessage: function(e){
-    // if (e.from === 'button') {
-    //   // 来自页面内转发按钮
-    //   console.log(e.target)
-    // }
-    // return {
-    //   title: '自定义转发标题',
-    //   path: '/page/index/index',
-    //   // imageUrl:'../../images/czwgl.jpg'
-    // }
   },
   onbindload:function(e){
-    console.log('onbindload:',e);
+    // console.log('onbindload:',e);
   },
   onbinderror: function (e) {
-    console.log('onbinderror:',e);
-  }
+    // console.log('onbinderror:',e);
+  },
+  // 上传图片
+  doUpload: function () {
+    const token = "16_mcPbSOYyZtOJqFLxXlTiaU242P5UnC03RCrHuqZAPP2vRdgbxjNo8PJKJTWltwBR4EbNcCJWd98tiweRupJINUVFeDQYnDCf6gz1LspY-Erl9WI87_M1Tfn2WgFaU-gnPq9A7G5RvARy_yS_LRTjAIAHNP";
+    const url = "http://api.weixin.qq.com/cv/ocr/idcard?type=photo&access_token=" + token;
 
+    let self = this;
+    wx.chooseImage({
+      count: 1,
+      sizeType: ['compressed'],
+      sourceType: ['album', 'camera'],
+      success: function (res) {
+        //检查文件大小
+        const fileSize = res.tempFiles[0].size;
+        if (fileSize > config.uploadFileMaxSize) {
+          utils.showToast('上传文件大小不能超过：' + (config.uploadFileMaxSize / 1024) + 'k');
+          return;
+        }
+
+        // wx.showLoading({
+        //   title: '上传中',
+        // })
+
+        const filePath = res.tempFilePaths[0]
+        // 上传图片
+        const fileType = filePath.match(/\.[^.]+?$/)[0];
+        // const cloudPath = yzhid + '/' + fwmc + '/' + utils.uuid(5) + fileType;
+        console.log('chooseImage Path:', filePath);
+        wx.uploadFile({
+          url,
+          filePath,
+          name: 'sfzh',
+          success:(res)=>{
+            console.log(res);
+          }
+        })
+      }
+    })
+  }
 
 })

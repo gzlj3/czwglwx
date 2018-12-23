@@ -37,11 +37,12 @@
 }
 
 .fixed-top-right {  
-  position: fixed;
-  top: 0.52em;
+  position: absolute;
+  /* top: 0.52em;
   left: 0;
-  right: 0;
+  right: 0; */
   margin: 5px;
+  width:100%;
   text-align: right;
   color: red;
 }

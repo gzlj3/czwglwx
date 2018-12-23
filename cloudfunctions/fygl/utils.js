@@ -2,6 +2,7 @@ const moment = require('moment.min.js');
 const rp = require('request-promise');
 const request = require('request');
 const CONSTS = require('constants.js');
+const cloud = require('wx-server-sdk')
 
 exports.getInteger = (value) => {
   try{
@@ -147,9 +148,47 @@ exports.id = () => {
   return uuid(16);
 }
 
+exports.testRequest = async ()=>{
+  const token = "16_FVs0ET7q1sXSU0QlIbElKfDve0AXtJaLt6JeP9yX3Vc6aRa26uly555GBiVatr7I7CwdBmvf-jMw8HtGcchmoA_IL63ySJAz-5EitxD8XFqQJBinMKV1NDVxPpQNW-eJPEWaU_Oim9p9gpA7ERXiAEAPCI";
+  const url = "http://api.weixin.qq.com/cv/ocr/idcard?type=photo&access_token="+token;
+  // return await requestOtherUrl(url);
+  const fileID = 'cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/1/200/Hu0Xp.jpg'
+  const res = await cloud.downloadFile({
+    fileID,
+  })
+  const buffer = res.fileContent;
+  console.log('filelength:',buffer.length);
+  // return buffer.toString('utf8')  
+  const options = {
+    method: 'POST',
+    uri: url,
+    // body: buffer,
+    formData: {
+      // Like <input type="file" name="file">
+      file: {
+        value: buffer,
+        options: {
+          filename: 'test.jpg',
+          contentType: 'image/jpg'
+        }
+      }
+    },
+    headers: {
+      // 'content-type': 'application/x-www-form-urlencoded',
+      'content-type': 'multipart/form-data',
+      
+    }
+  };
+  // console.log('请求URL:', options);
+  let result = await rp(options);
+  // result = JSON.parse(result);
+  console.log(result);
+  return result;
 
-const requestOtherUrl = async (data, curUser) => {
-  const url = 'http://vb9nvs.natappfree.cc/fygl/fygl_list';
+}
+
+const requestOtherUrl = async (url,data, curUser) => {
+  // const url = 'http://vb9nvs.natappfree.cc/fygl/fygl_list';
   const options = {
     method: 'GET',
     uri: url,
@@ -165,6 +204,8 @@ const requestOtherUrl = async (data, curUser) => {
   console.log(result);
   return result;
 }
+exports.requestOtherUrl = requestOtherUrl;
+
 
 exports.sendTemplateMessage = async (data,curUser) => {
   return await requestOtherUrl(data,curUser);

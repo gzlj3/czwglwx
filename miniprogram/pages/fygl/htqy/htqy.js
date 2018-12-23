@@ -250,12 +250,24 @@ Page({
     console.log('htclick:',flag);
   },
 
+  getZkQmPath : function (item) {
+    if (item.zkQmFilePath) return item.zkQmFilePath;
+    if (item.zkQmCloudPath) return item.zkQmCloudPath;
+    return '../../../images/qm.png';
+  },
+  getFdQmPath : function (item) {
+    if (item.fdQmFilePath) return item.fdQmFilePath;
+    if (item.fdQmCloudPath) return item.fdQmCloudPath;
+    return '../../../images/qm.png';
+  },
+
   onsxqm_zk: function(e){
     const { currentObject,grantcode,seeHt } = this.data;
     if (utils.isEmpty(grantcode)) return;
 
     getApp().globalData[zkTempFilePath] = null;
-    const lastQmFilePath = !utils.isEmpty(currentObject.zkQmFilePath) ? currentObject.zkQmFilePath : '';
+    // const lastQmFilePath = !utils.isEmpty(currentObject.zkQmFilePath) ? currentObject.zkQmFilePath : '';
+    const lastQmFilePath = this.getZkQmPath(currentObject);
     wx.navigateTo({
       url: '/pages/sxqm/sxqm?qmTempFilePath=' + zkTempFilePath + '&lastQmFilePath=' + lastQmFilePath,
     })
@@ -264,7 +276,8 @@ Page({
     const { currentObject, grantcode, seeHt } = this.data;
     if (!utils.isEmpty(grantcode) || seeHt) return;
     getApp().globalData[fdTempFilePath] = null;
-    const lastQmFilePath = !utils.isEmpty(currentObject.fdQmFilePath) ? currentObject.fdQmFilePath:'';
+    // const lastQmFilePath = !utils.isEmpty(currentObject.fdQmFilePath) ? currentObject.fdQmFilePath:'';
+    const lastQmFilePath = this.getFdQmPath(currentObject);
     wx.navigateTo({
       url: '/pages/sxqm/sxqm?qmTempFilePath=' + fdTempFilePath + '&lastQmFilePath=' + lastQmFilePath,
     })
