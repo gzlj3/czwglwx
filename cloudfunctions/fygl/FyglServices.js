@@ -296,7 +296,7 @@ const processSxqm = async (data, curUser) => {
 
 exports.processHt = async (data, curUser) => {
   const { openId} = curUser;
-  const { formObject, flag, grantcodeParas} = data;
+  const { formObject, flag, grantcodeParas, sfzhCloudFileId} = data;
 
   if(flag==='htmb'){
     //先处理签名图片
@@ -304,6 +304,9 @@ exports.processHt = async (data, curUser) => {
   //存为合同模板
     await saveHtmb(formObject,curUser);
     return formObject;
+  } else if (flag === 'ocrsfz') {
+    // 身份证图片解析
+    
   } else if (flag === 'savezkqm') {
     //保存租客签名
     // console.log('savezkqm:', grantcodeParas);

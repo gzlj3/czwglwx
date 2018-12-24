@@ -51,6 +51,19 @@ export function handleAfterRemote(response, tsinfo, successCallback,failCallback
   })
 }
 
+const chooseImage = (cloudPath, successCallback, failCallback) => {
+  wx.chooseImage({
+    count: 1,
+    sizeType: ['compressed'],
+    sourceType: ['album', 'camera'],
+    success: function (res) {
+      const filePath = res.tempFilePaths[0];
+      uploadCloudFile(filePath,cloudPath,successCallback,failCallback);
+    }
+  });
+}
+export { chooseImage };
+
 const uploadCloudFile = (filePath, cloudPath, successCallback, failCallback) =>{
   let self = this;
   wx.getFileInfo({
@@ -76,13 +89,7 @@ const uploadCloudFile = (filePath, cloudPath, successCallback, failCallback) =>{
         cloudPath,
         filePath,
         success: res => {
-          // console.log('[上传文件] 成功111：', res)
-          // console.log(this.data.currentObject);
           if(successCallback) successCallback(res.fileID);
-          // let { currentObject } = self.data;
-          // if (!currentObject.photos) currentObject.photos = [];
-          // currentObject.photos.push(res.fileID);
-          // self.setData({ currentObject });
         },
         fail: e => {
           // console.error('[上传文件] 失败：', e)

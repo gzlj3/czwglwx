@@ -8,7 +8,8 @@ const tsinfo = {
   'hthc':'合同缓存', 
   'htmb':'保存模板',
   'htsave':'合同签约',
-  'savezkqm': '上传签名'
+  'savezkqm': '上传签名',
+  'ocrsfz':'上传身份证',
 }
 
 const zkTempFilePath = 'zkTempFilePath';
@@ -340,6 +341,23 @@ Page({
       currentObject.fwpts = fwpts;
       this.setData({currentObject});
     }
+  },
+
+  onPhotoZksfz: function (e) {
+    const yzhid = getApp().globalData.user.yzhid;
+    const cloudPath = yzhid + '/sfzh/' + utils.uuid(10);
+    const self = this;
+    commService.chooseImage(cloudPath, (sfzhCloudFileId) => { this.ocrsfz(sfzhCloudFileId)});
+  },
+
+  ocrsfz:function(sfzhCloudFileId){
+    flag = 'ocrsfz'
+    const response = fyglService.postData(CONSTS.BUTTON_HTQY, { sfzhCloudFileId, flag});
+    fyglService.handleAfterRemote(response, tsinfo[flag],
+      (resultData) => {
+        console.log(resultData);
+      }
+    );    
   },
 
   toIndex: function (e) {

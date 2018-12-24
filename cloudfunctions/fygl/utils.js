@@ -148,6 +148,18 @@ exports.id = () => {
   return uuid(16);
 }
 
+const requestUrl = async (url) => {
+  const options = {
+    method: 'GET',
+    uri: url,
+  };
+  let result = await rp(options);
+  result = JSON.parse(result);
+  return result;
+}
+exports.requestUrl = requestUrl;
+
+
 exports.testRequest = async ()=>{
   const token = "16_FVs0ET7q1sXSU0QlIbElKfDve0AXtJaLt6JeP9yX3Vc6aRa26uly555GBiVatr7I7CwdBmvf-jMw8HtGcchmoA_IL63ySJAz-5EitxD8XFqQJBinMKV1NDVxPpQNW-eJPEWaU_Oim9p9gpA7ERXiAEAPCI";
   const url = "http://api.weixin.qq.com/cv/ocr/idcard?type=photo&access_token="+token;

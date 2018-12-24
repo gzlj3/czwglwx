@@ -2,6 +2,7 @@ const cloud = require('wx-server-sdk')
 const CONSTS = require('constants.js');
 const utils = require('utils.js');
 const config = require('config.js')
+const rp = require('request-promise');
 
 cloud.init({
   env: config.conf.env,
@@ -193,6 +194,21 @@ const queryGrantcode = async (grantcode,yxq,openId) => {
   return result;
 }
 exports.queryGrantcode = queryGrantcode;
+
+
+const getAccessToken = async () => {
+  const result = await queryPrimaryDoc('global','AccessToken');
+  if(!result)
+    throw utils.newException('获取AccessToken错误！');
+  // if (utils.currentTimeMillis() - result.createtime > (result.expires_in*1000 - 120*1000)){
+  //   // token.setAccessToken(json.getString("access_token"));
+  //   // token.setExpiresin(json.getInteger("expires_in"));
+  //   const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${result.appId}&secret=${result.appSecret}`;
+  //   result = await utils.requestUrl(url);
+
+  // }
+}
+
 
 exports.testService = async (data) => {
   // const fileID = 'cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/1/fdqm/BIrpF.png'
