@@ -103,6 +103,8 @@
         <view class="weui-article__section"> 
           <input class="displaynone" id='zkQmCloudPath' name='zkQmCloudPath' value="{{currentObject.zkQmCloudPath}}"/>
           <input class="displaynone" id='fdQmCloudPath' name='fdQmCloudPath' value="{{currentObject.fdQmCloudPath}}"/>
+          <input class="displaynone" id='zkSfzhFront' name='zkSfzhFront' value="{{currentObject.zkSfzhFront}}"/>
+          <input class="displaynone" id='zkSfzhBack' name='zkSfzhBack' value="{{currentObject.zkSfzhBack}}"/>
           <view class="inputcontainer" style="justify-content: space-between">
             <text style="width:170px;text-align:center">甲方签名</text> 
             <text style="width:170px;text-align:center">乙方签名</text>
