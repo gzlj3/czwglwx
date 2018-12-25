@@ -48,6 +48,7 @@ const fyxxMetas = {
 
 const blx = ['fdxm','fdsjhm','fwmc','zhxm','dhhm', 'czje', 'fwyj', 'htrqq', 'htrqz', 'jzr', 'dscds', 'sscds', 'ddj', 'sdj'];
 let flag;
+let tempSfzhCloudFileId='';
 Page({
 
   /**
@@ -197,7 +198,7 @@ Page({
     const { grantcodeParas} = this.data;
     // console.log('htqy formsubmit:', e.detail.value);
     const formObject = e.detail.value;
-    const response = fyglService.postData(CONSTS.BUTTON_HTQY, { formObject, flag, grantcodeParas});
+    const response = fyglService.postData(CONSTS.BUTTON_HTQY, { formObject, flag, grantcodeParas, tempSfzhCloudFileId});
     fyglService.handleAfterRemote(response, tsinfo[flag],
       (resultData) => {
         if (flag ==='sendzkht'){
@@ -230,7 +231,7 @@ Page({
   onsendzk: function(e){
     // this.setData({flag:'sendzkht'});
     const {seeHt,grantcode,grantcodeParas} = this.data;
-    console.log('onsendzk',seeHt,grantcode);
+    // console.log('onsendzk',seeHt,grantcode);
     if(seeHt && !grantcode) return;
     if(grantcode){
       if(grantcodeParas.registered){
@@ -344,20 +345,49 @@ Page({
   },
 
   onPhotoZksfz: function (e) {
-    const yzhid = getApp().globalData.user.yzhid;
-    const cloudPath = yzhid + '/sfzh/' + utils.uuid(10);
-    const self = this;
-    commService.chooseImage(cloudPath, (sfzhCloudFileId) => { this.ocrsfz(sfzhCloudFileId)});
+    const { seeHt, grantcode,currentObject} = this.data;
+    if (seeHt || grantcode){
+      let photos = [];
+      if (!utils.isEmpty(currentObject.zkSfzhFront)){
+        photos.push(currentObject.zkSfzhFront);
+      }
+      if (!utils.isEmpty(currentObject.zkSfzhBack)) {
+        photos.push(currentObject.zkSfzhBack);
+      }
+      //查看身份证照
+      if (photos.length===0){
+        utils.showToast('身份证还未拍照！');
+        return;
+      }
+      wx.previewImage({
+        // current,
+        urls: photos,
+      });
+    }else{
+      //拍照
+      const yzhid = getApp().globalData.user.yzhid;
+      const cloudPath = yzhid + '/sfzh/' + utils.uuid(10);
+      const self = this;
+      commService.chooseImage(cloudPath, (sfzhCloudFileId) => { 
+          tempSfzhCloudFileId = sfzhCloudFileId;
+          this.ocrsfz(e)
+        }
+      );
+    }
   },
 
-  ocrsfz:function(sfzhCloudFileId){
-    flag = 'ocrsfz'
-    const response = fyglService.postData(CONSTS.BUTTON_HTQY, { sfzhCloudFileId, flag});
-    fyglService.handleAfterRemote(response, tsinfo[flag],
-      (resultData) => {
-        console.log(resultData);
-      }
-    );    
+  ocrsfz:function(e){
+    flag = 'ocrsfz';
+    // tempSfzhCloudFileId = sfzhCloudFileId;
+    e.detail.value = this.data.currentObject;
+    this.formSubmit(e);
+    // flag = 'ocrsfz'
+    // const response = fyglService.postData(CONSTS.BUTTON_HTQY, { sfzhCloudFileId, flag});
+    // fyglService.handleAfterRemote(response, tsinfo[flag],
+    //   (resultData) => {
+    //     console.log(resultData);
+    //   }
+    // );    
   },
 
   toIndex: function (e) {

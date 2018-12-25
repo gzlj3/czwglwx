@@ -293,6 +293,30 @@ const processSxqm = async (data, curUser) => {
   }
 }
 
+const processOcrsfz = async (data, curUser) => {
+  // 身份证图片解析
+  const { formObject, flag, tempSfzhCloudFileId } = data;
+  if (flag !== 'ocrsfz') return;
+  try {
+    const result = await commService.ocrSfz(tempSfzhCloudFileId);
+    if (result.errcode !== 0)
+      throw utils.newException(result.errmsg, result.errcode);    
+    if (result.type === "Front") {
+      formObject.zkSfzhFront = tempSfzhCloudFileId;
+      formObject.zhxm = result.name;
+      formObject.sfzh = result.id;
+      // console.log(result);
+      // formObject.zhxm = result.
+    } else if (result.type === "Back"){
+      formObject.zkSfzhBack = tempSfzhCloudFileId;
+    }else{
+      throw utils.newException("身份证解析失败！");    
+    }
+  } catch (e) {
+    await cloud.deleteFile({ fileList: [tempSfzhCloudFileId] });
+    throw e;
+  }
+}
 
 exports.processHt = async (data, curUser) => {
   const { openId} = curUser;
@@ -304,9 +328,6 @@ exports.processHt = async (data, curUser) => {
   //存为合同模板
     await saveHtmb(formObject,curUser);
     return formObject;
-  } else if (flag === 'ocrsfz') {
-    // 身份证图片解析
-    
   } else if (flag === 'savezkqm') {
     //保存租客签名
     // console.log('savezkqm:', grantcodeParas);
@@ -322,7 +343,7 @@ exports.processHt = async (data, curUser) => {
     const updatedNum = await commService.updateDoc('session', session);
     // console.log('savezkqm:',updatedNum);
     return formObject;
-  } else if (flag === 'hthc' || flag === 'sendzkht' || flag === 'htsave'){
+  } else if (flag === 'hthc' || flag === 'sendzkht' || flag === 'htsave' || flag==='ocrsfz'){
   //合同缓存
     let session = await commService.querySingleDoc('session', { openId});
     if(!session)
@@ -330,6 +351,8 @@ exports.processHt = async (data, curUser) => {
     const sessionid = session._id;
     //先处理签名图片
     await processSxqm(data, curUser);
+    //处理ocr身份证
+    await processOcrsfz(data, curUser);
 
     //房东不能修改租客签名
     if(!utils.isEmptyObj(session.htdata) && !utils.isEmpty(session.htdata.zkQmCloudPath)){
@@ -340,8 +363,9 @@ exports.processHt = async (data, curUser) => {
     if (flag === 'sendzkht'){
       session.htid = htid;
     }
+
     const updatedNum = await commService.updateDoc('session',session);
-    if(flag==='hthc') 
+    if (flag === 'hthc' || flag === 'ocrsfz') 
       return formObject;
     if(flag==='sendzkht')
       return commService.createGrantcode('个人房屋租赁合同\r\n租客签名确认！\r\n\r\n请在30分钟内确认。', { page:'/pages/fygl/htqy/htqy',htid,flag,sjhm:formObject.dhhm,noclipboard:'1'});
@@ -509,7 +533,7 @@ exports.exitFy = async (data,curUser) => {
     throw utils.newException("房源数据更新失败！");
 }
 
-exports.deleteFy = async (house,curUser) => { 
+const deleteFy = async (house,curUser) => { 
   const {collid} = curUser;
   const { houseid} = house;
   const deleteHouse = await commService.queryPrimaryDoc(commService.getTableName('house', collid), houseid);
@@ -532,6 +556,7 @@ exports.deleteFy = async (house,curUser) => {
     await cloud.deleteFile({ fileList: deleteHouse.photos});
   }
 }
+exports.deleteFy = deleteFy;
 
 async function tfFy(data,curUser){
   const {collid} = curUser;
@@ -547,27 +572,31 @@ async function tfFy(data,curUser){
     }
   }
   await commService.addDoc('house_tf', house);
-  // 房源数据保存进退房表后，再删除数据
-  await commService.removeDoc(commService.getTableName('house',collid),house._id);
-  if (housefyList) {
-    for (let i = 0; i < housefyList.length; i++) {
-      await commService.removeDoc(commService.getTableName('housefy',collid), housefyList[i]._id);
-    }
-  }
-  //删除房屋图片
-  if (house.photos && house.photos.length > 0) {
-    await cloud.deleteFile({ fileList: house.photos });
-  }
+  //由于新加了合同签约，因此，退房后，直接将房屋数据删除
+  // console.log('tffy:',house);
+  await deleteFy(data,curUser);
 
-  //保留现有房屋数据，但将其置为空房
-  const clearFields = ['aratarUrl', 'bz', 'dbcds', 'dfhj', 'dhhm', 'dscds', 'fyhj', 'housefyid', 'htrqq', 'htrqz', 'lrr', 'lrsj','moreZh','photos','qtf','querySjhm','rq1','rq2','sbcds','sfhj','sfsz','sfzh','sscds','syjzf','szrq','yffrq1','yffrq2','zdlx','zdmonth','zhxgr','zhxgsj','zhxm'];
-  let newHouse = house;
-  clearFields.map(value=>{
-    delete newHouse[value];
-  })
-  newHouse._id = utils.id();
-  console.log('tffy:',newHouse);
-  await commService.addDoc(commService.getTableName('house',curUser.collid),newHouse);
+  // 房源数据保存进退房表后，再删除数据
+  // await commService.removeDoc(commService.getTableName('house',collid),house._id);
+  // if (housefyList) {
+  //   for (let i = 0; i < housefyList.length; i++) {
+  //     await commService.removeDoc(commService.getTableName('housefy',collid), housefyList[i]._id);
+  //   }
+  // }
+  // //删除房屋图片
+  // if (house.photos && house.photos.length > 0) {
+  //   await cloud.deleteFile({ fileList: house.photos });
+  // }
+
+  // //保留现有房屋数据，但将其置为空房
+  // const clearFields = ['aratarUrl', 'bz', 'dbcds', 'dfhj', 'dhhm', 'dscds', 'fyhj', 'housefyid', 'htrqq', 'htrqz', 'lrr', 'lrsj','moreZh','photos','qtf','querySjhm','rq1','rq2','sbcds','sfhj','sfsz','sfzh','sscds','syjzf','szrq','yffrq1','yffrq2','zdlx','zdmonth','zhxgr','zhxgsj','zhxm'];
+  // let newHouse = house;
+  // clearFields.map(value=>{
+  //   delete newHouse[value];
+  // })
+  // newHouse._id = utils.id();
+  // console.log('tffy:',newHouse);
+  // await commService.addDoc(commService.getTableName('house',curUser.collid),newHouse);
 }
 exports.tfFy = tfFy;
 

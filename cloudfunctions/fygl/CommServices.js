@@ -12,7 +12,7 @@ const _ = db.command;
 /**
  * 更新表的记录，返回更新成功的记录数
  */
-exports.updateDoc = async (tableName, docObj) => {
+const updateDoc = async (tableName, docObj) => {
   // if (utils.isEmptyObj(docObj))
   //   throw utils.newException('参数异常！');
   const db = cloud.database();
@@ -30,6 +30,8 @@ exports.updateDoc = async (tableName, docObj) => {
   }
   return updatedNum;
 }
+exports.updateDoc = updateDoc;
+
 /**
  * 删除表的记录，返回删除成功的记录数
  */
@@ -195,20 +197,40 @@ const queryGrantcode = async (grantcode,yxq,openId) => {
 }
 exports.queryGrantcode = queryGrantcode;
 
-
-const getAccessToken = async () => {
-  const result = await queryPrimaryDoc('global','AccessToken');
-  if(!result)
-    throw utils.newException('获取AccessToken错误！');
-  // if (utils.currentTimeMillis() - result.createtime > (result.expires_in*1000 - 120*1000)){
-  //   // token.setAccessToken(json.getString("access_token"));
-  //   // token.setExpiresin(json.getInteger("expires_in"));
-  //   const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${result.appId}&secret=${result.appSecret}`;
-  //   result = await utils.requestUrl(url);
-
-  // }
+exports.ocrSfz = async (sfzhCloudFileId) => {
+  const token = await getAccessToken();
+  const url = "http://api.weixin.qq.com/cv/ocr/idcard?type=photo&access_token=" + token;
+  const res = await cloud.downloadFile({
+    fileID: sfzhCloudFileId,
+  })
+  const buffer = res.fileContent;
+  // console.log('ocrsfz:',sfzhCloudFileId,res.fileContent.length);
+  const result = await utils.postFileData(url,buffer);
+  return result;
 }
 
+
+const getAccessToken = async () => {
+  let result = await querySingleDoc('global',{code:'AccessToken'});
+  if(!result)
+    throw utils.newException('获取AccessToken错误！');
+  if (result.createtime && result.expires_in){
+    if(utils.currentTimeMillis() - result.createtime <= result.expires_in*1000 - 120*1000){
+      // console.log('return valid accesstoken!');
+      return result.access_token;
+    }
+  }  
+  const url = `https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${result.appId}&secret=${result.appSecret}`;
+  const token = await utils.requestUrl(url);
+  if(utils.isEmpty(token.access_token))
+    throw utils.newException(token.errmsg, token.errcode);
+  result.createtime = utils.currentTimeMillis();
+  result.access_token = token.access_token;
+  result.expires_in = token.expires_in;
+  const retu = await updateDoc('global',result);
+  return result.access_token;
+}
+exports.getAccessToken = getAccessToken;
 
 exports.testService = async (data) => {
   // const fileID = 'cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/1/fdqm/BIrpF.png'

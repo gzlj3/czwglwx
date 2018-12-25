@@ -24,7 +24,7 @@
           <input class='input_underline' disabled="{{seeHt}}" name='fdxm' id='fdxm' type='text' value='{{currentObject.fdxm}}' bindblur="onInputBlur"></input>
         </view>
         <view class="inputcontainer">
-          <text class="inputlabel_9">甲方身份证号:</text>
+          <text class="inputlabel_9">甲方身份证:</text>
           <input class='input_underline' disabled="{{seeHt}}" name='fdsfzh' id='fdsfzh' type='idcard' value='{{currentObject.fdsfzh}}' bindblur="onInputBlur"></input>
         </view>
         <view class="inputcontainer">
@@ -36,7 +36,7 @@
           <input class='input_underline' disabled="{{seeHt}}" name='zhxm' id='zhxm' type='text'  value='{{currentObject.zhxm}}' bindblur="onInputBlur"></input>
         </view>
         <view class="inputcontainer">
-          <text style="{{(seeHt || grantcode)?'':'color:blue;border-bottom:1rpx solid'}}" class="inputlabel_9" catchtap="onPhotoZksfz">乙方身份证{{(seeHt || grantcode)?'':'(拍照)'}}:</text>
+          <text style="color:blue;border-bottom:1rpx solid" class="inputlabel_9" catchtap="onPhotoZksfz">乙方身份证{{(seeHt || grantcode)?'(查看)':'(拍照)'}}:</text>
           <input class='input_underline' disabled="{{seeHt}}" name='sfzh' id='sfzh' type='idcard' value='{{currentObject.sfzh}}' bindblur="onInputBlur"></input>
         </view>
         <view class="inputcontainer">

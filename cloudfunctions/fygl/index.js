@@ -26,9 +26,9 @@ exports.main = async (event, context) => {
     services.setUser(curUser);
     if (action === 300) {
       //测试发送模板消息
-      // const result = await commService.testService(data);
-      // return results.getSuccessResults(result);
-      return results.getSuccessResults(await utils.testRequest());
+      const result = await commService.getAccessToken(data);
+      return results.getSuccessResults(result);
+      // return results.getSuccessResults(await utils.testRequest());
     }
     let result;
     switch(action){

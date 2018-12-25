@@ -159,6 +159,30 @@ const requestUrl = async (url) => {
 }
 exports.requestUrl = requestUrl;
 
+const postFileData = async (url,fileData) => {
+  const options = {
+    method: 'POST',
+    uri: url,
+    formData: {
+      // Like <input type="file" name="file">
+      file: {
+        value: fileData,
+        options: {
+          filename: '1.jpg',
+          contentType: 'image/*'
+        }
+      }
+    },
+    headers: {
+      // 'content-type': 'application/x-www-form-urlencoded',
+      'content-type': 'multipart/form-data',
+    }
+  };
+  let result = await rp(options);
+  result = JSON.parse(result);
+  return result;
+}
+exports.postFileData = postFileData;
 
 exports.testRequest = async ()=>{
   const token = "16_FVs0ET7q1sXSU0QlIbElKfDve0AXtJaLt6JeP9yX3Vc6aRa26uly555GBiVatr7I7CwdBmvf-jMw8HtGcchmoA_IL63ySJAz-5EitxD8XFqQJBinMKV1NDVxPpQNW-eJPEWaU_Oim9p9gpA7ERXiAEAPCI";
