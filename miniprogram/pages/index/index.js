@@ -340,8 +340,41 @@ Page({
     );
   },
   testPage: function (e) {
-    this.doUpload();
+    wx.navigateTo({
+      url: '/pages/hcecard/hcecard',
+    })
+    // wx.getHCEState({
+    //   success(res) {
+    //     console.log(res.errCode)
+    //   },
+    //   fail(e){
+    //     console.log(e);
+    //   }
+    // })
+    // wx.startHCE({
+    //   aid_list: ['F222222222'],
+    //   success(res) {
+    //     console.log(res.errMsg)
+    //   }
+    // })
+    // const buffer = new ArrayBuffer(1)
+    // const dataView = new DataView(buffer)
+    // dataView.setUint8(0, 0)
+
+    // wx.startHCE({
+    //   aid_list: ['F222222222'],
+    //   success(res) {
+    //     console.log('starthce success.',res);
+    //     wx.onHCEMessage(function (res) {
+    //       console.log('onHCEMessage.', res);
+    //       if (res.messageType === 1) {
+    //         wx.sendHCEMessage({ data: buffer })
+    //       }
+    //     })
+    //   }
+    // })
   },
+
   onShareAppMessage: function(e){
   },
   onbindload:function(e){
@@ -350,43 +383,4 @@ Page({
   onbinderror: function (e) {
     // console.log('onbinderror:',e);
   },
-  // 上传图片
-  doUpload: function () {
-    const token = "16_mcPbSOYyZtOJqFLxXlTiaU242P5UnC03RCrHuqZAPP2vRdgbxjNo8PJKJTWltwBR4EbNcCJWd98tiweRupJINUVFeDQYnDCf6gz1LspY-Erl9WI87_M1Tfn2WgFaU-gnPq9A7G5RvARy_yS_LRTjAIAHNP";
-    const url = "http://api.weixin.qq.com/cv/ocr/idcard?type=photo&access_token=" + token;
-
-    let self = this;
-    wx.chooseImage({
-      count: 1,
-      sizeType: ['compressed'],
-      sourceType: ['album', 'camera'],
-      success: function (res) {
-        //检查文件大小
-        const fileSize = res.tempFiles[0].size;
-        if (fileSize > config.uploadFileMaxSize) {
-          utils.showToast('上传文件大小不能超过：' + (config.uploadFileMaxSize / 1024) + 'k');
-          return;
-        }
-
-        // wx.showLoading({
-        //   title: '上传中',
-        // })
-
-        const filePath = res.tempFilePaths[0]
-        // 上传图片
-        const fileType = filePath.match(/\.[^.]+?$/)[0];
-        // const cloudPath = yzhid + '/' + fwmc + '/' + utils.uuid(5) + fileType;
-        console.log('chooseImage Path:', filePath);
-        wx.uploadFile({
-          url,
-          filePath,
-          name: 'sfzh',
-          success:(res)=>{
-            console.log(res);
-          }
-        })
-      }
-    })
-  }
-
 })

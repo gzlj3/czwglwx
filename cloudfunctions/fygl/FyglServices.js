@@ -36,9 +36,17 @@ exports.queryFyList = async (curUser) => {
     for (let i = 0; i < granted.length; i++) {
       if (!granted[i]) continue;
       const { collid, nickName, yzhid, rights } = granted[i];
-      result = await db.collection(commService.getTableName('house', collid)).orderBy('sfsz','asc').orderBy('fwmc', 'asc').where({
-        yzhid
-      }).get(); 
+      try{
+        result = await db.collection(commService.getTableName('house', collid)).field({htdata:false}).orderBy('sfsz','asc').orderBy('fwmc', 'asc').where({
+          yzhid
+        }).get(); 
+      }catch(e){
+        if (e.errCode === -502005) {
+          result = null;
+        }else{
+          throw e;
+        }
+      }
       //计算费用合计数
       // let czjehj=0,sfhj=0,dfhj=0,fyhj=0;
       // result.data.map(value=>{
@@ -165,14 +173,21 @@ async function querySdbList (curUser,data) {
     if(result) result = Array.of(result);
   }else{
     const szrqCond = moment().startOf('day').add(4, 'days').format('YYYY-MM-DD');
-    console.log('szrqcond:'+szrqCond);
-    result = await db.collection(commService.getTableName('house', collid)).orderBy('fwmc', 'asc').where({
-      yzhid,
-      sfsz: _.in([CONSTS.SFSZ_YJQ, CONSTS.SFSZ_YJZ]),
-      szrq: _.lte(szrqCond),
-    }).get();
-    // console.log('querysdb list:',result);
-    result = result.data;
+    // console.log('szrqcond:'+szrqCond);
+    try{
+      result = await db.collection(commService.getTableName('house', collid)).orderBy('fwmc', 'asc').where({
+        yzhid,
+        sfsz: _.in([CONSTS.SFSZ_YJQ, CONSTS.SFSZ_YJZ]),
+        szrq: _.lte(szrqCond),
+      }).get();
+      result = result.data;
+    }catch (e) {
+      if (e.errCode === -502005) {
+        result = [];
+      } else {
+        throw e;
+      }
+    }
   }
   return result;
 }

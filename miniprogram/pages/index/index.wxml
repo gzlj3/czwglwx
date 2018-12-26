@@ -7,10 +7,10 @@
       <view class="page__desc">极简出租为房东提供简洁高效的房屋出租管理，为租客提供方便快捷的帐单查询。</view> 
   </view>
  <official-account bindload="onbindload" binderror="onbinderror"></official-account>
- <!-- <form bind:submit="testSubmit" report-submit="true" report-submit="true">
+ <form bind:submit="testSubmit" report-submit="true" report-submit="true">
     <button formType="submit">测试服务</button> 
     <button bindtap='testPage'>测试页面</button> 
- </form> -->
+ </form>
   <view class="page__bd page__bd_spacing">
       <view class="grant-container grant-container-wxgrant" wx:if="{{!waitingCloud && !user}}">
         <view class='grant-item'>服务器处理异常</view>

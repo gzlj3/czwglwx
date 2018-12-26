@@ -16,7 +16,7 @@ const zkTempFilePath = 'zkTempFilePath';
 const fdTempFilePath = 'fdTempFilePath';
 const fwptObjectname = 'fwpt';
 
-const httk = '7、乙方租住满三个月后发生的房屋设施（如灯、水龙头、油烟机、洗衣机等）坏，由乙方负责更换或修理。由于乙方原因造成的下水道堵塞由乙方负责清理。\r\n8、乙方要注意安全，搞好环境卫生，不得从高处乱扔垃圾，未经甲方同意，不得养猫狗等动物。\r\n9、未经甲方同意，乙方不得转租、转卖、改变房屋结构，如因乙方管理不善发生水灾、火灾、盗窃及人为破坏行为，法律责任及经济损失由乙方承担。\r\n10、租赁期满时，双方对所租房屋、家具及其它设施进行验收，如有损坏者，由乙负责修复或照价赔偿，退租时把房屋卫生打扫干净，否则从押金扣除房屋清洁费用100元。\r\n';
+const httk = '7、乙方租住满三个月后发生的房屋设施（如灯、水龙头、油烟机、洗衣机等）坏，由乙方负责更换或修理。由于乙方原因造成的下水道堵塞由乙方负责清理。\r\n8、乙方要注意安全，搞好环境卫生，不得从高处乱扔垃圾，未经甲方同意，不得养猫狗等动物。\r\n9、未经甲方同意，乙方不得转租、转卖、改变房屋结构，如因乙方管理不善发生水灾、火灾、盗窃及人为破坏行为，法律责任及经济损失由乙方承担。\r\n10、租赁期满时，双方对所租房屋、家具及其它设施进行验收，如有损坏者，由乙方负责修复或照价赔偿，退租时把房屋卫生打扫干净，否则从押金扣除房屋清洁费用100元。\r\n';
 const fwptattr = [{ label: '空调(台)', name: 'kt' }, { label: '热水器(套)', name: 'rsq' }, { label: '抽油烟机(台)', name: 'yyj' }, { label: '大门钥匙(条)', name: 'dmys' }, { label: '房间钥匙(条)', name: 'fjys' }, { label: '洗衣机(台)', name: 'xyj' }, { label: '冰箱(台)', name: 'bx' }, { label: '沙发(张)', name: 'sf' }, { label: '茶几(张)', name: 'cj' }, { label: '床(张)', name: 'c' }, { label: '衣柜(个)', name: 'yg' }, { label: '书桌(张)', name: 'sz' }, { label: '凳子(张)', name: 'dz' }];
 const fyxxMetas = {
   fdxm:{label:'甲方姓名'},
@@ -30,8 +30,8 @@ const fyxxMetas = {
   htrqq: { label: '合同日期起', name: 'htrqq', type: 'date' },
   htrqz: { label: '合同日期止', name: 'htrqz', type: 'date' },
   jzr: { label: '每月交租日', name: 'szrq', type: 'date' },
-  dscds: { label: '电上次读数', name: 'dscds', type: "number" },
-  sscds: { label: '水上次读数', name: 'sscds', type: "number" },
+  dscds: { label: '电初始读数', name: 'dscds', type: "number" },
+  sscds: { label: '水初始读数', name: 'sscds', type: "number" },
   ddj: { label: '电费单价', name: 'ddj', type: "digit" },
   sdj: { label: '水费单价', name: 'sdj', type: "digit" },
   dgtds: { label: '电公摊度数', name: 'dgtds', type: "digit" },

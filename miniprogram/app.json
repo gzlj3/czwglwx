@@ -1,6 +1,8 @@
 {
   "pages": [
+    "pages/nfc/nfcopt",
     "pages/index/index",
+    "pages/smartcard/smartccard",
     "pages/fygl/htqy/htqy",
     "pages/fygl/fyglmain",
     "pages/fygl/addfy/addfy",
@@ -11,7 +13,8 @@
     "pages/sysmanager/sysconfig/sysconfig",
     "pages/fygl/sendzd/sendzd",
     "pages/sxqm/sxqm",
-    "pages/pageform/pageform"
+    "pages/pageform/pageform",
+    "pages/hcecard/hcecard"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",
