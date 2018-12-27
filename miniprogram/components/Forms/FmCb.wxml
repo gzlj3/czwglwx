@@ -18,7 +18,10 @@
                     <input id="{{index}}.sbcds" type="number" value="{{item.sbcds}}" bindinput="onInputBlur" class="weui-input" placeholder="上月:{{item.sscds}}"/>
                 </view>
                 <view class="weui-cell__ft weui-vcode-btn" wx:if="{{item.sbcds}}">
-                    实用：{{item.sbcds - item.sscds}}
+                    实用:{{item.sbcds - item.sscds}}                    
+                </view>
+                <view class="weui-cell__ft weui-vcode-btn" wx:if="{{item.ssyds}}">
+                    上月:{{item.ssyds}}                    
                 </view>
             </view>
             <view class="weui-cell weui-cell_input">
@@ -29,7 +32,10 @@
                     <input id="{{index}}.dbcds" type="number" value="{{item.dbcds}}" bindinput="onInputBlur" class="weui-input" placeholder="上月:{{item.dscds}}"/>
                 </view>
                 <view class="weui-cell__ft weui-vcode-btn" wx:if="{{item.dbcds}}">
-                    实用：{{item.dbcds - item.dscds}}
+                    实用:{{item.dbcds - item.dscds}}
+                </view>
+                <view class="weui-cell__ft weui-vcode-btn" wx:if="{{item.dsyds}}">
+                    上月:{{item.dsyds}}
                 </view>
             </view>
           </view>

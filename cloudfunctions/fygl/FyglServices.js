@@ -1171,6 +1171,11 @@ function makeHousefy(house, housefy, zdlx,tfrq,flag){
   house.dfhj = housefy.dfhj;
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
+  // console.log('makehousefy:',housefy.ssyds,housefy.dsyds);
+  if(flag !== 'sxzd'){
+    house.ssyds = housefy.ssyds;
+    house.dsyds = housefy.dsyds;
+  }
   //根据当前配置，生成帐单显示月份提示（用后付费或预付费显示）
   let zdlxinfo;
   if (house.zdlx == CONSTS.ZDLX_HTZD) zdlxinfo = '签约';

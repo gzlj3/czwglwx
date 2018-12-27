@@ -331,17 +331,32 @@ Page({
   },
 
   testSubmit: function(e){
-    console.log('testsubmit:',e);
-    const response = fyglService.postData(300, { form_id:e.detail.formId });
-    fyglService.handleAfterRemote(response, '测试服务',
-      (resultData) => {
-        console.log(resultData)
+    // console.log('testsubmit:',e);
+    // const response = fyglService.postData(300, { form_id:e.detail.formId });
+    // fyglService.handleAfterRemote(response, '测试服务',
+    //   (resultData) => {
+    //     console.log(resultData)
+    //   }
+    // );
+    const buffer = new ArrayBuffer(1)
+    const dataView = new DataView(buffer)
+    dataView.setUint8(0, 0)
+    wx.startHCE({
+      aid_list: ['F222222222'],
+      success(res) {
+        console.log('starthce success.',res);
+        wx.onHCEMessage(function (res) {
+          console.log('onHCEMessage.', res);
+          if (res.messageType === 1) {
+            wx.sendHCEMessage({ data: buffer })
+          }
+        })
       }
-    );
+    })
   },
   testPage: function (e) {
     wx.navigateTo({
-      url: '/pages/hcecard/hcecard',
+      url: '/pages/home/home',
     })
     // wx.getHCEState({
     //   success(res) {

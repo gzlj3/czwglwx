@@ -10,7 +10,7 @@
 	},
 	"appid": "wx074eecae1210da4a",
 	"projectname": "czwglwx",
-	"libVersion": "2.4.2",
+	"libVersion": "2.4.3",
 	"condition": {
 		"search": {
 			"current": -1,
@@ -32,7 +32,7 @@
 			"list": [
 				{
 					"id": 0,
-					"name": "测试",
+					"name": "极简出租调试场景",
 					"pathName": "pages/index/index",
 					"query": "",
 					"scene": "1001"
