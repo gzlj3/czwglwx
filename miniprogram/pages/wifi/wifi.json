@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "wifi连接",
-
-  "usingComponents": {
-    "listView":"customView/listView"
-  }
-}

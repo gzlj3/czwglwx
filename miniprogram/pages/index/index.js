@@ -342,52 +342,46 @@ Page({
     const dataView = new DataView(buffer)
     dataView.setUint8(0, 0)
     wx.startHCE({
-      aid_list: ['F222222222'],
+      aid_list: ['0322510487'],
       success(res) {
         console.log('starthce success.',res);
+        utils.showToast('start hce success.');
         wx.onHCEMessage(function (res) {
           console.log('onHCEMessage.', res);
+          utils.showToast('onHCEMessage callback:' + res.messageType);
           if (res.messageType === 1) {
             wx.sendHCEMessage({ data: buffer })
           }
         })
-      }
+      },
+      fail(res) {
+        console.log('starthce fail.', res);
+        utils.showToast('start hce fail.');
+      }     
     })
   },
   testPage: function (e) {
-    wx.navigateTo({
-      url: '/pages/home/home',
+    const buffer = new ArrayBuffer(1)
+    const dataView = new DataView(buffer)
+    dataView.setUint8(0, 0)
+    wx.startHCE({
+      aid_list: ['F222222222'],
+      success(res) {
+        console.log('starthce success.', res);
+        utils.showToast('start hce success.');
+        wx.onHCEMessage(function (res) {
+          console.log('onHCEMessage.', res);
+          utils.showToast('onHCEMessage callback:' + res.messageType);
+          if (res.messageType === 1) {
+            wx.sendHCEMessage({ data: buffer })
+          }
+        })
+      },
+      fail(res){
+        console.log('starthce fail.', res);
+        utils.showToast('start hce fail.');
+      }
     })
-    // wx.getHCEState({
-    //   success(res) {
-    //     console.log(res.errCode)
-    //   },
-    //   fail(e){
-    //     console.log(e);
-    //   }
-    // })
-    // wx.startHCE({
-    //   aid_list: ['F222222222'],
-    //   success(res) {
-    //     console.log(res.errMsg)
-    //   }
-    // })
-    // const buffer = new ArrayBuffer(1)
-    // const dataView = new DataView(buffer)
-    // dataView.setUint8(0, 0)
-
-    // wx.startHCE({
-    //   aid_list: ['F222222222'],
-    //   success(res) {
-    //     console.log('starthce success.',res);
-    //     wx.onHCEMessage(function (res) {
-    //       console.log('onHCEMessage.', res);
-    //       if (res.messageType === 1) {
-    //         wx.sendHCEMessage({ data: buffer })
-    //       }
-    //     })
-    //   }
-    // })
   },
 
   onShareAppMessage: function(e){

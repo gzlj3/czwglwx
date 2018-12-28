@@ -1,5 +1,0 @@
-/* pages/web/html.wxss */
-.webview{
-  width: 100%;
-  height: 100%;
-}

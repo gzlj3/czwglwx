@@ -852,6 +852,8 @@ const htHouse = async (house, housefy, collid) => {
   house.sfhj = lastHousefy.sfhj;
   house.dfhj = lastHousefy.dfhj;
   house.fyhj = lastHousefy.fyhj;
+  house.ssyds = lastHousefy.ssyds;
+  house.dsyds = lastHousefy.dsyds;
   //回退收租日期
   house.szrq = lastHousefy.yffrq2;
 
@@ -888,6 +890,9 @@ function jzHouse(house, housefy, flag) {
   house.sscds=housefy.sbcds;
   house.dbcds="";
   house.sbcds="";
+  //上月水电使用数
+  house.ssyds = housefy.ssyds;
+  house.dsyds = housefy.dsyds;
   if ("jzzd"===flag) {
     // 结转帐单
     house.syjzf=housefy.fyhj;
@@ -1172,10 +1177,10 @@ function makeHousefy(house, housefy, zdlx,tfrq,flag){
   house.fyhj=housefy.fyhj;
   house.housefyid = housefy._id;
   // console.log('makehousefy:',housefy.ssyds,housefy.dsyds);
-  if(flag !== 'sxzd'){
-    house.ssyds = housefy.ssyds;
-    house.dsyds = housefy.dsyds;
-  }
+  // if(flag !== 'sxzd'){
+  //   house.ssyds = housefy.ssyds;
+  //   house.dsyds = housefy.dsyds;
+  // }
   //根据当前配置，生成帐单显示月份提示（用后付费或预付费显示）
   let zdlxinfo;
   if (house.zdlx == CONSTS.ZDLX_HTZD) zdlxinfo = '签约';
