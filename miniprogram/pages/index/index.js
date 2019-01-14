@@ -360,15 +360,15 @@ Page({
       }     
     })
   },
-  testPage: function (e) {
+  testPage: function (e) { 
     const buffer = new ArrayBuffer(1)
     const dataView = new DataView(buffer)
     dataView.setUint8(0, 0)
     wx.startHCE({
-      aid_list: ['F222222222'],
+      aid_list: ['F223344556'],
       success(res) {
         console.log('starthce success.', res);
-        utils.showToast('start hce success.');
+        utils.showToast('start hce success.'); 
         wx.onHCEMessage(function (res) {
           console.log('onHCEMessage.', res);
           utils.showToast('onHCEMessage callback:' + res.messageType);
