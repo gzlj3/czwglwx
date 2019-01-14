@@ -6,7 +6,7 @@ const fyglService = require('../../services/fyglServices.js');
 const config = require('../../config.js');
 const app = getApp()
 
-const menuList = [ 
+const menuList = [
   {
     id: 'form',  
     name: '我的房源列表',

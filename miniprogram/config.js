@@ -1,6 +1,6 @@
-const production = false;
+const production = true;
 exports.conf = {
-  env: production ? 'jjczwgl-bc6ef9' : 'jjczwgl-test-2e296e',
+  env: production ? 'jjczgl-2d82f0' : 'jjczgl-test-aca51e',
   yzmYxq: 2 * 60,   //验证码有效期，2分钟
 }
 exports.uploadFileMaxCount = 5;       //每个房间上传文件最大数 
