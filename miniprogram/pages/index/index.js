@@ -161,7 +161,9 @@ Page({
   onGetUserInfo: function(e) {
     this.setUserData(e.detail.userInfo);
   },
-
+  onGetPhoneNumber: function(e){
+    console.log(e);
+  },
 
   // onGetOpenid: function() {
   //   // 调用云函数

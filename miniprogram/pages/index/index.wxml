@@ -24,6 +24,7 @@
         <view class='grant-item'>
           <button type='primary' open-type="getUserInfo" 
       bindgetuserinfo="onGetUserInfo">微信授权</button>
+          <button open-type="getPhoneNumber" bindgetphonenumber="onGetPhoneNumber">获取手机号</button>
         </view>
       </view>
       <view class="grant-container {{requestUserType?'grant-container-zkzc':''}}" wx:if="{{user && user.wxgranted && user.userType===CONSTS.USERTYPE_NONE}}"> 

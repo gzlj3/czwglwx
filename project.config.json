@@ -9,8 +9,8 @@
 		"newFeature": true
 	},
 	"appid": "wx28d377dcad57d224",
-	"projectname": "czwglwx_new",
-	"libVersion": "2.4.3",
+	"projectname": "czwglwx_qyb",
+	"libVersion": "2.5.0",
 	"condition": {
 		"search": {
 			"current": -1,
