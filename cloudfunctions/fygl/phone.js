@@ -5,6 +5,11 @@ const request = require('request');
 
 //通过榛子云短信平台发送手机短信（http://smsow.zhenzikj.com）
 //其中的appId,appSecret为榛子云平台注册的帐号信息
+// uri: 'http://sms_developer.zhenzikj.com/sms/send.do',
+// appId: '100127',
+//   appSecret: '4d8234e0-9771-4d1c-a673-83c88f943b92',
+
+
 exports.sendPhoneMessage = async (sjhm, message,messageId) => {
   console.log('sendmessagelength:',message.length);
   // if(!config.production) {
@@ -14,10 +19,10 @@ exports.sendPhoneMessage = async (sjhm, message,messageId) => {
   if(!messageId) messageId = utils.currentTimeMillis()+"";
   const options = {
     method: 'POST',
-    uri: 'http://sms_developer.zhenzikj.com/sms/send.do',
+    uri: 'http://sms.zhenzikj.com/sms/send.do',
     form: {
-      appId: '100127',
-      appSecret: '4d8234e0-9771-4d1c-a673-83c88f943b92',
+      appId: '100019',
+      appSecret: '8379f582-35f4-48c2-9f8a-8cd0f2a60a01',
       message,
       messageId,
       number: sjhm
@@ -38,10 +43,10 @@ exports.sendPhoneMessage = async (sjhm, message,messageId) => {
 exports.queryPhoneMessageStatus = async (messageId) => {
   const options = {
     method: 'POST',
-    uri: 'http://sms_developer.zhenzikj.com/smslog/findSmsByMessageId.do',
+    uri: 'http://sms.zhenzikj.com/smslog/findSmsByMessageId.do',
     form: {
-      appId: '100127',
-      appSecret: '4d8234e0-9771-4d1c-a673-83c88f943b92',
+      appId: '100019',
+      appSecret: '8379f582-35f4-48c2-9f8a-8cd0f2a60a01',
       messageId,
     },
     headers: {

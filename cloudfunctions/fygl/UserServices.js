@@ -98,7 +98,7 @@ exports.sendSjyzm = async (data,userInfo) => {
     throw utils.newException('此手机号已经注册，如果非你本人操作，请联系管理员！');
   
   const yzm = utils.getRandom(6);
-  const message="【极简出租】验证码："+yzm+",您正在注册极简出租，验证码2分钟内有效。";
+  const message="验证码："+yzm+",您正在注册极简出租，验证码2分钟内有效。";
   console.log(message);
   // try{ 
     await phone.sendPhoneMessage(sjhm,message);  //短信发送失败会抛出异常

@@ -685,7 +685,7 @@ const sendZdMessage= async (house,housefy,collid,openId)=>{
   let message = getPhoneMessage(housefy);
   message = message.replace(/\r\n/g,'\n');
   // if(message.endsWith('\n')) message = message.substring(0,message.length - 1);  
-  message += '微信搜索【极简出租】关注，查看帐单详情。';
+  message += '微信搜索“极简出租”关注，查看帐单详情。';
   //发送短信
   const messageId = utils.currentTimeMillis()+"";
   await phone.sendPhoneMessage(dhhm,message,messageId);
@@ -766,7 +766,7 @@ const getPhoneMessage = (housefy) => {
   else zdlxinfo = housefy.zdmonth ? housefy.zdmonth : rq1.substring(0, 4) + '年' + rq1.substring(5, 7) + '月';
   const ts1 = housefy.fyhj < 0 ? '退' : '缴';
   const ts2 = housefy.czje < 0 ? '(退)' : '';
-  const s = `${housefy.fwmc}房,${housefy.zhxm},您好:\r\n${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。`;
+  const s = `${housefy.fwmc}房,${housefy.zhxm},您好:${zdlxinfo}应${ts1}费用:${Math.abs(housefy.fyhj)}元。`;
   return s;
 }
 
