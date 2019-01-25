@@ -19,8 +19,10 @@ exports.sendPhoneMessage = async (sjhm, message,messageId) => {
   if(!messageId) messageId = utils.currentTimeMillis()+"";
   const options = {
     method: 'POST',
-    uri: 'http://sms.zhenzikj.com/sms/send.do',
+    // uri: 'https://sms.zhenzikj.com/sms/send.do',
+    uri: 'https://smsdeveloper.zhenzikj.com/sms/send.html',    
     form: {
+      apiUrl: 'https://sms.zhenzikj.com',
       appId: '100019',
       appSecret: '8379f582-35f4-48c2-9f8a-8cd0f2a60a01',
       message,
@@ -43,8 +45,9 @@ exports.sendPhoneMessage = async (sjhm, message,messageId) => {
 exports.queryPhoneMessageStatus = async (messageId) => {
   const options = {
     method: 'POST',
-    uri: 'http://sms.zhenzikj.com/smslog/findSmsByMessageId.do',
+    uri: 'https://smsdeveloper.zhenzikj.com/sms/findSmsByMessageId.html',
     form: {
+      apiUrl: 'https://sms.zhenzikj.com',
       appId: '100019',
       appSecret: '8379f582-35f4-48c2-9f8a-8cd0f2a60a01',
       messageId,
