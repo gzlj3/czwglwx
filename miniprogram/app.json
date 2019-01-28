@@ -11,7 +11,8 @@
     "pages/sysmanager/sysconfig/sysconfig",
     "pages/fygl/sendzd/sendzd",
     "pages/sxqm/sxqm",
-    "pages/pageform/pageform"
+    "pages/pageform/pageform",
+    "pages/comm/showweburl"
   ],
   "window_old": {
     "backgroundColor": "#f6f6f6",

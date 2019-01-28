@@ -1,15 +1,26 @@
 <view class="page">
   <view class="nickname" wx:if="{{user.wxgranted}}">
     {{user.nickName}},欢迎您！
+    <view >    
+      <!-- <image style="width:20px;height:20px;text-align:right" src='../../images/icon_nav_special.png'/> -->
+      <!-- <view class="sawzd">使用手册</view>     -->
+      <view class="sawzd" id='0' bindtap="showweburl">V1.2.2</view>    
+      <view class="sawzd" id='1' bindtap="showweburl" style="margin-left:5px">帮助</view>    
+      <!-- <image style="width:18px;height:18px;margin-left:5px;" src='../../images/icon_intro.png' id='1' bindtap="showweburl"/> -->
+  </view>
   </view> 
+
+  <!-- <web-view src="{{url}}" wx:if="{{url}}"></web-view>  -->
+
   <view class="page__hd">
       <!-- <view class="page__title"></view> --> 
       <view class="page__desc">极简出租为房东提供简洁高效的房屋出租管理，为租客提供方便快捷的帐单查询。</view> 
   </view>
  <official-account bindload="onbindload" binderror="onbinderror"></official-account>
+<!-- <web-view src="http://mp.weixin.qq.com/s?__biz=MzU4MDc1NDE5NQ==&mid=100000010&idx=1&sn=870369006f34d8234f6b32d50d849e69&chksm=7d534f764a24c660e96493aec23d43d5166a9a03729c1fc4445054d59be52a2cf5ebda94fd3e#rd"></web-view> -->
  <!-- <form bind:submit="testSubmit" report-submit="true" >
     <button formType="submit">测试服务</button> 
-    <button bindtap='testPage'>测试页面</button> 
+    <button bindtap='testPage'>测试页面</button>  
  </form> -->
   <view class="page__bd page__bd_spacing">
       <view class="grant-container grant-container-wxgrant" wx:if="{{!waitingCloud && !user}}">
@@ -18,20 +29,38 @@
           <button size='mini' type='primary' ontap='refreshUser'>重新刷新</button>
         </view>
       </view>
-      <view class="grant-container grant-container-wxgrant" wx:if="{{user && !user.wxgranted}}">
-      <!-- <view class="grant-container grant-container-wxgrant"> -->
+      <!-- <view class="grant-container grant-container-wxgrant" wx:if="{{user && !user.wxgranted}}">
         <view class='grant-item'>需要获得您微信公开信息的授权</view>
         <view class='grant-item'>
           <button type='primary' open-type="getUserInfo" 
       bindgetuserinfo="onGetUserInfo">微信授权</button>
         </view>
-      </view>
-      <view class="grant-container {{requestUserType?'grant-container-zkzc':''}}" wx:if="{{user && user.wxgranted && user.userType===CONSTS.USERTYPE_NONE}}"> 
+      </view> -->
+      <!-- <view class="grant-container {{requestUserType?'grant-container-zkzc':''}}" wx:if="{{user && user.wxgranted && user.userType===CONSTS.USERTYPE_NONE}}">  -->
+      <view class="grant-container {{requestUserType?'grant-container-zkzc':''}}" wx:if="{{user && user.userType===CONSTS.USERTYPE_NONE}}"> 
       <!-- <view class="grant-container {{requestUserType?'grant-container-zkzc':''}}" >  -->
-          <view class='grant-item' style="{{requestUserType?'display:none':''}}">请确定您的身份</view>
+        <!-- <view class='grant-item'>微信公开信息授权</view>
+        <view class='grant-item'>
+          <button type='primary' open-type="getUserInfo" 
+      bindgetuserinfo="onGetUserInfo">微信授权</button>
+        </view> -->
+          <!-- <view class='grant-item' style="{{!nickName?'display:none':''}}">房东{{nickName}}邀请你注册</view> -->
           <view class='grant-item'>
+            <view class="weui-cell">
+              <view class='weui-cell__bd'>微信公开信息授权</view>
+              <view class='weui-cell__ft'>
+                <block wx:if="{{user && !user.wxgranted}}">
+          <button size='mini' type='primary' open-type="getUserInfo" bindgetuserinfo="onGetUserInfo">微信授权</button>
+                </block>
+                <block wx:else>
+                  已授权
+                </block>
+              </view>
+            </view>
+
             <form bindsubmit="onRegister">
               <view style="{{requestUserType?'display:none':''}}">
+                <view class='weui-cells__title' >注册身份</view>
                 <radio-group bindchange="radioChange" name='userType'>
                     <label class="weui-cell weui-check__label" wx:for="{{radioItems}}" wx:key="value">
                         <radio class="weui-check" value="{{item.value}}" checked="{{item.checked}}"/>
@@ -39,10 +68,12 @@
                         <view class="weui-cell__bd">{{item.name}}</view>
                         <view class="weui-cell__ft weui-cell__ft_in-radio" wx:if="{{item.checked}}">
                             <icon class="weui-icon-radio" type="success_no_circle" size="16"></icon>
-                        </view>
+                        </view> 
                     </label>
                 </radio-group>
               </view>
+              <view class='weui-cells__title' wx:if="{{nickName}}">注册为房东{{nickName}}的租客</view>
+              <view class='weui-cells__title' wx:else>验证手机号</view>
               <view class="weui-cell weui-cell_input weui-cell_vcode">
                   <!-- <view class="weui-cell__hd">
                       <view class="weui-label">手机号</view>
@@ -67,9 +98,9 @@
                       <view class="weui-vcode-btn">获取验证码</view>
                   </view> -->
               </view>
-              <view class='weui-cell'>
-                <button size='default' type='primary' form-type="submit" style="margin-top:15px">确认</button>
-              </view>
+              <!-- <view class='weui-cell'> -->
+                <button size='default' type='default' form-type="submit" style="margin-top:15px">确认注册</button>
+              <!-- </view> -->
             </form>          
           </view>
       </view>

@@ -319,6 +319,18 @@ exports.sysconfig = async (data, curUser) => {
 exports.grantcode = async (data, curUser) => {
   delete data.message;
   delete data.page;
-  // console.log('grantcode:',data);
+  console.log('grantcode:',data);
+  if(data.flag === 'wxzd'){
+    //发送微信帐单，更新发送的次数
+    const {collid,housefyid} = data;
+    if(!utils.isEmpty(collid) && !utils.isEmpty(housefyid)){
+      await db.collection(commService.getTableName('housefy', collid)).doc(housefyid).update({
+        data: {
+          wxzdNum: _.inc(1),
+          wxzdState:'sendzd',
+        }
+      });
+    }
+  }
   return await commService.addDoc('grantcode',data);
 }

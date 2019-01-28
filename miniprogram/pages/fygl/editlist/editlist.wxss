@@ -243,3 +243,31 @@
 .weui-form-preview__btn_primary {
   color: #0bb20c;
 }
+
+.sendzd {
+  display: inline-block;
+  padding: 0.15em 0.4em;
+  min-width: 8px;
+  border-radius: 18px;
+  /* background-color: #e64340; */
+  background-color:lightsalmon;
+  color: #fff;
+  line-height: 1.2;
+  text-align: center;
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.sawzd {
+  display: inline-block;
+  padding: 0.15em 0.4em;
+  min-width: 8px;
+  border-radius: 18px;
+  /* background-color: #e64340; */
+  background-color: limegreen;
+  color: #fff;
+  line-height: 1.2;
+  text-align: center;
+  font-size: 12px;
+  vertical-align: middle;
+}

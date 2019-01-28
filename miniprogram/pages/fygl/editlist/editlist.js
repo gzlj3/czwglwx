@@ -369,9 +369,14 @@ Page({
   toIndex_zk: function (e) {
     let { grantcodeParas } = this.data;
     let sjhm = '';
-    if (grantcodeParas) sjhm = grantcodeParas.sjhm;
+    let nickName = '';
+    if (grantcodeParas){
+      sjhm = grantcodeParas.sjhm;
+      nickName = grantcodeParas.nickName;
+    }
+    if (utils.isEmpty(nickName)) nickName = '';
     wx.reLaunch({
-      url: '/pages/index/index?requestUserType='+CONSTS.USERTYPE_ZK+'&sjhm='+sjhm
+      url: '/pages/index/index?requestUserType=' + CONSTS.USERTYPE_ZK + '&sjhm=' + sjhm + '&nickName=' + nickName
     })
   },
 

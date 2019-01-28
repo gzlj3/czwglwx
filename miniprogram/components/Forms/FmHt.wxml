@@ -39,9 +39,10 @@
           <text style="color:blue;border-bottom:1rpx solid" class="inputlabel_9" catchtap="onPhotoZksfz">乙方身份证{{(seeHt || grantcode)?'(查看)':'(拍照)'}}:</text>
           <input class='input_underline' disabled="{{seeHt}}" name='sfzh' id='sfzh' type='idcard' value='{{currentObject.sfzh}}' bindblur="onInputBlur"></input>
         </view>
+        <view class="weui-cells__tips" wx:if="{{!seeHt && !grantcode}}">分别拍身份证正面和反面，系统会自动识别</view>
         <view class="inputcontainer">
           <text class="inputlabel_9" style="{{seeHt && !grantcode?'':'color:blue;border-bottom:1rpx solid'}}" catchtap="onsendzk">乙方手机号{{grantcode?'(验证)':(seeHt?'':'(发送)')}}:</text>
-          <input class='input_underline' disabled="{{seeHt}}" name='dhhm' id='dhhm' type='number' value='{{currentObject.dhhm}}' bindblur="onInputBlur"></input>
+          <input class='input_underline' disabled="{{seeHt}}" name='dhhm' id='dhhm' type='number' value='{{currentObject.dhhm}}' bindinput="onInputBlur"></input>
         </view>
         <view class="weui-article__section">
           <view>1、房屋基本信息</view>

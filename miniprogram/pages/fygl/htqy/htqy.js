@@ -182,8 +182,12 @@ Page({
   }, 
 
   uploadZkqm: function(e){
-    const { currentObject } = this.data;
-    const yzhid = getApp().globalData.user.yzhid;
+    const { currentObject, grantcodeParas } = this.data;
+    let yzhid = getApp().globalData.user.yzhid;
+    if (grantcodeParas && !utils.isEmpty(grantcodeParas.yzhid)){
+      yzhid = grantcodeParas.yzhid;
+      console.log('para yzhid:',yzhid);
+    }
     if (!utils.isEmpty(currentObject.zkQmFilePath)) {
       const { currentObject } = this.data;
       const cloudPath = yzhid + '/zkqm/' + utils.uuid(10);
@@ -392,12 +396,14 @@ Page({
 
   toIndex: function (e) {
     let { grantcodeParas } = this.data;
-    let { sjhm, registered } = grantcodeParas;
+    let { sjhm, nickName,registered } = grantcodeParas;
+    if(utils.isEmpty(nickName)) nickName = '';
+    if(utils.isEmpty(sjhm)) sjhm = '';
     let url;
     if (registered){
       url = '/pages/index/index';
     }else{
-      url='/pages/index/index?requestUserType=' + CONSTS.USERTYPE_ZK + '&sjhm=' + sjhm      
+      url='/pages/index/index?requestUserType=' + CONSTS.USERTYPE_ZK + '&sjhm=' + sjhm+'&nickName='+nickName
     }
     wx.reLaunch({url});
   },

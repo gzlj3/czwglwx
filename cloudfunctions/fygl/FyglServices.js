@@ -92,7 +92,7 @@ async function queryLastzdWithGrantcode(params, userInfo) {
   // // console.log('querygrantcode:',result);
   // if(!result)
   //   throw utils.newException('授权码错误或已失效！');
-  const { housefyid, createtime, collid, flag, sjhm, registered} = result;
+  const { housefyid, createtime, collid, flag, sjhm, nickName,registered} = result;
   // if (utils.currentTimeMillis() - createtime >= config.grantcodeYxq){
   if (!result.isValid){
     result = [];
@@ -101,13 +101,26 @@ async function queryLastzdWithGrantcode(params, userInfo) {
     result = await commService.queryPrimaryDoc(commService.getTableName('housefy',collid), housefyid);
     if (!result)
       throw utils.newException('帐单数据不存在！');
+
+    //租客查看帐单后，更新帐单状态为已查看
+    if (!utils.isEmpty(collid) && !utils.isEmpty(housefyid)) {
+      const zkSawZdSj = utils.getCurrentTimestamp();
+      await db.collection(commService.getTableName('housefy', collid)).doc(housefyid).update({
+        data: {
+          wxzdState: 'sawzd',
+          zkSawZdSj,
+          zkSawZdUser: userInfo.openId
+        }
+      });
+    }
+
     result = [result];
   }
   //检查查帐单用户是否已经注册系统
   // const userb = await commService.querySingleDoc('userb',{openId:userInfo.openId});
   // let registered = userb!==null;
   // registered = false;
-  return {sourceList:result,registered,grantcodeParas:{flag,sjhm}};
+  return {sourceList:result,registered,grantcodeParas:{flag,sjhm,nickName}};
 }
 exports.queryLastzdWithGrantcode = queryLastzdWithGrantcode;
 
@@ -334,7 +347,7 @@ const processOcrsfz = async (data, curUser) => {
 }
 
 exports.processHt = async (data, curUser) => {
-  const { openId} = curUser;
+  const { openId, collid, yzhid, nickName} = curUser;
   const { formObject, flag, grantcodeParas, sfzhCloudFileId} = data;
 
   if(flag==='htmb'){
@@ -383,7 +396,7 @@ exports.processHt = async (data, curUser) => {
     if (flag === 'hthc' || flag === 'ocrsfz') 
       return formObject;
     if(flag==='sendzkht')
-      return commService.createGrantcode('个人房屋租赁合同\r\n租客签名确认！\r\n\r\n请在30分钟内确认。', { page:'/pages/fygl/htqy/htqy',htid,flag,sjhm:formObject.dhhm,noclipboard:'1'});
+      return commService.createGrantcode('个人房屋租赁合同\r\n租客签名确认！\r\n\r\n请在30分钟内确认。', { page:'/pages/fygl/htqy/htqy',htid,flag,sjhm:formObject.dhhm,collid,yzhid,nickName,noclipboard:'1'});
     if (flag === 'htsave') {
       //签约完成
       //计算下次收租日期
@@ -452,8 +465,16 @@ const saveFy = async (house,collid,curUser) => {
   // console.log('querysingleDoc:', commService.getTableName('house', collid), { yzhid, _id: _.neq(house._id), fwmc: house.fwmc })
   result = await commService.querySingleDoc(commService.getTableName('house',collid),{yzhid,_id:_.neq(house._id),fwmc:house.fwmc});
   // console.log(result); 
-  if(result)
-    throw utils.newException("房屋编号已经存在！");
+  if(result){
+    //如果是新增房源，如果原房屋为未出租，则可以覆盖原房屋(先删除此房屋)
+    if(utils.isEmpty(result.zhxm)){
+      const num = await commService.removeDoc(commService.getTableName('house', collid), result._id);
+      if(num<1) 
+        throw utils.newException("房屋编号已经存在，删除处理异常！");
+    }else{
+      throw utils.newException("房屋编号已经存在！");
+    }
+  }
   let { _id: saveHouseid, dhhm, avatarUrl } = house;
   //处理所有租户查询手机号码
   let querySjhm = ',';
@@ -589,29 +610,29 @@ async function tfFy(data,curUser){
   await commService.addDoc('house_tf', house);
   //由于新加了合同签约，因此，退房后，直接将房屋数据删除
   // console.log('tffy:',house);
-  await deleteFy(data,curUser);
+  // await deleteFy(data,curUser);
 
   // 房源数据保存进退房表后，再删除数据
-  // await commService.removeDoc(commService.getTableName('house',collid),house._id);
-  // if (housefyList) {
-  //   for (let i = 0; i < housefyList.length; i++) {
-  //     await commService.removeDoc(commService.getTableName('housefy',collid), housefyList[i]._id);
-  //   }
-  // }
-  // //删除房屋图片
-  // if (house.photos && house.photos.length > 0) {
-  //   await cloud.deleteFile({ fileList: house.photos });
-  // }
+  await commService.removeDoc(commService.getTableName('house',collid),house._id);
+  if (housefyList) {
+    for (let i = 0; i < housefyList.length; i++) {
+      await commService.removeDoc(commService.getTableName('housefy',collid), housefyList[i]._id);
+    }
+  }
+  //删除房屋图片
+  if (house.photos && house.photos.length > 0) {
+    await cloud.deleteFile({ fileList: house.photos });
+  }
 
-  // //保留现有房屋数据，但将其置为空房
-  // const clearFields = ['aratarUrl', 'bz', 'dbcds', 'dfhj', 'dhhm', 'dscds', 'fyhj', 'housefyid', 'htrqq', 'htrqz', 'lrr', 'lrsj','moreZh','photos','qtf','querySjhm','rq1','rq2','sbcds','sfhj','sfsz','sfzh','sscds','syjzf','szrq','yffrq1','yffrq2','zdlx','zdmonth','zhxgr','zhxgsj','zhxm'];
-  // let newHouse = house;
-  // clearFields.map(value=>{
-  //   delete newHouse[value];
-  // })
-  // newHouse._id = utils.id();
-  // console.log('tffy:',newHouse);
-  // await commService.addDoc(commService.getTableName('house',curUser.collid),newHouse);
+  //保留现有房屋数据，但将其置为空房
+  const clearFields = ['aratarUrl', 'bz', 'dbcds', 'dfhj', 'dhhm', 'dscds', 'fyhj', 'housefyid', 'htrqq', 'htrqz', 'lrr', 'lrsj','moreZh','photos','qtf','querySjhm','rq1','rq2','sbcds','sfhj','sfsz','sfzh','sscds','syjzf','szrq','yffrq1','yffrq2','zdlx','zdmonth','zhxgr','zhxgsj','zhxm'];
+  let newHouse = house;
+  clearFields.map(value=>{
+    delete newHouse[value];
+  })
+  newHouse._id = utils.id();
+  console.log('tffy:',newHouse);
+  await commService.addDoc(commService.getTableName('house',curUser.collid),newHouse);
 }
 exports.tfFy = tfFy;
 
@@ -771,7 +792,7 @@ const getPhoneMessage = (housefy) => {
 }
 
 const processQrsz = async (params,curUser) => {
-  // const {collid} = curUser;
+  const {nickName} = curUser;
   const { housefyid, flag,collid } = params;
   const db = cloud.database();
   const _ = db.command;
@@ -802,7 +823,7 @@ const processQrsz = async (params,curUser) => {
     // const grantcode = utils.uuid(16);
     // const createtime = utils.currentTimeMillis();
     return commService.createGrantcode(message, {
-      page:'/pages/fygl/editlist/editlist',collid, housefyid: housefy._id,flag,sjhm:house.dhhm});
+      page: '/pages/fygl/editlist/editlist', collid, nickName,housefyid: housefy._id,flag,sjhm:house.dhhm});
     // return { message, collid, housefyid: housefy._id, grantcode, createtime, flag, sjhm: house.dhhm };
   } else if ("sendsjdx" === flag) {
     await sendZdMessage(house, housefy, collid, curUser.openId);

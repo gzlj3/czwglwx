@@ -176,10 +176,11 @@ const getTableName = (tableName, collid) => {
 }
 exports.getTableName = getTableName;
 
-const createGrantcode = (message, otherObj) => {
+const createGrantcode = (message, otherObj,curUser) => {
   const grantcode = utils.uuid(16);
   const createtime = utils.currentTimeMillis();
-  return { message, grantcode, createtime, ...otherObj };
+  const lrsj = utils.getCurrentTimestamp();
+  return { message, grantcode, createtime,lrsj, ...otherObj };
 }
 exports.createGrantcode = createGrantcode;
 

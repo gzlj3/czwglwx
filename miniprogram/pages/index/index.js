@@ -8,7 +8,7 @@ const app = getApp()
 
 const menuList = [ 
   {
-    id: 'form',  
+    id: 'form',
     name: '我的房源列表',
     open: false,
     page: '../fygl/fyglmain'
@@ -67,6 +67,7 @@ Page({
     list:menuList,
     zkMenuList,
     sjhm:'',
+    nickName:'',
     sendingYzm:false,
     second:config.conf.yzmYxq,
     CONSTS,
@@ -81,9 +82,10 @@ Page({
   
   onLoad: function (options) {
     // console.log(moment([moment().year(),moment().month(),0]).isValid());    
-    
+    console.log('index onload:',options);
     let requestUserType = options.requestUserType ? options.requestUserType:'';
     const sjhm = !utils.isEmpty(options.sjhm) ? options.sjhm : '';
+    const nickName = !utils.isEmpty(options.nickName) ? options.nickName : '';
     let {radioItems,disabledSjhm} = this.data;
     if (requestUserType === CONSTS.USERTYPE_ZK){
       radioItems[0].checked = false;
@@ -93,7 +95,7 @@ Page({
       disabledSjhm = true;
       if (utils.isEmpty(requestUserType)) requestUserType = CONSTS.USERTYPE_ZK;
     }
-    this.setData({ requestUserType, sjhm, disabledSjhm });
+    this.setData({ requestUserType, sjhm, disabledSjhm,nickName });
     this.waitingCloudNormal();
   },  
 
@@ -229,11 +231,15 @@ Page({
   },
 
   onRegister: function(e) { 
-    const {requestUserType} = this.data;
+    const {requestUserType,user} = this.data;
     if(!utils.isEmpty(requestUserType)){
       e.detail.value.userType = requestUserType;
     }
-    console.log(e.detail.value);
+    // console.log(e.detail.value);
+    if (user && !user.wxgranted) {
+      utils.showToast('微信公开信息未授权！');
+      return;
+    }
 
     const {sjhm,sjyzm} = e.detail.value;
     if (!utils.checkSjhm(sjhm) || utils.isEmpty(sjyzm) || sjyzm.length!==6) {
@@ -285,7 +291,16 @@ Page({
     //   this.setData({ user: app.globalData.user });
     // }
   },  
-
+  showweburl:function(e){
+    const {id} = e.target;
+    // console.log(e.target.dataset);
+    // const s = JSON.stringify(e.target.dataset);
+    // console.log('url:', s);
+    // this.setData({url});
+    wx.navigateTo({
+      url: '../comm/showweburl?item='+id,
+    })
+  },
   // seeLastzd: function(){
   //   wx.navigateTo({
   //     url: '../fygl/fyglmain',
