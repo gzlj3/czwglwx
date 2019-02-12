@@ -81,14 +81,18 @@ Page({
   },
   
   onLoad: function (options) {
-    // console.log(moment([moment().year(),moment().month(),0]).isValid());    
+    // let d1 = moment('2019-1-1');  
+    // let d2 = moment('2018-12-1');  
+    // console.log("===month:",d1.diff(d2,'months'));    
+    // console.log("===days:", d1.diff(d2, 'days'));    
+
     console.log('index onload:',options);
     let requestUserType = options.requestUserType ? options.requestUserType:'';
     const sjhm = !utils.isEmpty(options.sjhm) ? options.sjhm : '';
     const nickName = !utils.isEmpty(options.nickName) ? options.nickName : '';
     let {radioItems,disabledSjhm} = this.data;
     if (requestUserType === CONSTS.USERTYPE_ZK){
-      radioItems[0].checked = false;
+      radioItems[0].checked = false; 
       radioItems[1].checked = true;
     }
     if(!utils.isEmpty(sjhm) && utils.checkSjhm(sjhm)){

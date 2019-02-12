@@ -13,14 +13,7 @@
     "pages/sxqm/sxqm",
     "pages/pageform/pageform",
     "pages/comm/showweburl"
-  ],
-  "window_old": {
-    "backgroundColor": "#f6f6f6",
-    "backgroundTextStyle": "black",
-    "navigationBarBackgroundColor": "#f6f6f6",
-    "navigationBarTitleText": "极简出租",
-    "navigationBarTextStyle": "black"
-  },
+  ], 
   "window": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "极简出租",

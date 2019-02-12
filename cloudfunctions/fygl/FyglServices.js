@@ -1095,10 +1095,11 @@ function makeHousefy(house, housefy, zdlx,tfrq,flag){
       throw utils.newException("合同起始日期不合法！");
     yffrq2 = szrq.clone();//.subtract(1,'days');
     const days = yffrq2.diff(yffrq1,'days');// + 1;
+    const months = yffrq2.diff(yffrq1, 'months');// + 1;
     if (days < 0)
       throw utils.newException("下次收租日期不能小于合同起始日期！");
     let yzj;
-    if (days == 30 || days == 31){
+    if (days == 30 || days == 31 || (months===1 && days<=31)){
       yzj = house.czje;
     }else{
       yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同签约时月租金
