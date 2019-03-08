@@ -34,8 +34,8 @@
 					"id": 0,
 					"name": "极简出租调试场景",
 					"pathName": "pages/index/index",
-					"query": "requestUserType='2'&sjhm=13332875650&nickName=馨馨",
-					"scene": "1001"
+					"query": "requestUserType=2&sjhm=13332875650&nickName=馨馨",
+					"scene": 1001
 				}
 			]
 		}

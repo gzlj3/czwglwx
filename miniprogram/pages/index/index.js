@@ -350,57 +350,57 @@ Page({
   },
 
   testSubmit: function(e){
-    // console.log('testsubmit:',e);
-    // const response = fyglService.postData(300, { form_id:e.detail.formId });
-    // fyglService.handleAfterRemote(response, '测试服务',
-    //   (resultData) => {
-    //     console.log(resultData)
-    //   }
-    // );
-    const buffer = new ArrayBuffer(1)
-    const dataView = new DataView(buffer)
-    dataView.setUint8(0, 0)
-    wx.startHCE({
-      aid_list: ['0322510487'],
-      success(res) {
-        console.log('starthce success.',res);
-        utils.showToast('start hce success.');
-        wx.onHCEMessage(function (res) {
-          console.log('onHCEMessage.', res);
-          utils.showToast('onHCEMessage callback:' + res.messageType);
-          if (res.messageType === 1) {
-            wx.sendHCEMessage({ data: buffer })
-          }
-        })
-      },
-      fail(res) {
-        console.log('starthce fail.', res);
-        utils.showToast('start hce fail.');
-      }     
-    })
+    console.log('testsubmit:',e);
+    const response = fyglService.postData(300, { form_id:e.detail.formId });
+    fyglService.handleAfterRemote(response, '测试服务',
+      (resultData) => {
+        console.log(resultData)
+      }
+    );
+    // const buffer = new ArrayBuffer(1)
+    // const dataView = new DataView(buffer)
+    // dataView.setUint8(0, 0)
+    // wx.startHCE({
+    //   aid_list: ['0322510487'],
+    //   success(res) {
+    //     console.log('starthce success.',res);
+    //     utils.showToast('start hce success.');
+    //     wx.onHCEMessage(function (res) {
+    //       console.log('onHCEMessage.', res);
+    //       utils.showToast('onHCEMessage callback:' + res.messageType);
+    //       if (res.messageType === 1) {
+    //         wx.sendHCEMessage({ data: buffer })
+    //       }
+    //     })
+    //   },
+    //   fail(res) {
+    //     console.log('starthce fail.', res);
+    //     utils.showToast('start hce fail.');
+    //   }     
+    // })
   },
   testPage: function (e) { 
-    const buffer = new ArrayBuffer(1)
-    const dataView = new DataView(buffer)
-    dataView.setUint8(0, 0)
-    wx.startHCE({
-      aid_list: ['F223344556'],
-      success(res) {
-        console.log('starthce success.', res);
-        utils.showToast('start hce success.'); 
-        wx.onHCEMessage(function (res) {
-          console.log('onHCEMessage.', res);
-          utils.showToast('onHCEMessage callback:' + res.messageType);
-          if (res.messageType === 1) {
-            wx.sendHCEMessage({ data: buffer })
-          }
-        })
-      },
-      fail(res){
-        console.log('starthce fail.', res);
-        utils.showToast('start hce fail.');
-      }
-    })
+    // const buffer = new ArrayBuffer(1)
+    // const dataView = new DataView(buffer)
+    // dataView.setUint8(0, 0)
+    // wx.startHCE({
+    //   aid_list: ['F223344556'],
+    //   success(res) {
+    //     console.log('starthce success.', res);
+    //     utils.showToast('start hce success.'); 
+    //     wx.onHCEMessage(function (res) {
+    //       console.log('onHCEMessage.', res);
+    //       utils.showToast('onHCEMessage callback:' + res.messageType);
+    //       if (res.messageType === 1) {
+    //         wx.sendHCEMessage({ data: buffer })
+    //       }
+    //     })
+    //   },
+    //   fail(res){
+    //     console.log('starthce fail.', res);
+    //     utils.showToast('start hce fail.');
+    //   }
+    // })
   },
 
   onShareAppMessage: function(e){

@@ -184,42 +184,62 @@ const postFileData = async (url,fileData) => {
 }
 exports.postFileData = postFileData;
 
-exports.testRequest = async ()=>{
-  const token = "16_FVs0ET7q1sXSU0QlIbElKfDve0AXtJaLt6JeP9yX3Vc6aRa26uly555GBiVatr7I7CwdBmvf-jMw8HtGcchmoA_IL63ySJAz-5EitxD8XFqQJBinMKV1NDVxPpQNW-eJPEWaU_Oim9p9gpA7ERXiAEAPCI";
-  const url = "http://api.weixin.qq.com/cv/ocr/idcard?type=photo&access_token="+token;
+exports.testRequest = async (token)=>{
+  // const token = "16_FVs0ET7q1sXSU0QlIbElKfDve0AXtJaLt6JeP9yX3Vc6aRa26uly555GBiVatr7I7CwdBmvf-jMw8HtGcchmoA_IL63ySJAz-5EitxD8XFqQJBinMKV1NDVxPpQNW-eJPEWaU_Oim9p9gpA7ERXiAEAPCI";
+  const url = "https://api.weixin.qq.com/cgi-bin/wxaapp/createwxaqrcode?access_token="+token;
   // return await requestOtherUrl(url);
-  const fileID = 'cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/1/200/Hu0Xp.jpg'
-  const res = await cloud.downloadFile({
-    fileID,
-  })
-  const buffer = res.fileContent;
-  console.log('filelength:',buffer.length);
+  // const fileID = 'cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/1/200/Hu0Xp.jpg'
+  // const res = await cloud.downloadFile({
+  //   fileID,
+  // })
+  // const buffer = res.fileContent;
+  // console.log('filelength:',buffer.length);
   // return buffer.toString('utf8')  
+  // ?requestUserType = 2 & sjhm=13332875650 & nickName=馨馨
+  const body = JSON.stringify({
+    // access_token:token,
+    // path: 'pages/index/index'
+  });
+
   const options = {
     method: 'POST',
     uri: url,
-    // body: buffer,
-    formData: {
-      // Like <input type="file" name="file">
-      file: {
-        value: buffer,
-        options: {
-          filename: 'test.jpg',
-          contentType: 'image/jpg'
-        }
-      }
+    body:{
+      path:'aaaaa'
     },
-    headers: {
-      // 'content-type': 'application/x-www-form-urlencoded',
-      'content-type': 'multipart/form-data',
-      
-    }
+    json: true
+    // formData: {
+    //   // Like <input type="file" name="file">
+    //   file: {
+    //     value: buffer,
+    //     options: {
+    //       filename: 'test.jpg',
+    //       contentType: 'image/jpg'
+    //     }
+    //   }
+    // },
+    // headers: {
+    //   // 'content-type': 'application/x-www-form-urlencoded',
+    //   'content-type': 'multipart/form-data',      
+    // }
   };
   // console.log('请求URL:', options);
-  let result = await rp(options);
+  // let result = await rp(options);
+  // let buffer = await rp(options);
   // result = JSON.parse(result);
-  console.log(result);
-  return result;
+  // console.log('buffer length:', buffer.length);
+  // const result = await cloud.uploadFile({
+  //   cloudPath: 'qrcode3.jpg',
+  //   fileContent: buffer.data,
+  // });
+  // console.log(result);
+
+  const res = await cloud.downloadFile({
+    fileID: 'cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/1/fdqm/BIrpF.png',
+  })
+  const buffer = res.fileContent;
+
+  return buffer.length;
 
 }
 
@@ -236,8 +256,13 @@ const requestOtherUrl = async (url,data, curUser) => {
   };
   console.log('请求URL:', options);
   let result = await rp(options);
-  // result = JSON.parse(result);
-  console.log(result);
+  // // result = JSON.parse(result);
+  // console.log(buffer.length);
+  // const result = await cloud.uploadFile({
+  //   cloudPath: 'qrcode.jpg',
+  //   fileContent: buffer,
+  // });
+
   return result;
 }
 exports.requestOtherUrl = requestOtherUrl;
