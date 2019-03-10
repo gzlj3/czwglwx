@@ -1026,6 +1026,7 @@ function makeHousefy(house, housefy, zdlx,tfrq,flag){
       yzj = -house.czje;
       daysinfo = '退1个月租金';
     }else{
+      // if(days<0) days += 1;   (3.7 计算退租金时，应少退一天，待调试)
       yzj = Math.round((utils.getFloat(house.czje) / 30) * days); // 计算合同退房时月租金
       daysinfo = (days>0?'补':'退')+(Math.abs(days))+'天租金';
     }

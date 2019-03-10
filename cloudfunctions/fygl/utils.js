@@ -192,54 +192,30 @@ exports.testRequest = async (token)=>{
   // const res = await cloud.downloadFile({
   //   fileID,
   // })
-  // const buffer = res.fileContent;
-  // console.log('filelength:',buffer.length);
-  // return buffer.toString('utf8')  
-  // ?requestUserType = 2 & sjhm=13332875650 & nickName=馨馨
   const body = JSON.stringify({
     // access_token:token,
     // path: 'pages/index/index'
   });
-
+  const path = 'pages/index/index?requestUserType=2&sjhm=13332875650&nickName=馨馨';
+  console.log('path length:',path.length);
   const options = {
     method: 'POST',
     uri: url,
     body:{
-      path:'aaaaa'
+      path
     },
-    json: true
-    // formData: {
-    //   // Like <input type="file" name="file">
-    //   file: {
-    //     value: buffer,
-    //     options: {
-    //       filename: 'test.jpg',
-    //       contentType: 'image/jpg'
-    //     }
-    //   }
-    // },
-    // headers: {
-    //   // 'content-type': 'application/x-www-form-urlencoded',
-    //   'content-type': 'multipart/form-data',      
-    // }
+    json: true,
+    encoding:null
   };
-  // console.log('请求URL:', options);
-  // let result = await rp(options);
-  // let buffer = await rp(options);
-  // result = JSON.parse(result);
-  // console.log('buffer length:', buffer.length);
-  // const result = await cloud.uploadFile({
-  //   cloudPath: 'qrcode3.jpg',
-  //   fileContent: buffer.data,
-  // });
-  // console.log(result);
 
-  const res = await cloud.downloadFile({
-    fileID: 'cloud://jjczwgl-test-2e296e.6a6a-jjczwgl-test-2e296e/1/fdqm/BIrpF.png',
-  })
-  const buffer = res.fileContent;
+  let buffer = await rp(options);
+  // console.log('buffer:', buffer);
+  const result = await cloud.uploadFile({
+    cloudPath: 'qrcode9.jpg',
+    fileContent: buffer,
+  });
 
-  return buffer.length;
+  return path.length;
 
 }
 
